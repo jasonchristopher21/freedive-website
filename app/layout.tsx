@@ -19,6 +19,10 @@ export const metadata = {
   description: "The fastest way to build apps with Next.js and Supabase",
 };
 
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { NO_SIDEBAR_PATHS } from "@/constants";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,12 +37,19 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="min-h-screen flex flex-col items-center">
-            <Header />
-            <div className="flex flex-col gap-2 items-center w-full max-w-screen-xl min-h-[90vh] h-full mx-auto px-4">
-              {children}
-            </div>
-          </main>
+          <SidebarProvider>
+            <main className="min-h-screen flex flex-col items-center">
+              <Header />
+              <div className="flex justify-start w-full">
+                <AppSidebar />
+                {/* <div className="flex flex-col gap-2 items-center w-full max-w-screen-xl min-h-[90vh] h-full mx-auto px-4"> */}
+                <div className="flex flex-col gap-2 items-center w-full max-w-screen-xl min-h-[90vh] h-full mx-auto px-4">
+                {children}
+                </div>
+                {/* </div> */}
+                </div>
+            </main>
+          </SidebarProvider>
         </ThemeProvider>
       </body>
     </html>
