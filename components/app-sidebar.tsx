@@ -13,10 +13,15 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
+  Calendar,
+  CalendarPlus,
+  Users,
+  FileSpreadsheet,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
+import { NavItem } from "@/components/nav-item"
 import { NavUser } from "@/components/nav-user"
 import { NavFooter } from "@/components/nav-footer"
 import { TeamSwitcher } from "@/components/team-switcher"
@@ -32,34 +37,20 @@ import { NO_SIDEBAR_PATHS } from "@/constants"
 
 // This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
   navMain: [
+    {
+      title: "Sessions",
+      url: "#",
+      icon: SquareTerminal, 
+      isActive: true,
+      items: [
+
+      ]
+    },
     {
       title: "Playground",
       url: "#",
       icon: SquareTerminal,
-      isActive: true,
       items: [
         {
           title: "History",
@@ -141,22 +132,29 @@ const data = {
       ],
     },
   ],
-  projects: [
+  userView: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
+      name: "Sessions",
+      url: "/sessions",
+      icon: Calendar
+    }
+  ],
+  adminView: [
+    {
+      name: "Add Sessions",
+      url: "/sessions/add",
+      icon: CalendarPlus
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
+      name: "Manage Users",
+      url: "/users",
+      icon: Users
     },
     {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
+      name: "Reports",
+      url: "/reports",
+      icon: FileSpreadsheet
+    }
   ],
   footer: [
     {
@@ -180,8 +178,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavItem items={data.userView} title="Menu" />
+        <NavItem items={data.adminView} title="Admin" />
       </SidebarContent>
       <SidebarFooter>
         <NavFooter items={data.footer} />
