@@ -29,7 +29,7 @@ export default function SessionBox({ props }: { props: SessionBoxProps }) {
               <span className="text-grey-500 text-[14px]">{props.numPax}</span>
             </div>
             {props.levels.map((level) => (
-              <LevelLabel label={level} />
+              <LevelLabel label={level} key={level} />
             ))}
           </div>
         </div>
