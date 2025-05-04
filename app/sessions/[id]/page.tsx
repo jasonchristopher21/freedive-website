@@ -79,7 +79,7 @@ export default function Page() {
               </div>
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {dummyData.levels.map((level) => (
-                  <LevelLabel label={level} />
+                  <LevelLabel label={level} key={level} />
                 ))}
               </div>
             </div>
