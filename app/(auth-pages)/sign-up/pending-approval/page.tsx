@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import pendingApproval from "../../assets/img/pending-approval.svg";
+import pendingApproval from "../../../assets/img/pending-approval.svg";
 import styles from "@/app/styles";
 import { useRouter } from "next/navigation";
 
@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 export default function PendingPage() {
   const router = useRouter();
   return (
-    <div className="flex flex-col items-center justify-center text-center max-w-xl h-[70vh] text-gray-800 md:mx-0 mx-10">
+    <div className="flex flex-col items-center justify-center text-center max-w-xl h-[70vh] text-gray-800 md:mx-0 mx-10 mb-12">
       <Image
         src={pendingApproval}
         alt="Pending Approval"
