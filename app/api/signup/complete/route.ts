@@ -1,5 +1,20 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/dist/server/api-utils";
+
+function convertToYearOfStudy(year: string | number): string {
+  const yearOfStudyMap: Record<string, string> = {
+    "1": "YEAR_1",
+    "2": "YEAR_2",
+    "3": "YEAR_3",
+    "4": "YEAR_4",
+    "5": "Others",
+    Graduate: "Graduate",
+    Alumni: "Alumni",
+    Others: "Others",
+  };
+  return yearOfStudyMap[year.toString()] || "Others";
+}
 
 export async function POST(req: Request) {
   const supabase = await createClient();
@@ -38,8 +53,9 @@ export async function POST(req: Request) {
   }
 
   // Default role
-  let accessRole: "MEMBER" | "PENDING" = "PENDING";
-  let roleId: string | null = null;
+  let accessRole: string = "MEMBER"; // Default role
+  let roleId: string = "544ad654-3960-4f19-b193-d1dea0ee679b"; // Default roleId
+  let level: string = "BEGINNER"; // Default level
 
   // Check access code
   if (accessCode) {
@@ -64,10 +80,11 @@ export async function POST(req: Request) {
     email: user.email,
     nusnetEmail,
     yearOfEntry,
-    yearOfStudy,
+    yearOfStudy: convertToYearOfStudy(yearOfStudy),
     remarks,
     accessRole,
     roleId,
+    level,
   });
 
   if (userInsertError) {
@@ -77,15 +94,8 @@ export async function POST(req: Request) {
     );
   }
 
-  // Create Profile (optional)
-  await supabase.from("Profile").insert({
-    id: user.id,
-    name,
-    createdAt: new Date().toISOString(),
-  });
-
   return NextResponse.json({
     status: "success",
-    access: accessRole === "PENDING" ? "pending" : "granted",
+    redirect: "/auth/redirect",
   });
 }

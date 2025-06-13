@@ -1,8 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { createClient } from "@/utils/supabase/client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -62,9 +64,9 @@ const formSchema = z.object({
 });
 
 export default function ProfileForm() {
-
   const searchParams = useSearchParams();
   const accessCode = searchParams.get("accessCode");
+  const supabase = createClient();
 
   console.log("accessCode from searchParams:", accessCode);
 
@@ -86,7 +88,26 @@ export default function ProfileForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    fetch("/api/signup/complete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    })
+      .then((response) => {
+        if (response.ok) {
+          window.location.href = "/auth/redirect";
+        } else {
+          return response.json().then((data) => {
+            throw new Error(data.error || "Something went wrong");
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error during signup:", error);
+        alert(error.message);
+      });
   }
   return (
     <div className="py-10">
