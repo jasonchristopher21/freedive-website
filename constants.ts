@@ -13,5 +13,6 @@ export const NO_SIDEBAR_PATHS = [
     "/sign-up",
     "/sign-up/form",
     "/sign-up/pending-approval",
+    "/auth/redirect",
     "/register"
 ]

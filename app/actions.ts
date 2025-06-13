@@ -15,7 +15,7 @@ export const signUpAction = async (formData: FormData) => {
     return encodedRedirect(
       "error",
       "/sign-up",
-      "Email and password are required",
+      "Email and password are required"
     );
   }
 
@@ -23,19 +23,43 @@ export const signUpAction = async (formData: FormData) => {
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: `${origin}/api/auth/callback`,
+    },
+  });
+
+  // If there's an error, log it and redirect to the sign-up page with an error message.
+  // Usually for the case of user already registered with the email.
+  if (error) {
+    console.error("Sign Up Error: " + error.code + " " + error.message);
+    switch (error.code) {
+      case "user_already_exists":
+        return encodedRedirect(
+          "error",
+          "/sign-up",
+          "A user already exists with this email. Please sign in instead."
+        );
+      default:
+        return encodedRedirect("error", "/sign-up", error.message);
+    }
+  } else {
+    return redirect("/auth/redirect");
+  }
+};
+
+export const signUpWithGoogleAction = async () => {
+  const supabase = await createClient();
+  const origin = (await headers()).get("origin");
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${origin}/api/auth/callback`, // or your preferred callback URL
     },
   });
 
   if (error) {
-    console.error(error.code + " " + error.message);
+    console.error("OAuth Error " + error.code + " " + error.message);
     return encodedRedirect("error", "/sign-up", error.message);
-  } else {
-    return encodedRedirect(
-      "success",
-      "/sign-up",
-      "Thanks for signing up! Please check your email for a verification link.",
-    );
   }
 };
 
@@ -53,7 +77,7 @@ export const signInAction = async (formData: FormData) => {
     return encodedRedirect("error", "/sign-in", error.message);
   }
 
-  return redirect("/protected");
+  return redirect("/auth/redirect");
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {
@@ -67,7 +91,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
   }
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?redirect_to=/protected/reset-password`,
+    redirectTo: `${origin}/api/auth/callback?redirect_to=/protected/reset-password`,
   });
 
   if (error) {
@@ -75,7 +99,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
     return encodedRedirect(
       "error",
       "/forgot-password",
-      "Could not reset password",
+      "Could not reset password"
     );
   }
 
@@ -86,7 +110,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
   return encodedRedirect(
     "success",
     "/forgot-password",
-    "Check your email for a link to reset your password.",
+    "Check your email for a link to reset your password."
   );
 };
 
@@ -100,7 +124,7 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Password and confirm password are required",
+      "Password and confirm password are required"
     );
   }
 
@@ -108,7 +132,7 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Passwords do not match",
+      "Passwords do not match"
     );
   }
 
@@ -120,7 +144,7 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Password update failed",
+      "Password update failed"
     );
   }
 
