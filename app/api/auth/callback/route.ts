@@ -19,6 +19,8 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}${redirectTo}`);
   }
 
+  console.log("Internal redirect executed");
+  
   // URL to redirect to after sign up process completes
-  return NextResponse.redirect(`${origin}/protected`);
+  return NextResponse.redirect(`${origin}/auth/redirect`);
 }

@@ -8,6 +8,7 @@ import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
 import Header from "@/components/Header";
+import StoreProvider from "./StoreProvider";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -31,26 +32,28 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-background text-foreground">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SidebarProvider>
-            <main className="min-h-screen flex flex-col items-center">
-              <Header />
-              <div className="flex justify-start w-full">
-                <AppSidebar />
-                {/* <div className="flex flex-col gap-2 items-center w-full max-w-screen-xl min-h-[90vh] h-full mx-auto px-4"> */}
-                <div className="flex flex-col gap-2 items-center w-full max-w-screen-xl min-h-[90vh] h-full mx-auto px-4">
-                {children}
+        <StoreProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SidebarProvider>
+              <main className="min-h-screen flex flex-col items-center">
+                <Header />
+                <div className="flex justify-start w-full">
+                  <AppSidebar />
+                  {/* <div className="flex flex-col gap-2 items-center w-full max-w-screen-xl min-h-[90vh] h-full mx-auto px-4"> */}
+                  <div className="flex flex-col gap-2 items-center w-full max-w-screen-xl min-h-[90vh] h-full mx-auto px-4">
+                    {children}
+                  </div>
+                  {/* </div> */}
                 </div>
-                {/* </div> */}
-                </div>
-            </main>
-          </SidebarProvider>
-        </ThemeProvider>
+              </main>
+            </SidebarProvider>
+          </ThemeProvider>
+        </StoreProvider>
       </body>
     </html>
   );
