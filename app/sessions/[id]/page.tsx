@@ -1,12 +1,7 @@
-import Image from "next/image";
-import Header from "@/components/Header";
-import SessionBox from "../SessionBox";
-import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { UserIcon } from "@heroicons/react/24/outline";
 import styles from "@/app/styles";
 import LevelLabel from "@/components/LevelLabel";
 import TrainingPlan from "./TrainingPlan";
-import Link from "next/link";
 
 const dummyData =
 {
@@ -100,7 +95,3 @@ export default function Page() {
       </SidebarInset>
   )
 }
-// export default function Page() {
-//     return (
-//     );
-// }
