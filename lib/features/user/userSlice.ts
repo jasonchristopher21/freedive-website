@@ -1,35 +1,35 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { User } from "@supabase/supabase-js";
+import { User } from "@prisma/client";
 
 /**
- * Represents the state of the authentication slice.
+ * Represents the state of the user slice.
  */
-export interface AuthState {
-  authUser: User | null; // The authenticated user
+export interface UserState {
+  user: User | null; // The authenticated user
 }
 
 
 /**
  * Initial state for the authentication slice
  */
-const authInitialState: AuthState = {
-  authUser: null,
+const userInitialState: UserState = {
+  user: null,
 };
 
 
 /**
  * The authentication slice for Redux.
  */
-const authSlice = createSlice({
+const userSlice = createSlice({
   name: "auth",
-  initialState: { ...authInitialState },
+  initialState: { ...userInitialState },
   reducers: {
     // Logs the user out and resets the authentication state.
     logout: (state) => {
-      return { ...authInitialState };
+      return { ...userInitialState };
     },
     // Sets the authenticated user in the state.
-    setAuthUser: (state, action) => {
+    setUser: (state, action) => {
       const user = action.payload as User;
       return { ...state, user };
     }
@@ -37,7 +37,7 @@ const authSlice = createSlice({
 });
 
 // Action creators for the authentication slice.
-export const { setAuthUser, logout } = authSlice.actions;
+export const { setUser, logout } = userSlice.actions;
 
 /**
  * Selects the authentication token from the state.
@@ -45,6 +45,6 @@ export const { setAuthUser, logout } = authSlice.actions;
  * @param state - The authentication state.
  * @returns The authentication token.
  */
-export const selectUser = (state: AuthState) => state.authUser;
+export const selectUser = (state: UserState) => state.user;
 
-export default authSlice.reducer;
+export default userSlice.reducer;
