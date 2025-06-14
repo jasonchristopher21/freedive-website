@@ -5,7 +5,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { createClient } from "@/utils/supabase/client";
-
+import { selectAuthUser } from "@/redux/features/auth/authSlice";
+import { useAppSelector } from "@/redux/store";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -67,7 +68,10 @@ export default function ProfileForm() {
   const searchParams = useSearchParams();
   const accessCode = searchParams.get("accessCode");
   const supabase = createClient();
+  const authUser = useAppSelector((state) => state.auth.authUser);
+  const state = useAppSelector((state) => state.auth);
 
+  console.log(authUser);
   console.log("accessCode from searchParams:", accessCode);
 
   // 1. Define your form.
@@ -75,7 +79,7 @@ export default function ProfileForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      email: "",
+      email: authUser?.email || "",
       preferredName: "",
       yearOfEntry: currentYear,
       yearOfStudy: undefined,
@@ -149,7 +153,7 @@ export default function ProfileForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Your Email" {...field} />
+                  <Input placeholder="Your Email" {...field} disabled={true} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

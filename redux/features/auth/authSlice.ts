@@ -4,7 +4,7 @@ import { User } from "@supabase/supabase-js";
 /**
  * Represents the state of the authentication slice.
  */
-export interface AuthState {
+export interface AuthUserState {
   authUser: User | null; // The authenticated user
 }
 
@@ -12,7 +12,7 @@ export interface AuthState {
 /**
  * Initial state for the authentication slice
  */
-const authInitialState: AuthState = {
+const authInitialState: AuthUserState = {
   authUser: null,
 };
 
@@ -30,8 +30,8 @@ const authSlice = createSlice({
     },
     // Sets the authenticated user in the state.
     setAuthUser: (state, action) => {
-      const user = action.payload as User;
-      return { ...state, user };
+      const authUser = action.payload as User;
+      return { ...state, authUser };
     }
   },
 });
@@ -45,6 +45,6 @@ export const { setAuthUser, logout } = authSlice.actions;
  * @param state - The authentication state.
  * @returns The authentication token.
  */
-export const selectUser = (state: AuthState) => state.authUser;
+export const selectAuthUser = (state: AuthUserState) => state.authUser;
 
 export default authSlice.reducer;
