@@ -5,9 +5,9 @@ import pendingApproval from "../../../assets/img/pending-approval.svg";
 import styles from "@/app/styles";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/lib/store";
-import { setAuthUser } from "@/lib/features/auth/authSlice";
-import { setUser } from "@/lib/features/user/userSlice";
+import { useAppDispatch } from "@/redux/store";
+import { setAuthUser } from "@/redux/features/auth/authSlice";
+import { setUser } from "@/redux/features/user/userSlice";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
