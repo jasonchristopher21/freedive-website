@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
+import { AccessRole } from "@prisma/client";
 
 /**
  * GET handler to check the user's authentication status and access role.
@@ -58,8 +59,8 @@ export async function GET() {
 
   // If the form has been completed but has not yet been approved,
   // we redirect the user to the pending page.
-  if (existingUser.accessRole === "PENDING") {
-    return NextResponse.json({ status: "pending", redirect: "/pending" });
+  if (existingUser.accessRole === AccessRole.PENDING) {
+    return NextResponse.json({ status: "pending", redirect: "/sign-up/pending-approval" });
   }
 
   // If the user has completed the sign up form and is approved,

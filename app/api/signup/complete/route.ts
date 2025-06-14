@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/dist/server/api-utils";
+import { AccessRole, Level, YearOfStudy } from "@prisma/client";
 
 function convertToYearOfStudy(year: string | number): string {
   const yearOfStudyMap: Record<string, string> = {
-    "1": "YEAR_1",
-    "2": "YEAR_2",
-    "3": "YEAR_3",
-    "4": "YEAR_4",
-    "5": "Others",
-    Graduate: "Graduate",
-    Alumni: "Alumni",
-    Others: "Others",
+    "1": YearOfStudy.YEAR_1,
+    "2": YearOfStudy.YEAR_2,
+    "3": YearOfStudy.YEAR_3,
+    "4": YearOfStudy.YEAR_4,
+    "5": YearOfStudy.YEAR_5,
+    Graduate: YearOfStudy.GRADUATE,
+    Alumni: YearOfStudy.ALUMNI,
+    Others: YearOfStudy.OTHERS,
   };
   return yearOfStudyMap[year.toString()] || "Others";
 }
@@ -53,9 +53,9 @@ export async function POST(req: Request) {
   }
 
   // Default role
-  let accessRole: string = "MEMBER"; // Default role
-  let roleId: string = "544ad654-3960-4f19-b193-d1dea0ee679b"; // Default roleId
-  let level: string = "BEGINNER"; // Default level
+  let accessRole: string = AccessRole.PENDING; // Default role
+  let roleId: string = "40f4fa13-d766-4a82-9f7b-5eacbf20883a"; // Default roleId
+  let level: string = Level.BEGINNER; // Default level
 
   // Check access code
   if (accessCode) {

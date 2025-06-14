@@ -27,9 +27,9 @@ export default function PendingPage() {
       </p>
       <button
         className="mt-6 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors"
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/auth/redirect")}
       >
-        Back to Home
+        Recheck Status
       </button>
     </div>
   );
