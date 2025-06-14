@@ -1,12 +1,13 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
+import { AccessRole } from "@prisma/client";
 
 /**
  * GET handler to check the user's authentication status and access role.
  * This endpoint is accessed by users who have successfully authenitcated. Problems with
  * individual sign in and sign up flows are handled in the respective `actions.ts` functions
  * and the respective pages.
- * 
+ *
  * This endpoint is used to determine if the user is authenticated, and what to do next
  * based on their current authentication state.
  * - Authenticated users who have yet to complete the sign up form are redirected to the sign up form.
@@ -15,7 +16,6 @@ import { NextResponse } from "next/server";
  * @returns NextResponse with the user's status and redirect URL.
  */
 export async function GET() {
-
   const supabase = await createClient();
 
   // Get the current user from Supabase auth
@@ -23,7 +23,6 @@ export async function GET() {
     data: { user },
     error: userError,
   } = await supabase.auth.getUser();
-
 
   console.log(user);
 
@@ -35,7 +34,7 @@ export async function GET() {
   // This is to check if the user has completed the sign up process (i.e., has an entry in the User table).
   const { data: existingUser, error } = await supabase
     .from("User")
-    .select("accessRole")
+    .select("*")
     .eq("id", user.id)
     .single();
 
@@ -53,16 +52,30 @@ export async function GET() {
   // If the user does not exist in the User table, they have not completed the sign up form.
   // Redirect them to the sign up form.
   if (!existingUser) {
-    return NextResponse.json({ status: "new", redirect: "/sign-up/form" });
+    return NextResponse.json({
+      status: "new",
+      redirect: "/sign-up/form",
+      authUser: user,
+    });
   }
 
   // If the form has been completed but has not yet been approved,
   // we redirect the user to the pending page.
-  if (existingUser.accessRole === "PENDING") {
-    return NextResponse.json({ status: "pending", redirect: "/pending" });
+  if (existingUser.accessRole === AccessRole.PENDING) {
+    return NextResponse.json({
+      status: "pending",
+      redirect: "/sign-up/pending-approval",
+      authUser: user,
+      user: existingUser,
+    });
   }
 
   // If the user has completed the sign up form and is approved,
   // we redirect them to the sessions page.
-  return NextResponse.json({ status: "complete", redirect: "/sessions" });
+  return NextResponse.json({
+    status: "complete",
+    redirect: "/sessions",
+    authUser: user,
+    user: existingUser,
+  });
 }

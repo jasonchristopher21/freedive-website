@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Role {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique // Unique role name
+  users     User[]   @relation("UserRoles")
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model User {
+  // NOTE: The `id` field here SHOULD match auth.users.id.
+  //       This is, however, not enforced by a foreign key constraint since
+  //       we don't want to couple the Prisma schema with the auth schema. 
+  id             String       @id @default(uuid()) @db.Uuid
+  name           String
+  preferredName  String?
+  email          String       @unique
+  nusnetEmail    String
+  yearOfEntry    Int
+  yearOfStudy    YearOfStudy
+  remarks        String?
+  level          Level
+  blockedUntil   DateTime?    @db.Date
+  accessRole     AccessRole   @default(MEMBER)
+  createdAt      DateTime     @default(now()) @db.Timestamptz(6)
+  roleId         String       @db.Uuid // Foreign key to Role
+  role           Role         @relation("UserRoles", fields: [roleId], references: [id])
+  avatarUrl      String?
+  telegramHandle String?
+  attendance     Attendance[]
+  bans           Ban[]
+  signups        Signup[]
+  icSessions     SessionIC[] // Relation to the join table
+}
+
+model Session {
+  id              String        @id @default(uuid()) @db.Uuid
+  name            String
+  description     String
+  date            DateTime      @db.Date
+  startTime       DateTime      @db.Time(6)
+  endTime         DateTime      @db.Time(6)
+  lanes           Int[]
+  maxParticipants Int
+  createdAt       DateTime      @default(now()) @db.Timestamptz(6)
+  sessionType     SessionType   @default(TRAINING)
+  levels          Level[]
+  attendance      Attendance[]
+  signups         Signup[]
+  ics             SessionIC[] // Relation to the join table
+  trainingPlan    TrainingPlan? // Nullable relation for non-training sessions
+}
+
+model TrainingPlan {
+  id               String   @id @default(uuid()) @db.Uuid
+  generalPlan      String?
+  beginnerPlan     String?
+  intermediatePlan String?
+  advancedPlan     String?
+  createdAt        DateTime @default(now()) @db.Timestamptz(6)
+  session          Session? @relation(fields: [sessionId], references: [id])
+  sessionId        String?  @unique @db.Uuid // Set to be unique so that only one training plan can be associated with a session
+}
+
+model Signup {
+  id        String   @id @default(uuid()) @db.Uuid
+  sessionId String   @db.Uuid
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  session   Session  @relation(fields: [sessionId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Attendance {
+  id          String   @id @default(uuid()) @db.Uuid
+  sessionId   String   @db.Uuid
+  userId      String   @db.Uuid
+  isPresent   Boolean  @default(false)
+  checkedInAt DateTime @default(now()) @db.Timestamptz(6)
+  session     Session  @relation(fields: [sessionId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model AttendanceFile {
+  id        String   @id @default(uuid()) @db.Uuid
+  monthYear String
+  fileId    String
+  fileUrl   String?
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model Ban {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  reason    String
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model SessionIC {
+  id        String   @id @default(uuid()) @db.Uuid
+  sessionId String   @db.Uuid
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  session Session @relation(fields: [sessionId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum AccessRole {
+  PENDING
+  MEMBER
+  IC
+  ADMIN
+}
+
+enum SessionType {
+  TRAINING
+  EVENT
+  SAFETY_REFRESHER
+}
+
+enum YearOfStudy {
+  YEAR_1
+  YEAR_2
+  YEAR_3
+  YEAR_4
+  YEAR_5
+  ALUMNI
+  GRADUATE
+  OTHERS
+}
