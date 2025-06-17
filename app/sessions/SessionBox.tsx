@@ -2,19 +2,9 @@ import { UserIcon } from "@heroicons/react/24/outline";
 import LevelLabel from "@/components/LevelLabel";
 import Link from "next/link";
 import { Session } from "@prisma/client";
-import { format } from "date-fns";
+import { getDateString, getTimeString } from "@/app/common/functions/dateTimeUtils";
 
 export default function SessionBox({ props }: { props: Session }) {
-
-  const getDateString = (date: Date): string => {
-    return format(new Date(date), "EEEE, dd MMMM yyyy");
-  };
-
-  const getTimeString = (time: Date): string => {
-    // Ensure the time is in the correct format
-    const date = `${new Date().toISOString().slice(0, 10)}T${time}`;
-    return format(new Date(date), "HH:mm");
-  };
 
   return (
     <div className="flex flex-col h-full justify-between rounded-xl border border-grey-100 px-5 py-5">

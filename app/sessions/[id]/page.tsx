@@ -1,7 +1,13 @@
+"use client";
+
 import { UserIcon } from "@heroicons/react/24/outline";
 import styles from "@/app/styles";
 import LevelLabel from "@/components/LevelLabel";
 import TrainingPlan from "./TrainingPlan";
+import { useParams } from "next/navigation";
+import { useSessionDetailQuery } from "@/queries/useSessionDetailQuery";
+import { getDateString, getTimeString } from "@/app/common/functions/dateTimeUtils";
+import type { TrainingPlan as TrainingPlanType } from "@prisma/client";
 
 const dummyData =
 {
@@ -36,7 +42,63 @@ import {
 } from "@/components/ui/sidebar"
 import MemberGuard from "@/app/common/authguard/MemberGuard";
 
+export interface SessionDetailResponse {
+  id: string;
+  name: string;
+  description: string | null;
+  date: Date; // ISO date string
+  startTime: Date; // time string
+  endTime: Date; // time string
+  lanes: number[];
+  maxParticipants: number;
+  createdAt: string; // ISO datetime string
+  sessionType: string; // enum as string
+  levels: any[]; // Adjust if you know the type
+
+  attendance: Array<{
+    userId: string;
+    user: {
+      id: string;
+      name: string;
+      avatarUrl: string | null;
+      role: {
+        name: string;
+      };
+    };
+  }>;
+
+  ics: Array<{
+    userId: string;
+    user: {
+      id: string;
+      name: string;
+      avatarUrl: string | null;
+      role: {
+        name: string;
+      };
+    };
+  }>;
+
+  TrainingPlan: Array<TrainingPlanType>;
+}
+
 export default function Page() {
+  const { id } = useParams();
+  const { data, isLoading, refetch } = useSessionDetailQuery(id as string);
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>
+  }
+  if (!data) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <span className="text-grey-500">Session not found</span>
+      </div>
+    );
+  }
+  console.log("Session data:", data);
+  console.log(data.TrainingPlan);
+  const session: SessionDetailResponse = data;
   return (
     <MemberGuard>
       <SidebarInset>
@@ -51,7 +113,7 @@ export default function Page() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{dummyData.name}</BreadcrumbPage>
+                  <BreadcrumbPage>{session.name}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -65,17 +127,17 @@ export default function Page() {
                 <span className={`${styles.heading4} text-grey-500`}>BACK TO UPCOMING SESSIONS</span>
               </button>
             </Link> */}
-            <span className="font-heading font-bold text-[22px] leading-tight">{dummyData.name.toUpperCase()}</span>
+            <span className="font-heading font-bold text-[22px] leading-tight">{session.name.toUpperCase()}</span>
             <div className="flex flex-col gap-1">
-              <span className={`${styles.paragraph}`}>{dummyData.date}</span>
-              <span className={`${styles.paragraph}`}>{dummyData.time}</span>
+              <span className={`${styles.paragraph}`}>{getDateString(session.date)}</span>
+              <span className={`${styles.paragraph}`}>{getTimeString(session.endTime)} - {getTimeString(session.endTime)}</span>
               <div className="flex">
                 <span className={`${styles.paragraph}`}>Lanes {dummyData.lanes}</span>
                 <UserIcon className="ml-3 h-4 my-auto text-grey-500" />
-                <span className={`ml-1 ${styles.paragraph}`}>{dummyData.numPax}</span>
+                <span className={`ml-1 ${styles.paragraph}`}>{session.maxParticipants}</span>
               </div>
               <div className="flex flex-wrap gap-1.5 mt-3">
-                {dummyData.levels.map((level) => (
+                {session.levels.map((level) => (
                   <LevelLabel label={level} key={level} />
                 ))}
               </div>
@@ -85,13 +147,15 @@ export default function Page() {
             </div>
 
             {/* Description Box */}
-            <div className="flex flex-col gap-2">
-              <span className={`${styles.heading2}`}>DESCRIPTION</span>
-              <span className={`${styles.paragraph}`}>{dummyData.description}</span>
-            </div>
+            {session.description && session.description.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <span className={`${styles.heading2}`}>DESCRIPTION</span>
+                <span className={`${styles.paragraph}`}>{dummyData.description}</span>
+              </div>
+            )}
 
             {/* Training Plan */}
-            {true ? <TrainingPlan props={dummyData.trainingPlan} /> : null}
+            {session.TrainingPlan.length > 0 && <TrainingPlan props={session.TrainingPlan[0]} />}
           </div>
         </div>
       </SidebarInset>
