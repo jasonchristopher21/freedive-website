@@ -34,9 +34,11 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import MemberGuard from "@/app/common/authguard/MemberGuard";
 
 export default function Page() {
   return (
+    <MemberGuard>
       <SidebarInset>
         <header className="sticky flex mt-8 shrink-0 items-center gap-2 transition-[width,height] ease-linear">
           <div className="flex items-center gap-2 px-8">
@@ -93,5 +95,6 @@ export default function Page() {
           </div>
         </div>
       </SidebarInset>
+    </MemberGuard>
   )
 }
