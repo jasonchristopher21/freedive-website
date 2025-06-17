@@ -10,15 +10,12 @@ datasource db {
 
 model Role {
   id        String   @id @default(uuid()) @db.Uuid
-  name      String   @unique // Unique role name
-  users     User[]   @relation("UserRoles")
+  name      String   @unique
   createdAt DateTime @default(now()) @db.Timestamptz(6)
+  users     User[]   @relation("UserRoles")
 }
 
 model User {
-  // NOTE: The `id` field here SHOULD match auth.users.id.
-  //       This is, however, not enforced by a foreign key constraint since
-  //       we don't want to couple the Prisma schema with the auth schema. 
   id             String       @id @default(uuid()) @db.Uuid
   name           String
   preferredName  String?
@@ -31,20 +28,20 @@ model User {
   blockedUntil   DateTime?    @db.Date
   accessRole     AccessRole   @default(MEMBER)
   createdAt      DateTime     @default(now()) @db.Timestamptz(6)
-  roleId         String       @db.Uuid // Foreign key to Role
-  role           Role         @relation("UserRoles", fields: [roleId], references: [id])
+  roleId         String       @db.Uuid
   avatarUrl      String?
   telegramHandle String?
   attendance     Attendance[]
   bans           Ban[]
+  icSessions     SessionIC[]
   signups        Signup[]
-  icSessions     SessionIC[] // Relation to the join table
+  role           Role         @relation("UserRoles", fields: [roleId], references: [id])
 }
 
 model Session {
   id              String        @id @default(uuid()) @db.Uuid
   name            String
-  description     String
+  description     String?
   date            DateTime      @db.Date
   startTime       DateTime      @db.Time(6)
   endTime         DateTime      @db.Time(6)
@@ -54,9 +51,9 @@ model Session {
   sessionType     SessionType   @default(TRAINING)
   levels          Level[]
   attendance      Attendance[]
+  ics             SessionIC[]
   signups         Signup[]
-  ics             SessionIC[] // Relation to the join table
-  trainingPlan    TrainingPlan? // Nullable relation for non-training sessions
+  trainingPlan    TrainingPlan?
 }
 
 model TrainingPlan {
@@ -66,8 +63,8 @@ model TrainingPlan {
   intermediatePlan String?
   advancedPlan     String?
   createdAt        DateTime @default(now()) @db.Timestamptz(6)
+  sessionId        String?  @unique @db.Uuid
   session          Session? @relation(fields: [sessionId], references: [id])
-  sessionId        String?  @unique @db.Uuid // Set to be unique so that only one training plan can be associated with a session
 }
 
 model Signup {
@@ -111,9 +108,8 @@ model SessionIC {
   sessionId String   @db.Uuid
   userId    String   @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamptz(6)
-
-  session Session @relation(fields: [sessionId], references: [id])
-  user    User    @relation(fields: [userId], references: [id])
+  session   Session  @relation(fields: [sessionId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 enum Level {
@@ -123,10 +119,10 @@ enum Level {
 }
 
 enum AccessRole {
-  PENDING
   MEMBER
   IC
   ADMIN
+  PENDING
 }
 
 enum SessionType {
@@ -140,8 +136,8 @@ enum YearOfStudy {
   YEAR_2
   YEAR_3
   YEAR_4
-  YEAR_5
   ALUMNI
   GRADUATE
+  YEAR_5
   OTHERS
 }
