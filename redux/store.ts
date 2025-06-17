@@ -8,7 +8,7 @@ import userReducer from "./features/user/userSlice";
 const persistConfig = {
   key: "nus-freedive-website",
   storage,
-  whitelist: ["auth"], // which reducer want to store
+  whitelist: ["auth", "user"], // which reducer want to store
   timeout: 1000,
 };
 
