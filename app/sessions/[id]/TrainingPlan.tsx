@@ -4,15 +4,10 @@ import { useState } from "react";
 import clsx from "clsx";
 import styles from "@/app/styles";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import type { TrainingPlan } from "@prisma/client";
 
-interface TrainingPlanProps {
-    general?: string,
-    beginner?: string,
-    intermediate?: string,
-    advanced?: string,
-}
 
-export default function TrainingPlan({ props }: { props: TrainingPlanProps }) {
+export default function TrainingPlan({ props }: { props: TrainingPlan }) {
     const [selected, setSelected] = useState("");
 
     function sectionComponent({ title, content, keyword, color }: { title: string, content?: string, keyword: string, color: string }) {
@@ -59,16 +54,16 @@ export default function TrainingPlan({ props }: { props: TrainingPlanProps }) {
             <div className="flex flex-col gap-4">
 
                 {/* General Plan */}
-                {props.general ? sectionComponent({ title: "General", content: props.general, keyword: "general", color: "blue-500" }) : null}
+                {props.generalPlan ? sectionComponent({ title: "General", content: props.generalPlan, keyword: "general", color: "blue-500" }) : null}
 
                 {/* Beginner Plan */}
-                {props.beginner ? sectionComponent({ title: "Beginner program", content: props.beginner, keyword: "beginner", color: "green-500" }) : null}
+                {props.beginnerPlan ? sectionComponent({ title: "Beginner program", content: props.beginnerPlan, keyword: "beginner", color: "green-500" }) : null}
 
                 {/* Intermediate Plan */}
-                {props.intermediate ? sectionComponent({ title: "Intermediate program", content: props.intermediate, keyword: "intermediate", color: "orange-500" }) : null}
+                {props.intermediatePlan ? sectionComponent({ title: "Intermediate program", content: props.intermediatePlan, keyword: "intermediate", color: "orange-500" }) : null}
 
                 {/* Advanced Plan */}
-                {props.advanced ? sectionComponent({ title: "Advanced program", content: props.advanced, keyword: "advanced", color: "red-500" }) : null}
+                {props.advancedPlan ? sectionComponent({ title: "Advanced program", content: props.advancedPlan, keyword: "advanced", color: "red-500" }) : null}
             </div>
         </div>
     );

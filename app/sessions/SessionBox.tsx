@@ -1,17 +1,11 @@
 import { UserIcon } from "@heroicons/react/24/outline";
 import LevelLabel from "@/components/LevelLabel";
 import Link from "next/link";
+import { Session } from "@prisma/client";
+import { getDateString, getTimeString } from "@/app/common/functions/dateTimeUtils";
 
-interface SessionBoxProps {
-  id: string;
-  name: string;
-  date: string;
-  time: string;
-  numPax: number;
-  levels: string[];
-}
+export default function SessionBox({ props }: { props: Session }) {
 
-export default function SessionBox({ props }: { props: SessionBoxProps }) {
   return (
     <div className="flex flex-col h-full justify-between rounded-xl border border-grey-100 px-5 py-5">
       <Link href="/sessions/[id]" as={`/sessions/${props.id}`}>
@@ -19,14 +13,15 @@ export default function SessionBox({ props }: { props: SessionBoxProps }) {
           <span className="font-heading text-[17px] font-bold leading-tight w-4/5">
             {props.name.toUpperCase()}
           </span>
-          <div className="flex gap-2">
-            <span className="text-grey-500 text-[14px]">{props.date}</span>
-            <span className="text-grey-500 text-[14px]">{props.time}</span>
+          <div className="flex gap-1.5">
+            <span className="text-grey-500 text-[14px]">{getDateString(props.date)}</span>
+            <span className="bg-grey-300 w-1 h-1 rounded-full my-auto" />
+            <span className="text-grey-500 text-[14px]">{getTimeString(props.startTime)} - {getTimeString(props.endTime)}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <div className="flex pr-1">
               <UserIcon className="h-3.5 my-auto text-grey-500" />
-              <span className="text-grey-500 text-[14px]">{props.numPax}</span>
+              <span className="text-grey-500 text-[14px]">{props.maxParticipants}</span>
             </div>
             {props.levels.map((level) => (
               <LevelLabel label={level} key={level} />
