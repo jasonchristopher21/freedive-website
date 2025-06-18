@@ -33,6 +33,7 @@ export function NavItem({
 	title: string,
 }) {
 	const router = useRouter();
+	const { setOpenMobile } = useSidebar();
 	return (
 		<SidebarGroup>
 			<SidebarGroupLabel>{title}</SidebarGroupLabel>
@@ -46,7 +47,7 @@ export function NavItem({
 					>
 						<SidebarMenuItem key={item.name}>
 							<CollapsibleTrigger asChild>
-								<SidebarMenuButton tooltip={item.name} onClick={() => {router.push(item.url)}}>
+								<SidebarMenuButton tooltip={item.name} onClick={() => { router.push(item.url); setOpenMobile(false); }}>
 									{item.icon && <item.icon />}
 									<span>{item.name}</span>
 								</SidebarMenuButton>
