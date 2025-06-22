@@ -21,29 +21,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useSearchParams } from "next/navigation";
 import { SessionType, Level } from "@prisma/client";
 import styles from "@/app/styles";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-
-
+import { DatePicker, TimePicker, Divider, Select, Space } from "antd";
+import dayjs from "dayjs";
+import { useIcListQuery } from "@/queries/useIcListQuery";
 
 
 const formSchema = z.object({
@@ -74,14 +59,19 @@ const formSchema = z.object({
 
 export default function AddSessionPage() {
 
+  const laneOptions = Array.from({ length: 10 }, (_, i) => ({
+    value: i + 1,
+    label: `${i + 1}`,
+  }));
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
       date: new Date(),
-      startTime: new Date("2023-01-01T08:00:00"),
-      endTime: new Date("2023-01-01T08:00:00"),
+      startTime: new Date("2023-01-01T00:00:00"),
+      endTime: new Date("2023-01-01T00:00:00"),
       lanes: [],
       maxParticipants: 1,
       sessionType: SessionType.TRAINING,
@@ -97,6 +87,14 @@ export default function AddSessionPage() {
   function onSubmit(data: z.infer<typeof formSchema>) {
     console.log("Form submitted with data:", data);
   }
+  
+  const { data: icList, isLoading: isIcListLoading, error: isError } = useIcListQuery();
+
+  if (isIcListLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading ICs...</div>;
+  }
+
+  console.log("IC List:", icList);
 
   return (
     <AdminGuard>
@@ -104,7 +102,7 @@ export default function AddSessionPage() {
         <span className={styles.heading1}>ADD SESSION</span>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex-col gap-4">
+            <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
               <span className={`${styles.heading2} text-grey-500`}>SESSION DETAILS</span>
               <FormField
                 control={form.control}
@@ -137,45 +135,26 @@ export default function AddSessionPage() {
                   </FormItem>
                 )}
               />
-              <div className="flex flex-col md:flex-row gap-4">
+              <div className="w-full border-t border-grey-200 mt-6 mb-2" />
+
+              {/* Date and Time Picker */}
+              <div className="flex flex-col md:flex-row md:gap-4">
                 <FormField
                   control={form.control}
                   name="date"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col mt-4">
+                    <FormItem className="flex flex-col mt-4 md:min-w-[270px]">
                       <FormLabel>Session Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-[240px] pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              // disable past dates
-                              date < new Date(Date.now() - 86400000)
-                            }
-                            captionLayout="dropdown"
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <DatePicker
+                        className="w-full"
+                        format="dddd, D MMMM YYYY"
+                        value={field.value ? dayjs(field.value) : null}
+                        onChange={(date, dateString) => {
+                          field.onChange(date);
+                        }}
+                        placeholder="Select date"
+                        suffixIcon={<CalendarIcon />}
+                      />
                     </FormItem>
                   )}
                 />
@@ -185,29 +164,183 @@ export default function AddSessionPage() {
                   render={({ field }) => (
                     <FormItem className="flex flex-col mt-4">
                       <FormLabel>Start Time</FormLabel>
-                      <Input
-                        type="time"
-                        id="time-picker"
-                        step="1"
-                        className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                        value={field.value ? field.value.toISOString().substring(11, 19) : "17:00:00"}
-                        onChange={(e) => {
-                          const [hours, minutes, seconds] = e.target.value.split(":").map(Number);
-                          const newDate = new Date();
-                          newDate.setHours(hours);
-                          newDate.setMinutes(minutes);
-                          newDate.setSeconds(seconds ?? 0);
-                          newDate.setMilliseconds(0);
-                          field.onChange(newDate);
+                      <TimePicker
+                        defaultOpenValue={dayjs("00:00", "HH:mm")}
+                        format="HH:mm"
+                        value={field.value ? dayjs(field.value) : null}
+                        onChange={(time) => {
+                          field.onChange(new Date(time.toDate()));
                         }}
-                        ref={field.ref}
-                        name={field.name}
-                      />
+                        minuteStep={5} />
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="endTime"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col mt-4">
+                      <FormLabel>End Time</FormLabel>
+                      <TimePicker
+                        defaultOpenValue={dayjs("00:00", "HH:mm")}
+                        format="HH:mm"
+                        value={field.value ? dayjs(field.value) : null}
+                        onChange={(time) => {
+                          field.onChange(new Date(time.toDate()));
+                        }}
+                        minuteStep={5} />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Training Config */}
+              <div className="w-full border-t border-grey-200 my-6" />
+              <FormField
+                control={form.control}
+                name="sessionType"
+                render={({ field }) => (
+                  <FormItem className="mt-2 flex flex-col md:flex-row md:gap-10">
+                    <FormLabel className="my-auto md:w-[155px]">Select session type</FormLabel>
+                    <FormControl className="w-full md:w-auto md:min-w-[200px]">
+                      <Select
+                        showSearch
+                        placeholder="Select session type"
+                        filterOption={(input, option) =>
+                          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                        defaultValue={SessionType.TRAINING}
+                        options={[
+                          { value: SessionType.TRAINING, label: "Training" },
+                          { value: SessionType.SAFETY_REFRESHER, label: "Safety Refresher" },
+                          { value: SessionType.EVENT, label: "Event" },
+                        ]}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div>
+                <FormField
+                  control={form.control}
+                  name="lanes"
+                  render={({ field }) => (
+                    <FormItem className="mt-2 flex flex-col md:flex-row md:gap-10">
+                      <FormLabel className="my-auto md:w-[200px]">Select lanes</FormLabel>
+                      <FormControl className="w-full md:w-auto md:min-w-[200px]">
+                        <Select
+                          mode="multiple"
+                          allowClear
+                          style={{ width: '100%' }}
+                          placeholder="Please select"
+                          options={laneOptions}
+                          value={field.value.sort((a, b) => a - b)}
+                          onChange={(value) => {
+                            field.onChange(value.map(Number))
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div>
 
               </div>
+            </div>
+            <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
+              <span className={`${styles.heading2} text-grey-500`}>SESSION IC</span>
+              <span className="text-sm text-grey-500 md:mt-2 mt-1">
+                Select the ICs for this session. You can select multiple ICs.
+              </span>
+              <span className="text-xs text-grey-500 md:mt-1">
+                <i>Note: Only users with the IC or Admin role can be selected as ICs.</i>
+              </span>
+            </div>
+
+            {/* Training Plan Input */}
+            <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
+              <span className={`${styles.heading2} text-grey-500`}>TRAINING PLAN</span>
+                <FormField
+                  control={form.control}
+                  name="generalPlan"
+                  render={({ field }) => (
+                  <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
+                    <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
+                      <span>General Plan</span>
+                      <span className="text-xs text-muted-foreground">
+                        (Optional)
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <AutosizeTextarea placeholder="Enter general training plan" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="beginnerPlan"
+                  render={({ field }) => (
+                  <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
+                    <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
+                      <span>Beginner Plan</span>
+                      <span className="text-xs text-muted-foreground">
+                        (Optional)
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <AutosizeTextarea placeholder="Enter training plan for beginner level members" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="intermediatePlan"
+                  render={({ field }) => (
+                  <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
+                    <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
+                      <span>Intermediate Plan</span>
+                      <span className="text-xs text-muted-foreground">
+                        (Optional)
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <AutosizeTextarea placeholder="Enter training plan for intermediate level members" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="advancedPlan"
+                  render={({ field }) => (
+                  <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
+                    <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
+                      <span>Advanced Plan</span>
+                      <span className="text-xs text-muted-foreground">
+                        (Optional)
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <AutosizeTextarea placeholder="Enter training plan for advanced level members" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                  )}
+                />
+            </div>
+
+            <div className="flex justify-end">
+              <Button type="submit" className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white">
+                Add Session
+              </Button>
             </div>
           </form>
         </Form>
