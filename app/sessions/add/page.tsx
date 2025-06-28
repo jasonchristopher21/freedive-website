@@ -29,7 +29,11 @@ import { CalendarIcon } from "lucide-react"
 import { DatePicker, TimePicker, Divider, Select, Space } from "antd";
 import dayjs from "dayjs";
 import { useIcListQuery } from "@/queries/useIcListQuery";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name cannot be empty" }),
@@ -82,14 +86,17 @@ export default function AddSessionPage() {
     },
   });
 
+  const formatGmt8 = (date: Date) =>
+    dayjs(date).tz("Asia/Singapore").toISOString(); // Returns ISO string with +08:00
+
   function transformFormValuesToBodySchema(values: z.infer<typeof formSchema>) {
     return {
       sessionData: {
         name: values.name,
         description: values.description ?? "",
         date: values.date.toISOString(),
-        startTime: values.startTime.toISOString(),
-        endTime: values.endTime.toISOString(),
+        startTime: formatGmt8(values.startTime),
+        endTime: formatGmt8(values.endTime),
         lanes: values.lanes,
         maxParticipants: values.maxParticipants,
         sessionType: values.sessionType,
@@ -107,6 +114,7 @@ export default function AddSessionPage() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const data = transformFormValuesToBodySchema(values);
+    console.log("Submitting data:", data);
     fetch("/api/sessions/add", {
       method: "POST",
       headers: {
@@ -198,7 +206,7 @@ export default function AddSessionPage() {
                         placeholder="Select date"
                         suffixIcon={<CalendarIcon />}
                       />
-                                          <FormMessage />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -216,7 +224,7 @@ export default function AddSessionPage() {
                           field.onChange(new Date(time.toDate()));
                         }}
                         minuteStep={5} />
-                      <FormMessage />                        
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
