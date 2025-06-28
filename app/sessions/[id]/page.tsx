@@ -130,9 +130,9 @@ export default function Page() {
             <span className="font-heading font-bold text-[22px] leading-tight">{session.name.toUpperCase()}</span>
             <div className="flex flex-col gap-1">
               <span className={`${styles.paragraph}`}>{getDateString(session.date)}</span>
-              <span className={`${styles.paragraph}`}>{getTimeString(session.endTime)} - {getTimeString(session.endTime)}</span>
+              <span className={`${styles.paragraph}`}>{getTimeString(session.startTime)} - {getTimeString(session.endTime)}</span>
               <div className="flex">
-                <span className={`${styles.paragraph}`}>Lanes {dummyData.lanes}</span>
+                <span className={`${styles.paragraph}`}>Lanes {session.lanes.join(", ")}</span>
                 <UserIcon className="ml-3 h-4 my-auto text-grey-500" />
                 <span className={`ml-1 ${styles.paragraph}`}>{session.maxParticipants}</span>
               </div>
