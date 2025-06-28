@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useSearchParams } from "next/navigation";
-import { SessionType, Level } from "@prisma/client";
+import { SessionType, Level, User } from "@prisma/client";
 import styles from "@/app/styles";
 import { CalendarIcon } from "lucide-react"
 import { DatePicker, TimePicker, Divider, Select, Space } from "antd";
@@ -33,7 +33,7 @@ import { useIcListQuery } from "@/queries/useIcListQuery";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name cannot be empty" }),
-  description: z.string().min(1, { message: "Description cannot be empty" }),
+  description: z.string().optional(),
   date: z.coerce.date({
     message: "Please enter a valid date",
   }),
@@ -52,9 +52,7 @@ const formSchema = z.object({
   beginnerPlan: z.string().optional(),
   intermediatePlan: z.string().optional(),
   advancedPlan: z.string().optional(),
-  sessionICs: z.array(z.object({
-    userId: z.string().uuid(),
-  })),
+  sessionICs: z.array(z.string()).min(1, { message: "At least 1 Session IC is required" }),
 });
 
 export default function AddSessionPage() {
@@ -84,10 +82,53 @@ export default function AddSessionPage() {
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log("Form submitted with data:", data);
+  function transformFormValuesToBodySchema(values: z.infer<typeof formSchema>) {
+    return {
+      sessionData: {
+        name: values.name,
+        description: values.description ?? "",
+        date: values.date.toISOString(),
+        startTime: values.startTime.toISOString(),
+        endTime: values.endTime.toISOString(),
+        lanes: values.lanes,
+        maxParticipants: values.maxParticipants,
+        sessionType: values.sessionType,
+        levels: values.levels ?? [],
+      },
+      trainingPlanData: {
+        generalPlan: values.generalPlan,
+        beginnerPlan: values.beginnerPlan,
+        intermediatePlan: values.intermediatePlan,
+        advancedPlan: values.advancedPlan,
+      },
+      sessionICs: values.sessionICs,
+    };
   }
-  
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    const data = transformFormValuesToBodySchema(values);
+    fetch("/api/sessions/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (response.ok) {
+          window.location.href = "/sessions";
+        } else {
+          return response.json().then((data) => {
+            throw new Error(data.error || "Something went wrong");
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error during signup:", error);
+        alert(error.message);
+      });
+  }
+
   const { data: icList, isLoading: isIcListLoading, error: isError } = useIcListQuery();
 
   if (isIcListLoading) {
@@ -95,6 +136,8 @@ export default function AddSessionPage() {
   }
 
   console.log("IC List:", icList);
+  console.log(form.getValues())
+  console.log(form.formState.errors);
 
   return (
     <AdminGuard>
@@ -155,6 +198,7 @@ export default function AddSessionPage() {
                         placeholder="Select date"
                         suffixIcon={<CalendarIcon />}
                       />
+                                          <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -172,6 +216,7 @@ export default function AddSessionPage() {
                           field.onChange(new Date(time.toDate()));
                         }}
                         minuteStep={5} />
+                      <FormMessage />                        
                     </FormItem>
                   )}
                 />
@@ -189,6 +234,7 @@ export default function AddSessionPage() {
                           field.onChange(new Date(time.toDate()));
                         }}
                         minuteStep={5} />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -248,6 +294,34 @@ export default function AddSessionPage() {
               </div>
               <div>
 
+                <FormField
+                  control={form.control}
+                  name="levels"
+                  render={({ field }) => (
+                    <FormItem className="mt-2 flex flex-col md:flex-row md:gap-10">
+                      <FormLabel className="my-auto md:w-[200px]">Select levels</FormLabel>
+                      <FormControl className="w-full md:w-auto md:min-w-[200px]">
+                        <Select
+                          mode="multiple"
+                          allowClear
+                          style={{ width: '100%' }}
+                          placeholder="Please select"
+                          options={[
+                            { value: Level.BEGINNER, label: "Beginner" },
+                            { value: Level.INTERMEDIATE, label: "Intermediate" },
+                            { value: Level.ADVANCED, label: "Advanced" }
+                          ]}
+                          value={field.value}
+                          onChange={(value) => { field.onChange(value) }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div>
+
               </div>
             </div>
             <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
@@ -255,18 +329,43 @@ export default function AddSessionPage() {
               <span className="text-sm text-grey-500 md:mt-2 mt-1">
                 Select the ICs for this session. You can select multiple ICs.
               </span>
-              <span className="text-xs text-grey-500 md:mt-1">
+              <span className="text-xs text-grey-500 md:mt-1 mb-2">
                 <i>Note: Only users with the IC or Admin role can be selected as ICs.</i>
               </span>
+              <FormField
+                control={form.control}
+                name="sessionICs"
+                render={({ field }) => (
+                  <FormItem className="mt-2 flex flex-col md:flex-row md:gap-10">
+                    <FormControl className="w-full md:w-auto md:min-w-[200px]">
+                      <Select
+                        mode="multiple"
+                        allowClear
+                        style={{ width: '100%' }}
+                        placeholder="Please select"
+                        options={icList?.map((ic: any) => ({
+                          value: ic.id,
+                          label: `${ic.name} (${ic.Role.name})`
+                        }))}
+                        value={field.value}
+                        onChange={(value) => {
+                          field.onChange(value)
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* Training Plan Input */}
             <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
               <span className={`${styles.heading2} text-grey-500`}>TRAINING PLAN</span>
-                <FormField
-                  control={form.control}
-                  name="generalPlan"
-                  render={({ field }) => (
+              <FormField
+                control={form.control}
+                name="generalPlan"
+                render={({ field }) => (
                   <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
                     <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
                       <span>General Plan</span>
@@ -279,12 +378,12 @@ export default function AddSessionPage() {
                     </FormControl>
                     <FormMessage />
                   </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="beginnerPlan"
-                  render={({ field }) => (
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="beginnerPlan"
+                render={({ field }) => (
                   <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
                     <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
                       <span>Beginner Plan</span>
@@ -297,12 +396,12 @@ export default function AddSessionPage() {
                     </FormControl>
                     <FormMessage />
                   </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="intermediatePlan"
-                  render={({ field }) => (
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="intermediatePlan"
+                render={({ field }) => (
                   <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
                     <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
                       <span>Intermediate Plan</span>
@@ -315,12 +414,12 @@ export default function AddSessionPage() {
                     </FormControl>
                     <FormMessage />
                   </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="advancedPlan"
-                  render={({ field }) => (
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="advancedPlan"
+                render={({ field }) => (
                   <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
                     <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
                       <span>Advanced Plan</span>
@@ -333,15 +432,18 @@ export default function AddSessionPage() {
                     </FormControl>
                     <FormMessage />
                   </FormItem>
-                  )}
-                />
+                )}
+              />
             </div>
 
-            <div className="flex justify-end">
+            {/* Submit Button */}
+
+            <Button type="submit"> Test </Button>
+            {/* <div className="flex justify-end">
               <Button type="submit" className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white">
                 Add Session
               </Button>
-            </div>
+            </div> */}
           </form>
         </Form>
       </div>

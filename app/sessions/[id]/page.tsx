@@ -107,7 +107,7 @@ export default function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
+                  <BreadcrumbLink href="/sessions">
                     Sessions
                   </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -150,7 +150,7 @@ export default function Page() {
             {session.description && session.description.length > 0 && (
               <div className="flex flex-col gap-2">
                 <span className={`${styles.heading2}`}>DESCRIPTION</span>
-                <span className={`${styles.paragraph}`}>{dummyData.description}</span>
+                <span className={`${styles.paragraph}`}>{session.description}</span>
               </div>
             )}
 

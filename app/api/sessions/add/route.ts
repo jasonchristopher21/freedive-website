@@ -29,7 +29,7 @@ const sessionICSchema = z.object({
 const bodySchema = z.object({
   sessionData: sessionSchema,
   trainingPlanData: trainingPlanSchema, // Make optional if needed
-  sessionICs: z.array(sessionICSchema)
+  sessionICs: z.array(z.string())
 });
 
 // --- POST handler ---
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
         await tx.sessionIC.createMany({
           data: sessionICs.map((ic) => ({
             sessionId: session.id,
-            userId: ic.userId,
+            userId: ic,
           })),
         });
       }
