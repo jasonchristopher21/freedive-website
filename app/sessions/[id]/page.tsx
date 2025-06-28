@@ -107,7 +107,7 @@ export default function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
+                  <BreadcrumbLink href="/sessions">
                     Sessions
                   </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -130,9 +130,9 @@ export default function Page() {
             <span className="font-heading font-bold text-[22px] leading-tight">{session.name.toUpperCase()}</span>
             <div className="flex flex-col gap-1">
               <span className={`${styles.paragraph}`}>{getDateString(session.date)}</span>
-              <span className={`${styles.paragraph}`}>{getTimeString(session.endTime)} - {getTimeString(session.endTime)}</span>
+              <span className={`${styles.paragraph}`}>{getTimeString(session.startTime)} - {getTimeString(session.endTime)}</span>
               <div className="flex">
-                <span className={`${styles.paragraph}`}>Lanes {dummyData.lanes}</span>
+                <span className={`${styles.paragraph}`}>Lanes {session.lanes.join(", ")}</span>
                 <UserIcon className="ml-3 h-4 my-auto text-grey-500" />
                 <span className={`ml-1 ${styles.paragraph}`}>{session.maxParticipants}</span>
               </div>
@@ -150,7 +150,7 @@ export default function Page() {
             {session.description && session.description.length > 0 && (
               <div className="flex flex-col gap-2">
                 <span className={`${styles.heading2}`}>DESCRIPTION</span>
-                <span className={`${styles.paragraph}`}>{dummyData.description}</span>
+                <span className={`${styles.paragraph}`}>{session.description}</span>
               </div>
             )}
 

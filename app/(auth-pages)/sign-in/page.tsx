@@ -8,7 +8,7 @@ import Link from "next/link";
 export default async function Login(props: { searchParams: Promise<Message> }) {
   const searchParams = await props.searchParams;
   return (
-    <div className="h-full">
+    <div className="w-full p-4 h-full">
       {/* <iframe
       className="bg-video"
       src="https://www.youtube.com/embed/8U_nLVItqdw?autoplay=1&mute=1&controls=0&loop=1&start=1&end=13&playlist=8U_nLVItqdw"
@@ -16,7 +16,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
       allowFullScreen
       allow="autoplay"
     /> */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm mx-auto max-w-md md:min-w-[400px] my-auto">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm mx-auto max-w-sm md:min-w-[400px] my-auto">
         <div className="p-4 sm:p-7">
           <div className="text-center">
             <h1 className="block text-2xl font-bold text-gray-800">Sign in</h1>
