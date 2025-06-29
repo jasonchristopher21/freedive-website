@@ -22,10 +22,6 @@ const trainingPlanSchema = z.object({
   advancedPlan: z.string().optional()
 });
 
-const sessionICSchema = z.object({
-  userId: z.string().uuid()
-});
-
 const bodySchema = z.object({
   sessionData: sessionSchema,
   trainingPlanData: trainingPlanSchema, // Make optional if needed
