@@ -25,8 +25,8 @@ import { Input } from "@/components/ui/input";
 import { useSearchParams } from "next/navigation";
 import { SessionType, Level, User } from "@prisma/client";
 import styles from "@/app/styles";
-import { CalendarIcon } from "lucide-react"
-import { DatePicker, TimePicker, Divider, Select, Space } from "antd";
+import { CalendarIcon, Divide } from "lucide-react"
+import { DatePicker, TimePicker, Select, InputNumber } from "antd";
 import dayjs from "dayjs";
 import { useIcListQuery } from "@/queries/useIcListQuery";
 import utc from "dayjs/plugin/utc";
@@ -75,7 +75,7 @@ export default function AddSessionPage() {
       startTime: new Date("2023-01-01T00:00:00"),
       endTime: new Date("2023-01-01T00:00:00"),
       lanes: [],
-      maxParticipants: 1,
+      maxParticipants: undefined,
       sessionType: SessionType.TRAINING,
       levels: [],
       generalPlan: "",
@@ -278,6 +278,30 @@ export default function AddSessionPage() {
               <div>
                 <FormField
                   control={form.control}
+                  name="maxParticipants"
+                  render={({ field }) => (
+                    <FormItem className="mt-2 flex flex-col md:flex-row md:gap-10">
+                      <FormLabel className="my-auto md:w-[155px]">Max Participants</FormLabel>
+                      <FormControl className="w-full md:w-auto md:min-w-[200px]">
+                        <InputNumber
+                          min={1}
+                          placeholder="Enter max participants"
+                          value={field.value}
+                          onChange={(value) => {
+                            field.onChange(value)
+                          }}
+                          className="w-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="w-full border-t border-grey-200 mt-6 mb-2" />
+              <div>
+                <FormField
+                  control={form.control}
                   name="lanes"
                   render={({ field }) => (
                     <FormItem className="mt-2 flex flex-col md:flex-row md:gap-10">
@@ -301,7 +325,6 @@ export default function AddSessionPage() {
                 />
               </div>
               <div>
-
                 <FormField
                   control={form.control}
                   name="levels"
@@ -327,9 +350,6 @@ export default function AddSessionPage() {
                     </FormItem>
                   )}
                 />
-              </div>
-              <div>
-
               </div>
             </div>
             <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
@@ -445,13 +465,11 @@ export default function AddSessionPage() {
             </div>
 
             {/* Submit Button */}
-
-            <Button type="submit"> Test </Button>
-            {/* <div className="flex justify-end">
+            <div className="flex justify-end">
               <Button type="submit" className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white">
                 Add Session
               </Button>
-            </div> */}
+            </div>
           </form>
         </Form>
       </div>
