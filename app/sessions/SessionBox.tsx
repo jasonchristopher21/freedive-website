@@ -4,7 +4,9 @@ import Link from "next/link";
 import { Session } from "@prisma/client";
 import { getDateString, getTimeString } from "@/app/common/functions/dateTimeUtils";
 
-export default function SessionBox({ props }: { props: Session }) {
+type SessionBoxProps = Session & { Signup?: { count: number }[] };
+
+export default function SessionBox({ props }: { props: SessionBoxProps }) {
 
   return (
     <div className="flex flex-col h-full justify-between rounded-xl border border-grey-100 px-5 py-5">
@@ -21,7 +23,7 @@ export default function SessionBox({ props }: { props: Session }) {
           <div className="flex flex-wrap gap-1.5">
             <div className="flex pr-1">
               <UserIcon className="h-3.5 my-auto text-grey-500" />
-              <span className="text-grey-500 text-[14px]">{props.maxParticipants}</span>
+              <span className="text-grey-500 text-[14px]">{props.Signup ? props.Signup[0].count : 0}/{props.maxParticipants}</span>
             </div>
             {props.levels.map((level) => (
               <LevelLabel label={level} key={level} />

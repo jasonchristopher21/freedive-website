@@ -22,7 +22,10 @@ export async function GET() {
   // This is to check if the user has completed the sign up process (i.e., has an entry in the User table).
   const { data: sessions, error } = await supabase
     .from("Session")
-    .select("*")
+    .select(`
+      *,
+      Signup(count)
+    `)
     .gt("date", new Date().toISOString())
 
   if (error) {
