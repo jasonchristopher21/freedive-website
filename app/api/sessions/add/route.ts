@@ -65,6 +65,14 @@ export async function POST(req: Request) {
             userId: ic,
           })),
         });
+
+        // Insert Signup records for each IC
+        await tx.signup.createMany({
+          data: sessionICs.map((userId) => ({
+            sessionId: session.id,
+            userId: userId,
+          })),
+        });
       }
 
       return session;
