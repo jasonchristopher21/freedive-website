@@ -24,7 +24,7 @@ export async function GET() {
     .from("Session")
     .select(`
       *,
-      Signup(count)
+      Signup(userId)
     `)
     .gt("date", new Date().toISOString())
 
@@ -43,6 +43,8 @@ export async function GET() {
     );
   }
 
+  console.log("Fetched sessions:", sessions);
+  console.log("Sessions signup", sessions.map(session => session.Signup));
   return NextResponse.json({
     status: "success",
     sessions: sessions,
