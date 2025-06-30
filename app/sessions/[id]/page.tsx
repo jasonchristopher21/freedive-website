@@ -8,7 +8,7 @@ import TrainingPlan from "./TrainingPlan";
 import { useParams } from "next/navigation";
 import { useSessionDetailQuery } from "@/queries/useSessionDetailQuery";
 import { getDateString, getTimeString } from "@/app/common/functions/dateTimeUtils";
-import type { Signup, TrainingPlan as TrainingPlanType, User } from "@prisma/client";
+import type { Level, Signup, TrainingPlan as TrainingPlanType, User } from "@prisma/client";
 
 const dummyData =
 {
@@ -56,7 +56,7 @@ export interface SessionDetailResponse {
   maxParticipants: number;
   createdAt: string; // ISO datetime string
   sessionType: string; // enum as string
-  levels: any[]; // Adjust if you know the type
+  levels: Level[]; 
 
   attendance: Array<{
     userId: string;
