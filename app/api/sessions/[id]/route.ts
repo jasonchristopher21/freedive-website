@@ -15,12 +15,14 @@ export async function GET(
     .select(`
       *,
       TrainingPlan (*),
-      Attendance (
+      Signup (
         userId,
         User (
           id,
           name,
+          preferredName,
           avatarUrl,
+          level,
           Role (
             name
           )
@@ -31,7 +33,9 @@ export async function GET(
         User (
           id,
           name,
+          preferredName,
           avatarUrl,
+          level,
           Role (
             name
           )
