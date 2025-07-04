@@ -92,7 +92,7 @@ export default function ProfileForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    fetch("/api/r/complete", {
+    fetch("/api/register/complete", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -100,7 +100,7 @@ export default function ProfileForm() {
       body: JSON.stringify(values),
     })
       .then((response) => {
-        if (response.ok) {sig
+        if (response.ok) {
           window.location.href = "/auth/redirect";
         } else {
           return response.json().then((data) => {

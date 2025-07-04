@@ -24,7 +24,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
               Don't have an account yet?{" "}
               <Link
                 className="text-blue-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium"
-                href="/sign-up"
+                href="/register"
               >
                 Sign up here
               </Link>
@@ -144,7 +144,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
     //   <h1 className="text-2xl font-medium">Sign in</h1>
     //   <p className="text-sm text-foreground">
     //     Don't have an account?{" "}
-    //     <Link className="text-foreground font-medium underline" href="/sign-up">
+    //     <Link className="text-foreground font-medium underline" href="/register">
     //       Sign up
     //     </Link>
     //   </p>
