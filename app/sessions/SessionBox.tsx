@@ -1,3 +1,4 @@
+import React from "react";
 import { UserIcon } from "@heroicons/react/24/outline";
 import LevelLabel from "@/components/LevelLabel";
 import Link from "next/link";
@@ -11,7 +12,7 @@ export default function SessionBox({ props }: { props: SessionBoxProps }) {
   const user = useAppSelector((state) => state.user.user);
   const userId = user?.id || "";
 
-  const RenderButton = () => {
+  const RenderButton = ({ onClick }: { onClick: React.MouseEventHandler<HTMLButtonElement> }) => {
     // If user already signed up for the session
     if (props.Signup && props.Signup.length > 0 && userId && props.Signup.some((signup) => signup.userId === userId)) {
       return (
@@ -40,11 +41,35 @@ export default function SessionBox({ props }: { props: SessionBoxProps }) {
     }
 
     return (
-      <button className="mt-3 font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5">
+      <button className="mt-3 font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5" onClick={onClick}>
         SIGN UP
       </button>
     );
 
+  }
+
+  const handleSignup = async () => {
+    await fetch("/api/sessions/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sessionId: props.id,
+        userId: userId,
+      }),
+    }).then((response) => {
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        return response.json().then((data) => {
+          throw new Error(data.error || "Something went wrong");
+        });
+      }
+    }).catch((error) => {
+      console.error("Error during signup:", error);
+      alert(error.message);
+    });
   }
 
   return (
@@ -70,7 +95,7 @@ export default function SessionBox({ props }: { props: SessionBoxProps }) {
           </div>
         </div>
       </Link>
-      <RenderButton />
+      <RenderButton onClick={handleSignup} />
     </div>
   );
 }
