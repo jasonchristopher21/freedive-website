@@ -228,8 +228,8 @@ export default function Page() {
             </div>
             <div>
               <span className={`${styles.heading2}`}>ATTENDEES</span>
-              <div className="flex flex-col border rounded-lg border-grey-300 max-w-screen-lg p-4">
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
+              <div className="flex flex-col border rounded-lg border-grey-300 max-w-screen-lg p-4 mt-2">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {users.map((user: User & { isIc: boolean }) => (
                     <AttendeeCard user={user} isIc={user.isIc} key={user.id} />
                   ))}
