@@ -9,6 +9,21 @@ import RenderButton from "@/app/sessions/RenderButton";
 
 export type SessionBoxProps = Session & { Signup?: { userId: string }[] };
 
+export const defaultSessionBoxProps: SessionBoxProps = {
+  id: "",
+  name: "",
+  description: "",
+  date: new Date(),
+  startTime: new Date(),
+  endTime: new Date(),
+  lanes: [],
+  maxParticipants: 0,
+  createdAt: new Date(),
+  sessionType: "TRAINING",
+  levels: [],
+  Signup: [],
+}
+
 export default function SessionBox({ props }: { props: SessionBoxProps }) {
   const user = useAppSelector((state) => state.user.user);
   const userId = user?.id || "";

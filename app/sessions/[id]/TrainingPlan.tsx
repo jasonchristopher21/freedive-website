@@ -14,7 +14,7 @@ export default function TrainingPlan({ props }: { props: TrainingPlan }) {
         const isSelected = selected === keyword;
         return (
             <button
-                className={clsx('flex flex-col border-2 py-4 px-5 rounded-xl', {
+                className={clsx('flex flex-col border-2 py-4 px-5 rounded-xl max-w-screen-lg', {
                     'border-blue-500': color === 'blue-500',
                     'border-green-500': color === 'green-500',
                     'border-orange-500': color === 'orange-500',
