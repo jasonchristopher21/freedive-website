@@ -54,7 +54,7 @@ export async function GET() {
   if (!existingUser) {
     return NextResponse.json({
       status: "new",
-      redirect: "/sign-up/form",
+      redirect: "/register/form",
       authUser: user,
     });
   }
@@ -64,7 +64,7 @@ export async function GET() {
   if (existingUser.accessRole === AccessRole.PENDING) {
     return NextResponse.json({
       status: "pending",
-      redirect: "/sign-up/pending-approval",
+      redirect: "/register/pending-approval",
       authUser: user,
       user: existingUser,
     });

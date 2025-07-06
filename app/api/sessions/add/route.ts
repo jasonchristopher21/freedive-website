@@ -22,10 +22,6 @@ const trainingPlanSchema = z.object({
   advancedPlan: z.string().optional()
 });
 
-const sessionICSchema = z.object({
-  userId: z.string().uuid()
-});
-
 const bodySchema = z.object({
   sessionData: sessionSchema,
   trainingPlanData: trainingPlanSchema, // Make optional if needed
@@ -67,6 +63,14 @@ export async function POST(req: Request) {
           data: sessionICs.map((ic) => ({
             sessionId: session.id,
             userId: ic,
+          })),
+        });
+
+        // Insert Signup records for each IC
+        await tx.signup.createMany({
+          data: sessionICs.map((userId) => ({
+            sessionId: session.id,
+            userId: userId,
           })),
         });
       }

@@ -14,7 +14,7 @@ export const signUpAction = async (formData: FormData) => {
   if (!email || !password) {
     return encodedRedirect(
       "error",
-      "/sign-up",
+      "/register",
       "Email and password are required"
     );
   }
@@ -27,7 +27,7 @@ export const signUpAction = async (formData: FormData) => {
     },
   });
 
-  // If there's an error, log it and redirect to the sign-up page with an error message.
+  // If there's an error, log it and redirect to the register page with an error message.
   // Usually for the case of user already registered with the email.
   if (error) {
     console.error("Sign Up Error: " + error.code + " " + error.message);
@@ -35,11 +35,11 @@ export const signUpAction = async (formData: FormData) => {
       case "user_already_exists":
         return encodedRedirect(
           "error",
-          "/sign-up",
+          "/register",
           "A user already exists with this email. Please sign in instead."
         );
       default:
-        return encodedRedirect("error", "/sign-up", error.message);
+        return encodedRedirect("error", "/register", error.message);
     }
   } else {
     return redirect("/auth/redirect");
@@ -59,7 +59,7 @@ export const signUpWithGoogleAction = async () => {
 
   if (error) {
     console.error("OAuth Error " + error.code + " " + error.message);
-    return encodedRedirect("error", "/sign-up", error.message);
+    return encodedRedirect("error", "/register", error.message);
   }
 };
 

@@ -22,7 +22,10 @@ export async function GET() {
   // This is to check if the user has completed the sign up process (i.e., has an entry in the User table).
   const { data: sessions, error } = await supabase
     .from("Session")
-    .select("*")
+    .select(`
+      *,
+      Signup(userId)
+    `)
     .gt("date", new Date().toISOString())
 
   if (error) {
@@ -40,6 +43,8 @@ export async function GET() {
     );
   }
 
+  console.log("Fetched sessions:", sessions);
+  console.log("Sessions signup", sessions.map(session => session.Signup));
   return NextResponse.json({
     status: "success",
     sessions: sessions,
