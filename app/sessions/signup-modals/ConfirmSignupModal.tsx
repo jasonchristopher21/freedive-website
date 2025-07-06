@@ -61,11 +61,18 @@ const ConfirmSignupModal = ({
 
           {/* Mobile View */}
           <div className="flex flex-col md:hidden gap-2 mt-1">
-            {!loading && (
-              <button className="font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto">
-                CONFIRM SIGN UP
-              </button>
-            )}
+            <button
+              className={clsx(
+                "font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto hover:bg-opacity-80 transition duration-200",
+                loading ? "cursor-not-allowed bg-grey-300" : "cursor-pointer"
+              )}
+              onClick={() => {
+                setLoading(true);
+                handleSignup(sessionId, userId);
+              }}
+            >
+              {loading ? "SIGNING UP..." : "CONFIRM SIGN UP"}
+            </button>
 
             <button
               className="font-heading text-grey-300 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto border border-grey-100 hover:border-red-500 hover:text-red-500 transition-colors duration-200"
