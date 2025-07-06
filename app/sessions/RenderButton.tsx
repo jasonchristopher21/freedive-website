@@ -1,5 +1,8 @@
 import type { SessionBoxProps } from "./SessionBox";
 import { useAppSelector } from "@/redux/store";
+import { useState } from "react";
+import ConfirmSignupModal from "./signup-modals/ConfirmSignupModal";
+import SignupConfirmedModal from "./signup-modals/SignupConfirmedModal";
 
 const handleSignup = async (sessionId: string, userId: string) => {
   await fetch("/api/sessions/signup", {
@@ -27,13 +30,13 @@ const handleSignup = async (sessionId: string, userId: string) => {
     });
 };
 
-const RenderButton = ({
-  props,
-}: {
-  props: SessionBoxProps;
-}) => {
+const RenderButton = ({ props }: { props: SessionBoxProps }) => {
   const user = useAppSelector((state) => state.user.user);
   const userId = user?.id || "";
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSignupConfirmedModal, setShowSignupConfirmedModal] =
+    useState(false);
 
   // If user already signed up for the session
   if (
@@ -43,12 +46,19 @@ const RenderButton = ({
     props.Signup.some((signup) => signup.userId === userId)
   ) {
     return (
-      <button
-        disabled
-        className="mt-3 font-heading text-white bg-green-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto"
-      >
-        CONFIRMED
-      </button>
+      <>
+        <button
+          className="mt-3 font-heading text-white bg-green-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto cursor-default"
+          onClick={() => setShowSignupConfirmedModal(true)}
+        >
+          CONFIRMED
+        </button>
+        {showSignupConfirmedModal && (
+          <SignupConfirmedModal
+            closeFn={() => setShowSignupConfirmedModal(false)}
+          />
+        )}
+      </>
     );
   }
 
@@ -81,12 +91,18 @@ const RenderButton = ({
   }
 
   return (
-    <button
-      className="mt-3 font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto"
-      onClick={() => handleSignup(props.id, userId)}
-    >
-      SIGN UP
-    </button>
+    <>
+      <button
+        className="mt-3 font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto"
+        // onClick={(() => handleSignup(props.id, userId))}
+        onClick={() => setShowConfirmModal(true)}
+      >
+        SIGN UP
+      </button>
+      {showConfirmModal && (
+        <ConfirmSignupModal closeFn={() => setShowConfirmModal(false)} />
+      )}
+    </>
   );
 };
 
