@@ -5,48 +5,13 @@ import Link from "next/link";
 import { Session } from "@prisma/client";
 import { getDateString, getTimeString } from "@/app/common/functions/dateTimeUtils";
 import { useAppSelector } from "@/redux/store";
+import RenderButton from "@/app/sessions/RenderButton";
 
-type SessionBoxProps = Session & { Signup?: { userId: string }[] };
+export type SessionBoxProps = Session & { Signup?: { userId: string }[] };
 
 export default function SessionBox({ props }: { props: SessionBoxProps }) {
   const user = useAppSelector((state) => state.user.user);
   const userId = user?.id || "";
-
-  const RenderButton = ({ onClick }: { onClick: React.MouseEventHandler<HTMLButtonElement> }) => {
-    // If user already signed up for the session
-    if (props.Signup && props.Signup.length > 0 && userId && props.Signup.some((signup) => signup.userId === userId)) {
-      return (
-        <button disabled className="mt-3 font-heading text-white bg-green-500 text-white rounded-md font-bold text-[16px] py-1.5">
-          CONFIRMED
-        </button>
-      );
-    }
-
-    // If session is full
-    if (props.Signup && props.Signup.length >= props.maxParticipants) {
-      return (
-        <button disabled className="mt-3 font-heading text-white bg-grey-300 text-white rounded-md font-bold text-[16px] py-1.5">
-          FULL
-        </button>
-      );
-    }
-
-    // If user level is not suitable for the session
-    if (props.levels.length > 0 && user?.level && !props.levels.includes(user.level)) {
-      return (
-        <button disabled className="mt-3 font-heading text-white bg-grey-300 text-white rounded-md font-bold text-[16px] py-1.5">
-          LOCKED
-        </button>
-      )
-    }
-
-    return (
-      <button className="mt-3 font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5" onClick={onClick}>
-        SIGN UP
-      </button>
-    );
-
-  }
 
   const handleSignup = async () => {
     await fetch("/api/sessions/signup", {
@@ -95,7 +60,7 @@ export default function SessionBox({ props }: { props: SessionBoxProps }) {
           </div>
         </div>
       </Link>
-      <RenderButton onClick={handleSignup} />
+      <RenderButton props={props} onClick={handleSignup} />
     </div>
   );
 }
