@@ -217,7 +217,7 @@ export default function Page() {
                 </span>
                 <UserIcon className="ml-3 h-4 my-auto text-grey-500" />
                 <span className={`ml-1 ${styles.paragraph}`}>
-                  {session.maxParticipants}
+                  {users.length}/{session.maxParticipants}
                 </span>
               </div>
               <div className="flex flex-wrap gap-1.5 mt-3">
@@ -237,7 +237,6 @@ export default function Page() {
                 <div className="w-full mt-2">
                   <RenderButton
                     props={renderButtonData || defaultSessionBoxProps}
-                    onClick={() => {}}
                   />
                 </div>
               </div>

@@ -75,7 +75,7 @@ export default function SessionBox({ props }: { props: SessionBoxProps }) {
           </div>
         </div>
       </Link>
-      <RenderButton props={props} onClick={handleSignup} />
+      <RenderButton props={props} />
     </div>
   );
 }
