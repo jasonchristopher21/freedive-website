@@ -5,6 +5,7 @@ import { CrossIcon } from "lucide-react";
 // import { toast, Bounce } from "react-toastify"
 import styles from "@/app/styles";
 import clsx from "clsx";
+import dayjs from "dayjs";
 
 const handleSignup = async (sessionId: string, userId: string) => {
   await fetch("/api/sessions/signup", {
@@ -55,7 +56,7 @@ const ConfirmSignupModal = ({
           <div className="flex flex-col gap-2">
             <h1 className={styles.heading1}>SIGN UP CONFIRMATION</h1>
             <p className="text-[16px] text-grey-500">
-              Are you sure you want to sign up for the session on XYZ?
+              Are you sure you want to sign up for the session on {dayjs(sessionDate).format("dddd, D MMMM YYYY")}?
             </p>
           </div>
 
