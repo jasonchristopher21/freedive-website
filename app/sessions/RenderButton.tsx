@@ -4,32 +4,6 @@ import { useState } from "react";
 import ConfirmSignupModal from "./signup-modals/ConfirmSignupModal";
 import SignupConfirmedModal from "./signup-modals/SignupConfirmedModal";
 
-const handleSignup = async (sessionId: string, userId: string) => {
-  await fetch("/api/sessions/signup", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      sessionId: sessionId,
-      userId: userId,
-    }),
-  })
-    .then((response) => {
-      if (response.ok) {
-        window.location.reload();
-      } else {
-        return response.json().then((data) => {
-          throw new Error(data.error || "Something went wrong");
-        });
-      }
-    })
-    .catch((error) => {
-      console.error("Error during signup:", error);
-      alert(error.message);
-    });
-};
-
 const RenderButton = ({ props }: { props: SessionBoxProps }) => {
   const user = useAppSelector((state) => state.user.user);
   const userId = user?.id || "";
@@ -100,7 +74,12 @@ const RenderButton = ({ props }: { props: SessionBoxProps }) => {
         SIGN UP
       </button>
       {showConfirmModal && (
-        <ConfirmSignupModal closeFn={() => setShowConfirmModal(false)} />
+        <ConfirmSignupModal
+          closeFn={() => setShowConfirmModal(false)}
+          sessionDate={props.date}
+          sessionId={props.id}
+          userId={userId}
+        />
       )}
     </>
   );

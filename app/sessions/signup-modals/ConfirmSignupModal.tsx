@@ -4,8 +4,45 @@ import { useRouter } from "next/navigation";
 import { CrossIcon } from "lucide-react";
 // import { toast, Bounce } from "react-toastify"
 import styles from "@/app/styles";
+import clsx from "clsx";
 
-const ConfirmSignupModal = ({ closeFn }: { closeFn: () => void }) => {
+const handleSignup = async (sessionId: string, userId: string) => {
+  await fetch("/api/sessions/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      sessionId: sessionId,
+      userId: userId,
+    }),
+  })
+    .then((response) => {
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        return response.json().then((data) => {
+          throw new Error(data.error || "Something went wrong");
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error during signup:", error);
+      alert(error.message);
+    });
+};
+
+const ConfirmSignupModal = ({
+  closeFn,
+  sessionDate,
+  sessionId,
+  userId,
+}: {
+  closeFn: () => void;
+  sessionDate: Date;
+  sessionId: string;
+  userId: string;
+}) => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -46,11 +83,18 @@ const ConfirmSignupModal = ({ closeFn }: { closeFn: () => void }) => {
             >
               CANCEL
             </button>
-            {!loading && (
-              <button className="font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto hover:bg-opacity-80 transition duration-200">
-                CONFIRM SIGN UP
-              </button>
-            )}
+            <button
+              className={clsx(
+                "font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto hover:bg-opacity-80 transition duration-200",
+                loading ? "cursor-not-allowed bg-grey-300" : "cursor-pointer"
+              )}
+              onClick={() => {
+                setLoading(true);
+                handleSignup(sessionId, userId);
+              }}
+            >
+              {loading ? "SIGNING UP..." : "CONFIRM SIGN UP"}
+            </button>
           </div>
 
           {errorMessage ? (
@@ -58,7 +102,6 @@ const ConfirmSignupModal = ({ closeFn }: { closeFn: () => void }) => {
               <p className="text-[14px] text-red-500">Error: {errorMessage}</p>
             </div>
           ) : null}
-
         </div>
       </div>
     </div>
