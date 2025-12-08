@@ -17,6 +17,7 @@ import {
   CalendarPlus,
   Users,
   FileSpreadsheet,
+  ArrowUpRightFromSquare,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -39,7 +40,7 @@ import { NO_SIDEBAR_PATHS } from "@/constants"
 const data = {
   navMain: [
     {
-      title: "Sessions",
+      name: "Sessions",
       url: "#",
       icon: SquareTerminal, 
       isActive: true,
@@ -48,7 +49,7 @@ const data = {
       ]
     },
     {
-      title: "Playground",
+      name: "Playground",
       url: "#",
       icon: SquareTerminal,
       items: [
@@ -67,7 +68,7 @@ const data = {
       ],
     },
     {
-      title: "Models",
+      name: "Models",
       url: "#",
       icon: Bot,
       items: [
@@ -86,7 +87,7 @@ const data = {
       ],
     },
     {
-      title: "Documentation",
+      name: "Documentation",
       url: "#",
       icon: BookOpen,
       items: [
@@ -109,7 +110,7 @@ const data = {
       ],
     },
     {
-      title: "Settings",
+      name: "Settings",
       url: "#",
       icon: Settings2,
       items: [
@@ -144,6 +145,11 @@ const data = {
       name: "Add Sessions",
       url: "/sessions/add",
       icon: CalendarPlus
+    },
+    {
+      name: "View Sessions",
+      url: "/sessions/view",
+      icon: ArrowUpRightFromSquare
     },
     {
       name: "Manage Users",

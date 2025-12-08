@@ -1,30 +1,27 @@
-import React from "react";
-import { UserIcon } from "@heroicons/react/24/outline";
-import LevelLabel from "@/components/LevelLabel";
-import Link from "next/link";
-import { Session } from "@prisma/client";
 import { getDateString, getTimeString } from "@/app/common/functions/dateTimeUtils";
-import { useAppSelector } from "@/redux/store";
 import RenderButton from "@/app/sessions/RenderButton";
+import LevelLabel from "@/components/LevelLabel";
+import { useAppSelector } from "@/redux/store";
+import { UserIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
+import { SessionQueryWithSignups } from "../types";
 
-export type SessionBoxProps = Session & { Signup?: { userId: string }[] };
-
-export const defaultSessionBoxProps: SessionBoxProps = {
+export const defaultSessionBoxProps: SessionQueryWithSignups = {
   id: "",
   name: "",
   description: "",
-  date: new Date(),
-  startTime: new Date(),
-  endTime: new Date(),
+  date: new Date().toString(),
+  startTime: "00:00:00",
+  endTime: "00:00:00",
   lanes: [],
   maxParticipants: 0,
-  createdAt: new Date(),
+  createdAt: new Date().toString(),
   sessionType: "TRAINING",
   levels: [],
-  Signup: [],
+  signups: [],
 }
 
-export default function SessionBox({ props }: { props: SessionBoxProps }) {
+export default function SessionBox({ props }: { props: SessionQueryWithSignups }) {
   const user = useAppSelector((state) => state.user.user);
   const userId = user?.id || "";
 
@@ -38,13 +35,12 @@ export default function SessionBox({ props }: { props: SessionBoxProps }) {
         sessionId: props.id,
         userId: userId,
       }),
-    }).then((response) => {
+    }).then(async (response) => {
       if (response.ok) {
         window.location.reload();
       } else {
-        return response.json().then((data) => {
-          throw new Error(data.error || "Something went wrong");
-        });
+        const err = await response.json()
+        throw new Error(err.error)
       }
     }).catch((error) => {
       console.error("Error during signup:", error);
@@ -67,7 +63,7 @@ export default function SessionBox({ props }: { props: SessionBoxProps }) {
           <div className="flex flex-wrap gap-1.5">
             <div className="flex pr-1">
               <UserIcon className="h-3.5 my-auto text-grey-500" />
-              <span className="text-grey-500 text-[14px]">{props.Signup?.length || 0}/{props.maxParticipants}</span>
+              <span className="text-grey-500 text-[14px]">{props.signups?.length || 0}/{props.maxParticipants}</span>
             </div>
             {props.levels.map((level) => (
               <LevelLabel label={level} key={level} />
