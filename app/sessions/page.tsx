@@ -6,7 +6,15 @@ import SessionBox from "./SessionBox";
 import { SessionQueryWithSignups } from "../types";
 import Loading from "../Loading";
 
-export default function Page() {
+export default function PageAuth() {
+  return (
+    <MemberGuard>
+      <Page />
+    </MemberGuard>
+  )
+}
+
+function Page() {
 
   const { data: sessions, isLoading } = useUpcomingSessionsQuery();
 
@@ -23,13 +31,11 @@ export default function Page() {
   }
 
   return (
-    <MemberGuard>
       <div className="px-8 py-8 flex flex-col gap-4 max-w-screen-xl ml-0">
         <span className={styles.heading1}>UPCOMING SESSIONS</span>
         <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
           {sessions.map((item: SessionQueryWithSignups) => <SessionBox props={item} key={item.id} />)}
         </div>
       </div>
-    </MemberGuard>
   )
 }

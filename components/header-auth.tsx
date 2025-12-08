@@ -20,10 +20,10 @@ export default function AuthButton() {
 
   // Clear credential on the client's browser, then logout from the server
   const clientSignoutWrapper = async () => {
+    router.push('/sign-in')
     dispatch(userLogout(null))
     dispatch(authLogout(null))
     await signOutAction()
-    router.push('/sign-in')
   }
 
   return user ? (

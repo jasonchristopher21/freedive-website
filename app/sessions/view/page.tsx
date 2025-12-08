@@ -24,7 +24,15 @@ const formSchema = z.object({
 	year: z.number()
 })
 
-export default function ExportExcelPage() {
+export default function ViewSessionsPageAuth() {
+	return (
+		<AdminGuard>
+			<ViewSessionsPage />
+		</AdminGuard>
+	)
+}
+
+function ViewSessionsPage() {
 	const [date, setDate] = useState<{ month: Month, year: number }>(
 		{ month: parseInt(format(new Date(), "M")), year: parseInt(format(new Date(), "y")) }
 	)
