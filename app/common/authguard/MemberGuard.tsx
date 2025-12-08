@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/redux/store";
 import { AccessRole } from "@prisma/client";
+import Loading from "../../Loading";
 
 export default function MemberGuard({ children }: { children: React.ReactNode }) {
     const router = useRouter();
@@ -30,7 +31,7 @@ export default function MemberGuard({ children }: { children: React.ReactNode })
     }, [user, router]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <Loading />;
     }
 
     return <>{children}</>;

@@ -31,6 +31,7 @@ import dayjs from "dayjs";
 import { useIcListQuery } from "@/queries/useIcListQuery";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import Loading from "@/app/Loading";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -140,7 +141,7 @@ export default function AddSessionPage() {
   const { data: icList, isLoading: isIcListLoading, error: isError } = useIcListQuery();
 
   if (isIcListLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading ICs...</div>;
+    return <Loading />
   }
 
   console.log("IC List:", icList);

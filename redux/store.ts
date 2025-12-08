@@ -1,6 +1,14 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { persistReducer, persistStore } from "redux-persist";
+import {
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  persistReducer,
+  PURGE,
+  REGISTER,
+  REHYDRATE
+} from 'redux-persist';
 import storage from "redux-persist/lib/storage";
 import authReducer from "./features/auth/authSlice";
 import userReducer from "./features/user/userSlice";
@@ -8,7 +16,7 @@ import userReducer from "./features/user/userSlice";
 const persistConfig = {
   key: "nus-freedive-website",
   storage,
-  whitelist: ["auth", "user"], // which reducer want to store
+  whitelist: ["auth", "user"], // which reducer we want to store
   timeout: 1000,
 };
 
@@ -25,7 +33,7 @@ export const makeStore = () => {
     middleware: (getDefaultMiddleware) => {
       return getDefaultMiddleware({
         serializableCheck: {
-          ignoredActions: ["persist/PERSIST"],
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         },
       });
     },

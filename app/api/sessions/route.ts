@@ -19,7 +19,7 @@ export async function GET() {
   const result = await prisma.$transaction(async (tx) => {
     const sessions = await tx.session.findMany({
       select: { id: true, name: true, description: true, date: true, startTime: true, endTime: true, maxParticipants: true, createdAt: true, sessionType: true, lanes: true, levels: true,
-        signups: { select: { user: { select: { name: true, yearOfStudy: true, role: { select: { name: true } } } } } }
+        signups: { select: { userId: true, user: { select: { name: true, yearOfStudy: true, role: { select: { name: true } } } } } }
       },
       where: { date: {gte: new Date()} }
     })
@@ -33,7 +33,7 @@ export async function GET() {
     const flattenUser = mappedSessions.map(s => {
       return {
         ...s, signups: s.signups.map(u => { return {
-          name: u.user.name, year: u.user.yearOfStudy, role: u.user.role.name
+          userId: u.userId, name: u.user.name, year: u.user.yearOfStudy, role: u.user.role.name
         }})
       }
     })

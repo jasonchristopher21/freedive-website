@@ -4,6 +4,7 @@ import { useUpcomingSessionsQuery } from "@/queries/useUpcomingSessionsQuery";
 import MemberGuard from "../common/authguard/MemberGuard";
 import SessionBox from "./SessionBox";
 import { SessionQueryWithSignups } from "../types";
+import Loading from "../Loading";
 
 export default function Page() {
 
@@ -11,7 +12,7 @@ export default function Page() {
 
   
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>
+    return <Loading />
   }
   if (!sessions || sessions.length === 0) {
     return (

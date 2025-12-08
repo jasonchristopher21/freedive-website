@@ -1,8 +1,7 @@
-import { z } from "zod";
-import { createClient } from "@/utils/supabase/server";
-import { NextResponse } from "next/server";
+import { Month } from "@/app/types";
 import { prisma } from "@/lib/prisma";
-import { Month, SessionQuery } from "@/app/types";
+import { NextResponse } from "next/server";
+import { z } from "zod";
 
 const bodySchema = z.object({
     month: z.nativeEnum(Month),
@@ -30,7 +29,7 @@ export async function POST(req: Request) {
         const sessions = await tx.session.findMany({
             select: {
                 id: true, name: true, description: true, date: true, startTime: true, endTime: true, maxParticipants: true, createdAt: true, sessionType: true, lanes: true, levels: true,
-                signups: { select: { user: { select: { name: true, yearOfStudy: true, role: { select: { name: true } } } } } }
+                signups: { select: { userId: true, user: { select: { name: true, yearOfStudy: true, role: { select: { name: true } } } } } }
             },
             where: { AND: [{ date: { gte: new Date(IsoDate + "-01") } }, { date: { lte: new Date(IsoDate + "-31") } }] }
         })
@@ -47,7 +46,7 @@ export async function POST(req: Request) {
             return {
                 ...s, signups: s.signups.map(u => {
                     return {
-                        name: u.user.name, year: u.user.yearOfStudy, role: u.user.role.name
+                        userId: u.userId, name: u.user.name, year: u.user.yearOfStudy, role: u.user.role.name
                     }
                 })
             }
@@ -58,7 +57,7 @@ export async function POST(req: Request) {
     console.log("Sessions fetched: ", result)
 
     return NextResponse.json({
-        message: "Session created",
+        message: "Sessions fetched",
         sessions: result
     }, { status: 201 })
 }

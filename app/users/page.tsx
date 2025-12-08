@@ -8,6 +8,7 @@ import type { TableProps } from "antd";
 import { Prisma, User, Level, AccessRole } from "@prisma/client";
 import { checkDomainOfScale } from "recharts/types/util/ChartUtils";
 import { getUserLevelColor } from "../common/functions/userUtils";
+import Loading from "../Loading";
 
 type UserWithRole = Prisma.UserGetPayload<{
   include: { role: true };
@@ -102,7 +103,7 @@ export default function Page() {
   const { data: userList, isLoading, error } = useUserListQuery();
   console.log(userList);
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />
   }
   if (error) {
     return <div>Error: {error.message}</div>;

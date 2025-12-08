@@ -33,6 +33,7 @@ export type SessionQuery = {
 
 export type SessionQueryWithSignups = SessionQuery & {
   signups: {
+    userId: string,
     name: string,
     year: YearOfStudy,
     role: string

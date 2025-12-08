@@ -5,7 +5,7 @@ import { UserIcon } from "@heroicons/react/24/outline";
 import styles from "@/app/styles";
 import LevelLabel from "@/components/LevelLabel";
 import TrainingPlan from "./TrainingPlan";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useSessionDetailQuery } from "@/queries/useSessionDetailQuery";
 import {
   getDateString,
@@ -13,6 +13,7 @@ import {
 } from "@/app/common/functions/dateTimeUtils";
 import type {
   Level,
+  SessionType,
   Signup,
   TrainingPlan as TrainingPlanType,
   User,
@@ -36,19 +37,21 @@ import MemberGuard from "@/app/common/authguard/MemberGuard";
 import clsx from "clsx";
 import { getUserLevelColor } from "@/app/common/functions/userUtils";
 import RenderButton from "../RenderButton";
-import { defaultSessionBoxProps, SessionBoxProps } from "../SessionBox";
+import { defaultSessionBoxProps } from "../SessionBox";
+import { SessionQueryWithSignups } from "@/app/types";
+import Loading from "@/app/Loading";
 
 export interface SessionDetailResponse {
   id: string;
   name: string;
   description: string | null;
-  date: Date; // ISO date string
-  startTime: Date; // time string
-  endTime: Date; // time string
+  date: string; // ISO date string
+  startTime: string; // time string
+  endTime: string; // time string
   lanes: number[];
   maxParticipants: number;
   createdAt: string; // ISO datetime string
-  sessionType: string; // enum as string
+  sessionType: SessionType; // enum as string
   levels: Level[];
 
   attendance: Array<{
@@ -126,10 +129,11 @@ function AttendeeCard({ user, isIc }: { user: any; isIc: boolean }) {
 }
 
 export default function Page() {
+  const router = useRouter()
   const { id } = useParams();
   const { data, isLoading, refetch } = useSessionDetailQuery(id as string);
   const [users, setUsers] = useState([]);
-  const [renderButtonData, setRenderButtonData] = useState<SessionBoxProps>();
+  const [renderButtonData, setRenderButtonData] = useState<SessionQueryWithSignups>();
 
   useEffect(() => {
     if (data && data.SessionIC && data.Signup) {
@@ -156,9 +160,7 @@ export default function Page() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
+      <Loading />
     );
   }
   if (!data) {
@@ -182,7 +184,7 @@ export default function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/sessions">Sessions</BreadcrumbLink>
+                  <BreadcrumbLink onClick={() => router.back()}>Sessions</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
