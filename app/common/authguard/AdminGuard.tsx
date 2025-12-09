@@ -10,6 +10,7 @@ import Loading from "../../Loading";
 export default function AdminGuard({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const user = useAppSelector((state) => state.user.user);
+    const authUser = useAppSelector((state) => state.auth.authUser)
     const [loading, setLoading] = useState(true);
     const [unauthorised, setUnauthorised] = useState(false); // State to track unauthorized access
 
@@ -17,7 +18,7 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
 
     useEffect(() => {
         const checkUser = async () => {
-            if (!user) {
+            if (!user || !authUser) {
                 // User is not authenticated, redirect to the sign in page
                 router.push("/sign-in");
             } else if (!ALLOWED_ROLES.includes(user.accessRole)) {

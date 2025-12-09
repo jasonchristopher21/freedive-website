@@ -5,7 +5,7 @@ import { authLogout } from "@/redux/features/auth/authSlice";
 import { userLogout } from "@/redux/features/user/userSlice";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { useAppDispatch } from "@/redux/store";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
@@ -14,9 +14,7 @@ import { useRouter } from "next/navigation";
 export default function AuthButton() {
   const router = useRouter()
   const dispatch = useAppDispatch();
-  const [user, setUser] = useState<User | null>(null)
-  const supabase = createClient()
-  supabase.auth.getUser().then(u => setUser(u.data.user))
+  const user = useAppSelector(state => state.user.user)
 
   // Clear credential on the client's browser, then logout from the server
   const clientSignoutWrapper = async () => {

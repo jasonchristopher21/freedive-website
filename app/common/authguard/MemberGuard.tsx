@@ -9,13 +9,13 @@ import Loading from "../../Loading";
 export default function MemberGuard({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const user = useAppSelector((state) => state.user.user);
+    const authUser = useAppSelector((state) => state.auth.authUser)
     const [loading, setLoading] = useState(true);
-
     const ALLOWED_ROLES: AccessRole[] = [AccessRole.MEMBER, AccessRole.ADMIN, AccessRole.IC]; // Define allowed roles
 
     useEffect(() => {
         const checkUser = async () => {
-            if (!user) {
+            if (!user || !authUser) {
                 // User is not authenticated, redirect to the sign in page
                 router.push("/sign-in");
             } else if (!ALLOWED_ROLES.includes(user.accessRole)) {
