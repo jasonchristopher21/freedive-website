@@ -15,8 +15,12 @@ export default function MemberGuard({ children }: { children: React.ReactNode })
   const authorized = user ? ALLOWED_ROLES.includes(user.accessRole) : false
 
   useEffect(() => {
-    if (!authorized || !user || !authUser) {
+    console.log(authorized, user, authUser)
+    if (!user || !authUser) {
       router.push('/sign-in')
+    } else if (!authorized) {
+      // User has Pending role, send to pending approval page.
+      router.push('/register/pending-approval')
     }
   }, [])
 
