@@ -1,28 +1,41 @@
-import type { SessionBoxProps } from "./SessionBox";
 import { useAppSelector } from "@/redux/store";
 import { useState } from "react";
 import ConfirmSignupModal from "./signup-modals/ConfirmSignupModal";
 import SignupConfirmedModal from "./signup-modals/SignupConfirmedModal";
+import { SessionQueryWithSignups } from "../types";
 
-const RenderButton = ({ props }: { props: SessionBoxProps }) => {
+const RenderButton = ({ props }: { props: SessionQueryWithSignups }) => {
   const user = useAppSelector((state) => state.user.user);
   const userId = user?.id || "";
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showSignupConfirmedModal, setShowSignupConfirmedModal] =
-    useState(false);
+  const [showSignupConfirmedModal, setShowSignupConfirmedModal] = useState(false);
+
+  // If date is past the session
+  if (new Date() > new Date(props.date.slice(0,10) + "T" + props.endTime)) {
+    return (
+      <>
+        <button
+          className="mt-3 font-heading text-white bg-gray-400 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto cursor-default"
+          disabled
+        >
+          LOCKED
+        </button>
+      </>
+    )
+  }
 
   // If user already signed up for the session
   if (
-    props.Signup &&
-    props.Signup.length > 0 &&
+    props.signups &&
+    props.signups.length > 0 &&
     userId &&
-    props.Signup.some((signup) => signup.userId === userId)
+    props.signups.some((signup) => signup.userId === userId)
   ) {
     return (
       <>
         <button
-          className="mt-3 font-heading text-white bg-green-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto cursor-default"
+          className="mt-3 font-heading text-white bg-green-500 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto cursor-default"
           onClick={() => setShowSignupConfirmedModal(true)}
         >
           CONFIRMED
@@ -37,11 +50,11 @@ const RenderButton = ({ props }: { props: SessionBoxProps }) => {
   }
 
   // If session is full
-  if (props.Signup && props.Signup.length >= props.maxParticipants) {
+  if (props.signups && props.signups.length >= props.maxParticipants) {
     return (
       <button
         disabled
-        className="mt-3 font-heading text-white bg-grey-300 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto"
+        className="mt-3 font-heading text-white bg-grey-300 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto"
       >
         FULL
       </button>
@@ -57,7 +70,7 @@ const RenderButton = ({ props }: { props: SessionBoxProps }) => {
     return (
       <button
         disabled
-        className="mt-3 font-heading text-white bg-grey-300 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto"
+        className="mt-3 font-heading text-white bg-grey-300 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto"
       >
         LOCKED
       </button>
@@ -67,7 +80,7 @@ const RenderButton = ({ props }: { props: SessionBoxProps }) => {
   return (
     <>
       <button
-        className="mt-3 font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto"
+        className="mt-3 font-heading text-white bg-blue-500 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto"
         // onClick={(() => handleSignup(props.id, userId))}
         onClick={() => setShowConfirmModal(true)}
       >

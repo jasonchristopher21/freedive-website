@@ -40,7 +40,7 @@ const ConfirmSignupModal = ({
   userId,
 }: {
   closeFn: () => void;
-  sessionDate: Date;
+  sessionDate: string;
   sessionId: string;
   userId: string;
 }) => {
@@ -64,7 +64,7 @@ const ConfirmSignupModal = ({
           <div className="flex flex-col md:hidden gap-2 mt-1">
             <button
               className={clsx(
-                "font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto hover:bg-opacity-80 transition duration-200",
+                "font-heading text-white bg-blue-500 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto hover:bg-opacity-80 transition duration-200",
                 loading ? "cursor-not-allowed bg-grey-300" : "cursor-pointer"
               )}
               onClick={() => {
@@ -93,7 +93,7 @@ const ConfirmSignupModal = ({
             </button>
             <button
               className={clsx(
-                "font-heading text-white bg-blue-500 text-white rounded-md font-bold text-[16px] py-1.5 w-full mx-auto hover:bg-opacity-80 transition duration-200",
+                "font-heading text-white bg-blue-500 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto hover:bg-opacity-80 transition duration-200",
                 loading ? "cursor-not-allowed bg-grey-300" : "cursor-pointer"
               )}
               onClick={() => {

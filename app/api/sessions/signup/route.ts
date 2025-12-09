@@ -66,13 +66,13 @@ export async function POST(req: Request) {
                 data: { userId, sessionId },
             });
 
-            return signup;
+            return NextResponse.json({
+                message: "User added to session successfully",
+                data: signup,
+            }, { status: 201 });
         });
 
-        return NextResponse.json({
-            message: "User added to session successfully",
-            data: result,
-        }, { status: 201 });
+        return result
     } catch (error) {
         console.error("Error adding user to session:", error);
         return NextResponse.json(

@@ -5,7 +5,7 @@ import { UserIcon } from "@heroicons/react/24/outline";
 import styles from "@/app/styles";
 import LevelLabel from "@/components/LevelLabel";
 import TrainingPlan from "./TrainingPlan";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useSessionDetailQuery } from "@/queries/useSessionDetailQuery";
 import {
   getDateString,
@@ -13,6 +13,7 @@ import {
 } from "@/app/common/functions/dateTimeUtils";
 import type {
   Level,
+  SessionType,
   Signup,
   TrainingPlan as TrainingPlanType,
   User,
@@ -36,19 +37,21 @@ import MemberGuard from "@/app/common/authguard/MemberGuard";
 import clsx from "clsx";
 import { getUserLevelColor } from "@/app/common/functions/userUtils";
 import RenderButton from "../RenderButton";
-import { defaultSessionBoxProps, SessionBoxProps } from "../SessionBox";
+import { defaultSessionBoxProps } from "../SessionBox";
+import { SessionQueryWithSignups } from "@/app/types";
+import Loading from "@/app/Loading";
 
 export interface SessionDetailResponse {
   id: string;
   name: string;
   description: string | null;
-  date: Date; // ISO date string
-  startTime: Date; // time string
-  endTime: Date; // time string
+  date: string; // ISO date string
+  startTime: string; // time string
+  endTime: string; // time string
   lanes: number[];
   maxParticipants: number;
   createdAt: string; // ISO datetime string
-  sessionType: string; // enum as string
+  sessionType: SessionType; // enum as string
   levels: Level[];
 
   attendance: Array<{
@@ -125,11 +128,20 @@ function AttendeeCard({ user, isIc }: { user: any; isIc: boolean }) {
   );
 }
 
-export default function Page() {
+export default function PageAuth() {
+  return (
+    <MemberGuard>
+      <Page />
+    </MemberGuard>
+  )
+}
+
+function Page() {
+  const router = useRouter()
   const { id } = useParams();
   const { data, isLoading, refetch } = useSessionDetailQuery(id as string);
   const [users, setUsers] = useState([]);
-  const [renderButtonData, setRenderButtonData] = useState<SessionBoxProps>();
+  const [renderButtonData, setRenderButtonData] = useState<SessionQueryWithSignups>();
 
   useEffect(() => {
     if (data && data.SessionIC && data.Signup) {
@@ -156,9 +168,7 @@ export default function Page() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
+      <Loading />
     );
   }
   if (!data) {
@@ -175,90 +185,88 @@ export default function Page() {
   const session: SessionDetailResponse = data;
 
   return (
-    <MemberGuard>
-      <SidebarInset>
-        <header className="sticky flex mt-8 shrink-0 items-center gap-2 transition-[width,height] ease-linear">
-          <div className="flex items-center gap-2 px-4">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/sessions">Sessions</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{session.name}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        <div>
-          <div className="px-4 py-6 flex flex-col gap-4 max-w-screen-xl mx-auto">
-            {/* <Link href="/sessions">
+    <SidebarInset>
+      <header className="sticky flex mt-8 shrink-0 items-center gap-2 transition-[width,height] ease-linear">
+        <div className="flex items-center gap-2 px-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink onClick={() => router.back()}>Sessions</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{session.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+      </header>
+      <div>
+        <div className="px-4 py-6 flex flex-col gap-4 max-w-screen-xl mx-auto">
+          {/* <Link href="/sessions">
               <button className="flex gap-4 items-center">
                 <ChevronLeftIcon className="h-5 text-grey-500" />
                 <span className={`${styles.heading4} text-grey-500`}>BACK TO UPCOMING SESSIONS</span>
               </button>
             </Link> */}
-            <span className="font-heading font-bold text-[22px] leading-tight">
-              {session.name.toUpperCase()}
+          <span className="font-heading font-bold text-[22px] leading-tight">
+            {session.name.toUpperCase()}
+          </span>
+          <div className="flex flex-col gap-1">
+            <span className={`${styles.paragraph}`}>
+              {getDateString(session.date)}
             </span>
-            <div className="flex flex-col gap-1">
+            <span className={`${styles.paragraph}`}>
+              {getTimeString(session.startTime)} -{" "}
+              {getTimeString(session.endTime)}
+            </span>
+            <div className="flex">
               <span className={`${styles.paragraph}`}>
-                {getDateString(session.date)}
+                Lanes {session.lanes.join(", ")}
               </span>
-              <span className={`${styles.paragraph}`}>
-                {getTimeString(session.startTime)} -{" "}
-                {getTimeString(session.endTime)}
+              <UserIcon className="ml-3 h-4 my-auto text-grey-500" />
+              <span className={`ml-1 ${styles.paragraph}`}>
+                {users.length}/{session.maxParticipants}
               </span>
-              <div className="flex">
-                <span className={`${styles.paragraph}`}>
-                  Lanes {session.lanes.join(", ")}
-                </span>
-                <UserIcon className="ml-3 h-4 my-auto text-grey-500" />
-                <span className={`ml-1 ${styles.paragraph}`}>
-                  {users.length}/{session.maxParticipants}
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-1.5 mt-3">
-                {session.levels.map((level) => (
-                  <LevelLabel label={level} key={level} />
+            </div>
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {session.levels.map((level) => (
+                <LevelLabel label={level} key={level} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <span className={`${styles.heading2}`}>ATTENDEES</span>
+            <div className="flex flex-col border rounded-lg border-grey-300 max-w-screen-lg p-4 mt-2">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {users.map((user: User & { isIc: boolean }) => (
+                  <AttendeeCard user={user} isIc={user.isIc} key={user.id} />
                 ))}
               </div>
-            </div>
-            <div>
-              <span className={`${styles.heading2}`}>ATTENDEES</span>
-              <div className="flex flex-col border rounded-lg border-grey-300 max-w-screen-lg p-4 mt-2">
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {users.map((user: User & { isIc: boolean }) => (
-                    <AttendeeCard user={user} isIc={user.isIc} key={user.id} />
-                  ))}
-                </div>
-                <div className="w-full mt-2">
-                  <RenderButton
-                    props={renderButtonData || defaultSessionBoxProps}
-                  />
-                </div>
+              <div className="w-full mt-2">
+                <RenderButton
+                  props={renderButtonData || defaultSessionBoxProps}
+                />
               </div>
             </div>
-
-            {/* Description Box */}
-            {session.description && session.description.length > 0 && (
-              <div className="flex flex-col gap-2">
-                <span className={`${styles.heading2}`}>DESCRIPTION</span>
-                <span className={`${styles.paragraph}`}>
-                  {session.description}
-                </span>
-              </div>
-            )}
-
-            {/* Training Plan */}
-            {session.TrainingPlan.length > 0 && (
-              <TrainingPlan props={session.TrainingPlan[0]} />
-            )}
           </div>
+
+          {/* Description Box */}
+          {session.description && session.description.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <span className={`${styles.heading2}`}>DESCRIPTION</span>
+              <span className={`${styles.paragraph}`}>
+                {session.description}
+              </span>
+            </div>
+          )}
+
+          {/* Training Plan */}
+          {session.TrainingPlan.length > 0 && (
+            <TrainingPlan props={session.TrainingPlan[0]} />
+          )}
         </div>
-      </SidebarInset>
-    </MemberGuard>
+      </div>
+    </SidebarInset>
   );
 }

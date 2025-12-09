@@ -8,6 +8,7 @@ import type { TableProps } from "antd";
 import { Prisma, User, Level, AccessRole } from "@prisma/client";
 import { checkDomainOfScale } from "recharts/types/util/ChartUtils";
 import { getUserLevelColor } from "../common/functions/userUtils";
+import Loading from "../Loading";
 
 type UserWithRole = Prisma.UserGetPayload<{
   include: { role: true };
@@ -98,33 +99,39 @@ const columns: TableProps<UserWithRole>["columns"] = [
   },
 ];
 
-export default function Page() {
+export default function PageAuth() {
+  return (
+    <AdminGuard>
+      <Page />
+    </AdminGuard>
+  )
+}
+
+function Page() {
   const { data: userList, isLoading, error } = useUserListQuery();
   console.log(userList);
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />
   }
   if (error) {
     return <div>Error: {error.message}</div>;
   }
   return (
-    <AdminGuard>
-      <div className="px-8 py-8 flex flex-col gap-4 max-w-screen-xl ml-0">
-        <span className={styles.heading1}>MANAGE USERS</span>
-        <Table<UserWithRole>
-          columns={columns}
-          dataSource={userList}
-          rowKey="id"
-          pagination={false}
-          className="cursor-pointer"
-          onRow={(record, rowIndex) => ({
-            onClick: (event) => {
-              // Handle row click if needed
-              console.log("Row clicked:", record);
-            },
-          })}
-        />
-      </div>
-    </AdminGuard>
+    <div className="px-8 py-8 flex flex-col gap-4 max-w-screen-xl ml-0">
+      <span className={styles.heading1}>MANAGE USERS</span>
+      <Table<UserWithRole>
+        columns={columns}
+        dataSource={userList}
+        rowKey="id"
+        pagination={false}
+        className="cursor-pointer"
+        onRow={(record, rowIndex) => ({
+          onClick: (event) => {
+            // Handle row click if needed
+            console.log("Row clicked:", record);
+          },
+        })}
+      />
+    </div>
   );
 }

@@ -22,14 +22,14 @@ const authInitialState: AuthUserState = {
  */
 const authSlice = createSlice({
   name: "auth",
-  initialState: { ...authInitialState },
+  initialState: authInitialState,
   reducers: {
     // Logs the user out and resets the authentication state.
-    logout: (state) => {
-      return { ...authInitialState };
+    authLogout: (_state, _action: {payload: null, type: string}) => {
+      return authInitialState;
     },
     // Sets the authenticated user in the state.
-    setAuthUser: (state, action) => {
+    setAuthUser: (state, action: {payload: User, type: string}) => {
       const authUser = action.payload as User;
       return { ...state, authUser };
     }
@@ -37,7 +37,7 @@ const authSlice = createSlice({
 });
 
 // Action creators for the authentication slice.
-export const { setAuthUser, logout } = authSlice.actions;
+export const { setAuthUser, authLogout } = authSlice.actions;
 
 /**
  * Selects the authentication token from the state.
