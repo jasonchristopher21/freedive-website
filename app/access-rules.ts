@@ -1,5 +1,7 @@
 import { AccessRole, User } from "@prisma/client";
 
+// This file handles the logic for determining whether the current logged in user has the ability to perform
+// an action, as defined in this file, based on their access role.
 
 const roleToValue = (v: AccessRole) => {
     switch (v) {
@@ -40,25 +42,28 @@ type RolesWithPermissions = {
     }>
 }
 
+// Define the additional data type needed if any, and the available user actions.
 type Permissions = {
     users: {
         dataType: User
         action: "view-users" | "edit-user" | "edit-user-access-role" | "remove"
     },
     settings: {
-        dataType: User
-        action: "view" | "update" | "delete"
+        dataType: null
+        action: "view" | "update" | "delete-account"
     },
 }
 
+const CannotEditSelf = (user: User, resource: User) => user.id !== resource.id
 
+// Define the logic for determining user permissions based on their role
 const ROLES = {
     ADMIN: {
         users: {
-            "view-users": true, "edit-user": true, "edit-user-access-role": true, remove: true
+            "view-users": true, "edit-user": CannotEditSelf, "edit-user-access-role": CannotEditSelf, remove: CannotEditSelf
         },
         settings: {
-            view: true, update: true, delete: true
+            view: true, update: true, "delete-account": true
         }
     },
     IC: {
@@ -69,6 +74,15 @@ const ROLES = {
     PENDING: {},
 } as const satisfies RolesWithPermissions
 
+/**
+ * Checks whether the current logged in user has the permission to execute the specified action,
+ * based on their access role and the rules located in the file of this function.
+ * @param user The current logged in user
+ * @param resource The access category, typically the page location
+ * @param action The type of action under the specified resource
+ * @param data May be used to determine more complex user permissions
+ * @returns boolean
+ */
 export function hasPermission<Resource extends keyof Permissions>(
     user: User,
     resource: Resource,

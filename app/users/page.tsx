@@ -2,36 +2,28 @@
 
 import styles from "@/app/styles";
 import { useUserListQuery } from "@/queries/useUserListQuery";
+import { useAppSelector } from "@/redux/store";
 import { AccessRole, Level, Prisma } from "@prisma/client";
 import { UseQueryResult } from "@tanstack/react-query";
 import type { TableProps } from "antd";
-import { Select, Space, Table, Tag } from "antd";
+import { Space, Table, Tag } from "antd";
 import { useState } from "react";
+import { hasPermission } from "../access-rules";
 import AdminGuard from "../common/authguard/AdminGuard";
 import Loading from "../Loading";
-import { CcaRoles } from "../types";
 import ConfirmEditModal from "./ConfirmEditModal";
-import { hasPermission } from "../access-rules";
-import { useAppSelector } from "@/redux/store";
-import Unauthorised from "../unauthorised";
-import EditSelect from "./EditSelect";
+import EditCcaRolesSelect from "./EditCcaRolesSelect";
+import EditLevelSelect from "./EditLevelSelect";
+import EditAccessRolesSelect from "./EditAccessRoleSelect";
 
 type UserWithRole = Prisma.UserGetPayload<{
   include: { role: true };
 }>;
 
-const getTableLevelColor = (level: Level) => {
-  switch (level) {
-    case Level.BEGINNER:
-      return "green";
-    case Level.INTERMEDIATE:
-      return "orange";
-    case Level.ADVANCED:
-      return "red";
-    default:
-      return "blue";
-  }
-};
+type Edit = {
+  confirm: () => Promise<void>,
+  cancel: () => void
+}
 
 const getTableAccessRoleColor = (role: string) => {
   switch (role) {
@@ -46,6 +38,19 @@ const getTableAccessRoleColor = (role: string) => {
   }
 };
 
+const getTableLevelColor = (level: Level) => {
+  switch (level) {
+    case Level.BEGINNER:
+      return "green";
+    case Level.INTERMEDIATE:
+      return "orange";
+    case Level.ADVANCED:
+      return "red";
+    default:
+      return "blue";
+  }
+};
+
 export default function PageAuth() {
   return (
     <AdminGuard>
@@ -54,22 +59,19 @@ export default function PageAuth() {
   )
 }
 
-type Edit = {
-  confirm: () => Promise<void>,
-  cancel: () => void
-}
-
-const notOwnRow = (rowId: string, userId: string) => rowId !== userId
-
 function Page() {
   const user = useAppSelector(state => state.user.user)!
   const [edit, setEdit] = useState<Edit | null>(null)
-  const { data, refetch, isLoading, error }: UseQueryResult<UserWithRole[]> = useUserListQuery();
+  const { data, isRefetchError, isLoading, error, refetch }: UseQueryResult<UserWithRole[]> = useUserListQuery();
+
   if (isLoading) {
     return <Loading />
   }
   if (error) {
     return <div>Error: {error.message}</div>;
+  }
+  if (isRefetchError) {
+    return <div>Error: Failed to refetch</div>;
   }
   const userList = data!.sort((u1, u2) => {
     return u1.accessRole.localeCompare(u2.accessRole)
@@ -106,27 +108,10 @@ function Page() {
         value: level,
       })),
       render: (_, record) => (
-        <Space size="middle">
-          <Tag color={getTableLevelColor(record.level)}>{record.level}</Tag>
-        </Space>
+        hasPermission(user, "users", "edit-user", record) ?
+          <EditLevelSelect userRow={record} userList={userList} setEdit={setEdit} refetch={refetch} /> :
+          <Space size='middle'><Tag style={{ marginLeft: 12 }} color={getTableLevelColor(record.level)}>{record.level}</Tag></Space>
       ),
-    },
-    {
-      title: "Access Role",
-      dataIndex: "accessRole",
-      key: "accessRole",
-      render: (_, record) => (
-        <Space size="middle">
-          <Tag color={getTableAccessRoleColor(record.accessRole)}>
-            {record.accessRole}
-          </Tag>
-        </Space>
-      ),
-      onFilter: (value, record) => record.accessRole === value,
-      filters: Object.values(AccessRole).map((role) => ({
-        text: role,
-        value: role,
-      })),
     },
     {
       title: "Role",
@@ -134,10 +119,25 @@ function Page() {
       key: "role",
       minWidth: 150,
       render: (val, record) => {
-        return hasPermission(user, "users", "edit-user") && notOwnRow(user.id, record.id) ?
-        <EditSelect userRow={record} userList={userList} setEdit={setEdit} refetch={refetch} /> :
-          record.role.name
+        return hasPermission(user, "users", "edit-user", record) ?
+          <EditCcaRolesSelect userRow={record} userList={userList} setEdit={setEdit} refetch={refetch} /> :
+          <span style={{ marginLeft: 12 }}>{record.role.name}</span>
       },
+    },
+    {
+      title: "Access Role",
+      dataIndex: "accessRole",
+      key: "accessRole",
+      render: (_, record) => (
+        hasPermission(user, "users", "edit-user-access-role", record) ?
+        <EditAccessRolesSelect userRow={record} userList={userList} setEdit={setEdit} refetch={refetch} /> :
+        <Space size="middle"><Tag style={{marginLeft: 12}} color={getTableAccessRoleColor(record.accessRole)}>{record.accessRole}</Tag></Space>
+      ),
+      onFilter: (value, record) => record.accessRole === value,
+      filters: Object.values(AccessRole).map((role) => ({
+        text: role,
+        value: role,
+      })),
     },
   ];
 
@@ -150,13 +150,12 @@ function Page() {
         rowKey="id"
         pagination={false}
         className="cursor-pointer"
-        onRow={(record, rowIndex) => ({
-          onClick: (event) => {
-            // Handle row click if needed
-            console.log("Row clicked:", record);
-          },
-        })}
-
+      // onRow={(record, rowIndex) => ({
+      //   onClick: (event) => {
+      //     // Handle row click if needed
+      //     console.log("Row clicked:", record);
+      //   },
+      // })}
       />
       {edit && <ConfirmEditModal edit={edit} setEdit={setEdit} />}
     </div>

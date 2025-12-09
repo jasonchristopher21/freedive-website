@@ -26,8 +26,31 @@ export default function ConfirmEditModal({ edit, setEdit }: props) {
                             Are you sure you want commit the change?
                         </p>
                     </div>
-                    {/* Desktop View */}
+                    {/* Mobile View */}
+                    <div className="flex flex-col md:hidden gap-2 mt-1">
+                        <button
+                            className={clsx(
+                                "font-heading text-white bg-blue-500 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto hover:bg-opacity-80 transition duration-200",
+                                loading ? "cursor-not-allowed bg-grey-300" : "cursor-pointer"
+                            )}
+                            onClick={async () => {
+                                setLoading(true)
+                                await edit.confirm()
+                                setLoading(false)
+                            }}
+                        >
+                            {loading ? "UPDATING..." : "CONFIRM"}
+                        </button>
 
+                        <button
+                            className="font-heading text-grey-300 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto border border-grey-100 hover:border-red-500 hover:text-red-500 transition-colors duration-200"
+                            onClick={() => edit.cancel()}
+                        >
+                            CANCEL
+                        </button>
+                    </div>
+
+                    {/* Desktop View */}
                     <div className="hidden md:flex flex-row gap-2 mt-2 w-2/3 mr-0 ml-auto">
                         <button
                             className="font-heading text-grey-300 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto border border-grey-100 hover:border-red-500 hover:text-red-500 transition-colors duration-200"
@@ -46,7 +69,7 @@ export default function ConfirmEditModal({ edit, setEdit }: props) {
                                 setLoading(false)
                             }}
                         >
-                            {loading ? "SIGNING UP..." : "CONFIRM SIGN UP"}
+                            {loading ? "UPDATING..." : "CONFIRM"}
                         </button>
                     </div>
 
