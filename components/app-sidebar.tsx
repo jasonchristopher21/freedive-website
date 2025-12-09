@@ -1,40 +1,29 @@
 "use client"
 
-import * as React from "react"
 import {
-  AudioWaveform,
+  ArrowUpRightFromSquare,
   BookOpen,
   Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  LogOut,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
   Calendar,
   CalendarPlus,
-  Users,
   FileSpreadsheet,
-  ArrowUpRightFromSquare,
+  LogOut,
+  Settings2,
+  SquareTerminal,
+  Users
 } from "lucide-react"
+import * as React from "react"
 
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavItem } from "@/components/nav-item"
-import { NavUser } from "@/components/nav-user"
 import { NavFooter } from "@/components/nav-footer"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { NavItem } from "@/components/nav-item"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
+  SidebarRail
 } from "@/components/ui/sidebar"
-import { usePathname } from "next/navigation"
 import { NO_SIDEBAR_PATHS } from "@/constants"
+import { usePathname } from "next/navigation"
 
 // This is sample data.
 const data = {
