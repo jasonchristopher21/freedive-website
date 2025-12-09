@@ -18,6 +18,7 @@ import Data from "./Data";
 import { Label } from "@/components/ui/label";
 import Loading from "@/app/Loading";
 import saveAs from "file-saver";
+import styles from "@/app/styles";
 
 const formSchema = z.object({
 	month: z.nativeEnum(Month),
@@ -49,6 +50,7 @@ function ViewSessionsPage() {
 
 	return (
 		<div className="min-h-[90vh] min-w-full px-8 py-8 flex flex-col gap-4 max-w-screen-lg ml-0">
+			<span className={styles.heading1}>VIEW SESSIONS</span>
 			<div className="flex flex-col h-full w-full items-center p-8 border-2 border-grey-100 border-opacity-50 rounded-lg gap-6 
 													md:flex-row md:px-8 md:py-6 md:gap-10">
 				<div className="flex items-center gap-4">

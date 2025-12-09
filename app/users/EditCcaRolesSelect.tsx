@@ -1,7 +1,7 @@
-import { ConfigProvider, Select } from "antd"
-import { CcaRoles } from "../types"
-import { Level, Prisma, User } from "@prisma/client"
+import { Prisma } from "@prisma/client";
+import { Select } from "antd";
 import React, { SetStateAction } from "react";
+import { CcaRoles } from "../types";
 
 type UserWithRole = Prisma.UserGetPayload<{
   include: { role: true };

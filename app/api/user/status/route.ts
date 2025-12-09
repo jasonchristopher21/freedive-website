@@ -27,7 +27,10 @@ export async function GET() {
   console.log(user);
 
   if (!user) {
-    return NextResponse.json({ status: "unauthenticated" }, { status: 401 });
+    return NextResponse.json({
+      status: "unauthenticated",
+      // redirect: "/sign-in"
+     }, { status: 401 });
   }
 
   // Fetch the user's access role from the User table

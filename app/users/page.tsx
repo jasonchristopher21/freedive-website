@@ -3,7 +3,7 @@
 import styles from "@/app/styles";
 import { useUserListQuery } from "@/queries/useUserListQuery";
 import { useAppSelector } from "@/redux/store";
-import { AccessRole, Level, Prisma } from "@prisma/client";
+import { AccessRole, Level, Prisma, User } from "@prisma/client";
 import { UseQueryResult } from "@tanstack/react-query";
 import type { TableProps } from "antd";
 import { Space, Table, Tag } from "antd";
@@ -54,7 +54,7 @@ const getTableLevelColor = (level: Level) => {
 export default function PageAuth() {
   return (
     <AdminGuard>
-      <Page />
+      <Page/>
     </AdminGuard>
   )
 }
@@ -130,8 +130,8 @@ function Page() {
       key: "accessRole",
       render: (_, record) => (
         hasPermission(user, "users", "edit-user-access-role", record) ?
-        <EditAccessRolesSelect userRow={record} userList={userList} setEdit={setEdit} refetch={refetch} /> :
-        <Space size="middle"><Tag style={{marginLeft: 12}} color={getTableAccessRoleColor(record.accessRole)}>{record.accessRole}</Tag></Space>
+          <EditAccessRolesSelect userRow={record} userList={userList} setEdit={setEdit} refetch={refetch} /> :
+          <Space size="middle"><Tag style={{ marginLeft: 12 }} color={getTableAccessRoleColor(record.accessRole)}>{record.accessRole}</Tag></Space>
       ),
       onFilter: (value, record) => record.accessRole === value,
       filters: Object.values(AccessRole).map((role) => ({
@@ -144,20 +144,23 @@ function Page() {
   return (
     <div className="px-8 py-8 flex flex-col gap-4 max-w-screen-xl ml-0">
       <span className={styles.heading1}>MANAGE USERS</span>
-      <Table<UserWithRole>
-        columns={columns}
-        dataSource={userList}
-        rowKey="id"
-        pagination={false}
-        className="cursor-pointer"
-      // onRow={(record, rowIndex) => ({
-      //   onClick: (event) => {
-      //     // Handle row click if needed
-      //     console.log("Row clicked:", record);
-      //   },
-      // })}
-      />
-      {edit && <ConfirmEditModal edit={edit} setEdit={setEdit} />}
+      <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
+
+        <Table<UserWithRole>
+          columns={columns}
+          dataSource={userList}
+          rowKey="id"
+          pagination={false}
+          className="cursor-pointer"
+        // onRow={(record, rowIndex) => ({
+        //   onClick: (event) => {
+        //     // Handle row click if needed
+        //     console.log("Row clicked:", record);
+        //   },
+        // })}
+        />
+        {edit && <ConfirmEditModal edit={edit} setEdit={setEdit} />}
+      </div>
     </div>
   );
 }

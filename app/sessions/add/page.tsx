@@ -152,12 +152,12 @@ function AddSessionPage() {
   }
 
   console.log("IC List:", icList);
-  console.log(form.getValues())
-  console.log(form.formState.errors);
+  // console.log(form.getValues())
+  // console.log(form.formState.errors);
 
   return (
-    <div className="px-8 py-8 flex flex-col gap-4 max-w-screen-lg ml-0">
-      <span className={styles.heading1}>ADD SESSION</span>
+    <div className="flex flex-col px-8 py-8 min-w-full justify-center gap-4 max-w-screen-lg ml-0">
+      <span className={styles.heading1}>ADD SESSIONS</span>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
