@@ -39,3 +39,7 @@ export type SessionQueryWithSignups = SessionQuery & {
     role: string
   }[]
 }
+
+export enum CcaRoles {
+  'Member', 'Publicity Manager', 'Logistics Manager', 'Projects Manager', 'Captain', 'Vice Captain', 'Events Manager', 'Admin'
+}
