@@ -1,12 +1,13 @@
 "use client"
 import { useAvatarQuery } from '@/queries/useAvatarQuery';
-import { useAppSelector } from "@/redux/store";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { PlusOutlined } from '@ant-design/icons';
 import { User } from '@prisma/client';
 import { useEffect, useRef, useState } from "react";
 import MemberGuard from "../common/authguard/MemberGuard";
 import styles from "../styles";
 import { UseQueryResult } from '@tanstack/react-query';
+import { setUser } from '@/redux/features/user/userSlice';
 
 
 export default function SettingsPageAuth() {
@@ -38,6 +39,7 @@ function SettingsPage() {
 }
 
 function AvatarUpload({ user }: { user: User }) {
+  const dispatch = useAppDispatch()
   // Fetch avatar public url
   const { data, isLoading, isRefetching, isRefetchError, isError, error, refetch }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
   if (isError || isRefetchError) {
@@ -46,6 +48,7 @@ function AvatarUpload({ user }: { user: User }) {
   const publicAvatarUrl: string | undefined = data || undefined
 
   const [file, setFile] = useState<File | null>(null)
+  const filename = file ? `${user.id}.${file?.name.split('.').pop()}` : undefined
   // Use timestamp to prevent browser from caching the result due to the same file name being used.
   const [timestamp, setTimestamp] = useState<number>(new Date().getTime())
   const ref = useRef<HTMLInputElement>(null)
@@ -74,7 +77,7 @@ function AvatarUpload({ user }: { user: User }) {
         body: formData
       })
       if (res.ok) {
-        await refetch()
+        dispatch(setUser({...user, avatarUrl: filename!}))
         setTimestamp(new Date().getTime())
       } else {
         console.error(res.statusText)
