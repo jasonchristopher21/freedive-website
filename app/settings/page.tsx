@@ -65,7 +65,7 @@ function AvatarUpload({ user }: { user: User }) {
       const formData = new FormData()
       formData.append('userId', user.id)
       formData.append("file", file)
-      await fetch("/api/settings", {
+      await fetch(`/api/avatar`, {
         method: "PATCH",
         body: formData
       })

@@ -9,7 +9,7 @@ export const useAvatarQuery = (avatarUrl: string | null) => {
         return avatarUrl
       }
       // Else it is the filename located in supabase Storage
-      const response = await fetch(`/api/user/${avatarUrl}`, {
+      const response = await fetch(`/api/user/avatar?url=${avatarUrl}`, {
         method: "GET"
       })
 
@@ -20,6 +20,7 @@ export const useAvatarQuery = (avatarUrl: string | null) => {
       console.log(data);
       return data.data;
     },
+    enabled: !!avatarUrl,
     refetchOnWindowFocus: false,
   });
 };
