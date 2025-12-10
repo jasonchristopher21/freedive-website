@@ -25,8 +25,8 @@ function SettingsPage() {
     <div className="flex flex-col px-8 py-8 min-w-full justify-center gap-4 max-w-screen-lg ml-0">
       <span className={styles.heading1}>SETTINGS</span>
       <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
-        <h1 className={styles.heading1}>{user.name}</h1>
         <AvatarUpload user={user} />
+        <h1 className={styles.heading1}>{user.name}</h1>
         <h1 className={styles.heading1}>{user.preferredName}</h1>
         <h1 className={styles.heading1}>{user.email}</h1>
         <h1 className={styles.heading1}>{user.nusnetEmail}</h1>
@@ -40,59 +40,54 @@ function SettingsPage() {
 
 function AvatarUpload({ user }: { user: User }) {
   const dispatch = useAppDispatch()
+
   // Fetch avatar public url
-  const { data, isLoading, isRefetching, isRefetchError, isError, error, refetch }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
+  const { data: publicAvatarUrl, isLoading, isRefetching, isRefetchError, isError, error, refetch }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
+
   if (isError || isRefetchError) {
     console.error(error.message)
   }
-  const publicAvatarUrl: string | undefined = data || undefined
 
-  const [file, setFile] = useState<File | null>(null)
-  const filename = file ? `${user.id}.${file?.name.split('.').pop()}` : undefined
   // Use timestamp to prevent browser from caching the result due to the same file name being used.
   const [timestamp, setTimestamp] = useState<number>(new Date().getTime())
-  const ref = useRef<HTMLInputElement>(null)
+  const ref = useRef<HTMLInputElement>(null) // Allows input to be clicked
 
-  const validateAndSetFile = (file: File | null) => {
+  const validateAndUploadFile = async (file: File | null) => {
     const ACCEPTED_FILE_TYPES = ['image/png', 'image/jpg', 'image/jpeg']
     const MAX_FILE_SIZE = 1 << 21
     if (file && ACCEPTED_FILE_TYPES.includes(file.type) && file.size <= MAX_FILE_SIZE) {
-      console.log(file)
-      setFile(file)
+      const filetype = file.name.split('.').pop()
+      const filename = `${user.id}.${filetype}` // The name of the file to be stored in Users table and Storage
+
+      const updateImage = async () => {
+        const formData = new FormData()
+        formData.append('userId', user.id)
+        formData.append("file", file)
+        formData.append("filename", filename)
+        const res = await fetch(`/api/user/avatar`, {
+          method: "PATCH",
+          body: formData
+        })
+        if (res.ok) {
+          dispatch(setUser({ ...user, avatarUrl: filename! }))
+          setTimestamp(new Date().getTime())
+        } else {
+          console.error(res.statusText)
+        }
+      }
+
+      await updateImage()
     } else {
       console.log("Image file not suitable!")
     }
   }
-
-  useEffect(() => {
-    if (!file) {
-      return
-    }
-    const updateImage = async () => {
-      const formData = new FormData()
-      formData.append('userId', user.id)
-      formData.append("file", file)
-      const res = await fetch(`/api/user/avatar`, {
-        method: "PATCH",
-        body: formData
-      })
-      if (res.ok) {
-        dispatch(setUser({...user, avatarUrl: filename!}))
-        setTimestamp(new Date().getTime())
-      } else {
-        console.error(res.statusText)
-      }
-    }
-    updateImage()
-
-  }, [file])
 
   // Displays a overlay that allows uploading of image file when clicked.
   const UploadInput = () => (
     <div className='flex justify-center items-center h-full w-full'>
       <img src={publicAvatarUrl + "?t=" + timestamp} />
       <input ref={ref} className='hidden bg-gray-100' type='file'
-        onChange={(e) => { validateAndSetFile(e.target.files && e.target.files[0]) }} accept='image/png, image/jpg, image/jpeg' />
+        onChange={(e) => { validateAndUploadFile(e.target.files && e.target.files[0]) }} accept='image/png, image/jpg, image/jpeg' />
       <div id='hover-upload-overlay' className={`flex flex-col items-center justify-center absolute top-0 left-0 w-full h-full
         transition-opacity ${publicAvatarUrl ? 'opacity-0 hover:opacity-50' : 'opacity-50 hover:opacity-100'} cursor-pointer bg-gray-100`} onClick={e => ref.current?.click()}>
         <PlusOutlined />
@@ -105,7 +100,7 @@ function AvatarUpload({ user }: { user: User }) {
       <svg className='fill-black' width={150} height={150} viewBox='0 0 100 100'>
         <defs>
           <clipPath id='cut-circle'>
-            <circle cx={50} cy={50} r={48} />
+            <circle cx={50} cy={50} r={48.5} />
           </clipPath>
           <clipPath id='cut-circle-outline'>
             <circle cx={50} cy={50} r={50} />

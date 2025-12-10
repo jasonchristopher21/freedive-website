@@ -29,7 +29,8 @@ export async function GET(req: NextRequest) {
 
 const bodySchema = z.object({
     userId: z.string(),
-    file: z.instanceof(File)
+    file: z.instanceof(File),
+    filename: z.string()
 })
 
 /**
@@ -47,15 +48,13 @@ export async function PATCH(req: Request) {
         })
     }
 
-    const userAvatarPath = `${data.userId}.${data.file.name.split('.').pop()}`
-
     const prev = await prisma.$transaction(async tx => {
         const prev = await tx.user.findUnique({
             select: { avatarUrl: true },
             where: { id: data.userId }
         })
         await tx.user.update({
-            data: { avatarUrl: { set: userAvatarPath } },
+            data: { avatarUrl: { set: data.filename } },
             where: { id: data.userId }
         })
         return prev?.avatarUrl
@@ -63,14 +62,14 @@ export async function PATCH(req: Request) {
 
     const supabase = await createClient()
 
-    if (prev && prev !== userAvatarPath) {
+    if (prev && prev !== data.filename) {
         supabase.storage.from('images-avatar')
             .remove([prev])
     }
 
 
     const url = await supabase.storage.from('images-avatar')
-        .upload(userAvatarPath, data.file, {upsert: true})
+        .upload(data.filename, data.file, {upsert: true})
 
 
     if (url.error) {
