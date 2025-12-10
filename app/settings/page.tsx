@@ -1,13 +1,14 @@
 "use client"
 import { useAvatarQuery } from '@/queries/useAvatarQuery';
 import { useAppDispatch, useAppSelector } from "@/redux/store";
-import { PlusOutlined } from '@ant-design/icons';
+import { CloseCircleOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { User } from '@prisma/client';
 import { useEffect, useRef, useState } from "react";
 import MemberGuard from "../common/authguard/MemberGuard";
 import styles from "../styles";
 import { UseQueryResult } from '@tanstack/react-query';
 import { setUser } from '@/redux/features/user/userSlice';
+import { Input } from 'antd';
 
 
 export default function SettingsPageAuth() {
@@ -24,25 +25,54 @@ function SettingsPage() {
   return (
     <div className="flex flex-col px-8 py-8 min-w-full justify-center gap-4 max-w-screen-lg ml-0">
       <span className={styles.heading1}>SETTINGS</span>
-      <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
-        <AvatarUpload user={user} />
-        <h1 className={styles.heading1}>{user.name}</h1>
-        <h1 className={styles.heading1}>{user.preferredName}</h1>
-        <h1 className={styles.heading1}>{user.email}</h1>
-        <h1 className={styles.heading1}>{user.nusnetEmail}</h1>
-        <h1 className={styles.heading1}>{user.yearOfStudy}</h1>
-        <h1 className={styles.heading1}>{user.telegramHandle}</h1>
-        <h1 className={styles.heading1}>{user.remarks}</h1>
+      <div className="p-4 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 w-fit
+                      md:px-20 md:py-12 md:gap-4">
+
+        {/** Row 1 */}
+        <div className='flex flex-row gap-12 items-center'>
+          <EdittableAvatar user={user} />
+          <EdittableText user={user} />
+        </div>
+
+        <div className="w-full border-t-2 border-grey-200 mt-4 mb-6" />
+
+        {/** Row 2 */}
+        <div className='flex flex-row gap-12 items-center'>
+          <h1 className={styles.heading1 + " min-w-[200]"}>Preferred name: </h1>
+          <h1 className={styles.heading1}>{user.preferredName}</h1>
+        </div>
+
+        <div className='flex flex-row gap-12 items-center'>
+          <h1 className={styles.heading1 + " min-w-[200]"}>Email: </h1>
+          <h1 className={styles.heading1}>{user.email}</h1>
+        </div>
+
+        <div className='flex flex-row gap-12 items-center'>
+          <h1 className={styles.heading1 + " min-w-[200]"}>NUSNet Email: </h1>
+          <h1 className={styles.heading1}>{user.nusnetEmail}</h1>
+        </div>
+
+        <div className='flex flex-row gap-12 items-center'>
+          <h1 className={styles.heading1 + " min-w-[200]"}>Year of Study: </h1>
+          <h1 className={styles.heading1}>{user.yearOfStudy}</h1>
+        </div>
+
+        {user.telegramHandle &&
+          <div className='flex flex-row gap-12 items-center'>
+            <h1 className={styles.heading1 + " min-w-[200]"}>Telegram Handle: </h1>
+            <h1 className={styles.heading1}>{user.telegramHandle}</h1>
+          </div>
+        }
       </div>
     </div>
   )
 }
 
-function AvatarUpload({ user }: { user: User }) {
+function EdittableAvatar({ user }: { user: User }) {
   const dispatch = useAppDispatch()
 
   // Fetch avatar public url
-  const { data: publicAvatarUrl, isLoading, isRefetching, isRefetchError, isError, error, refetch }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
+  const { data: publicAvatarUrl, isLoading, isRefetching, isRefetchError, isError, error }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
 
   if (isError || isRefetchError) {
     console.error(error.message)
@@ -95,9 +125,10 @@ function AvatarUpload({ user }: { user: User }) {
       </div>
     </div>
   )
+
   return (
     <>
-      <svg className='fill-black' width={150} height={150} viewBox='0 0 100 100'>
+      <svg width={150} height={150} viewBox='0 0 100 100'>
         <defs>
           <clipPath id='cut-circle'>
             <circle cx={50} cy={50} r={48.5} />
@@ -110,7 +141,7 @@ function AvatarUpload({ user }: { user: User }) {
           ? <circle cx={50} cy={50} r={50} fill='white' clipPath='url(#cut-circle)' />
           :
           <>
-            <circle cx={50} cy={50} r={50} clipPath='url(#cut-circle-outline)' />
+            <circle cx={50} cy={50} r={50} fill='rgb(0 0 0 / 0.1)' clipPath='url(#cut-circle-outline)' />
             <circle cx={50} cy={50} r={50} fill='white' clipPath='url(#cut-circle)' />
             <foreignObject width={100} height={100} clipPath='url(#cut-circle)'>
               <UploadInput />
@@ -119,5 +150,30 @@ function AvatarUpload({ user }: { user: User }) {
         }
       </svg>
     </>
+  )
+}
+
+function EdittableText({ user }: { user: User }) {
+  const [edit, setEdit] = useState<boolean>(false)
+  const [editName, setEditName] = useState<string>(user.name)
+
+  return (
+    <div className='flex min-w-[333] justify-between p-4 gap-4 items-center border-2 shadow-md'>
+      {edit ?
+        <>
+          <Input value={editName} onChange={e => setEditName(e.target.value)} className={styles.heading2} variant='underlined' />
+          <CloseCircleOutlined className='transition-all p-3 hover:bg-gray-200 rounded-full cursor-pointer' onClick={() => {
+            setEdit(false)
+            setEditName(user.name)
+          }} />
+        </>
+        :
+        <>
+          <h1 className={styles.heading1 + " pl-2"}>{user.name}</h1>
+          <EditOutlined className='transition-all p-3 hover:bg-gray-200 rounded-full cursor-pointer'
+            onClick={() => setEdit(true)} />
+        </>
+      }
+    </div>
   )
 }
