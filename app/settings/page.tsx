@@ -39,21 +39,25 @@ function SettingsPage() {
 
 function AvatarUpload({ user }: { user: User }) {
   // Fetch avatar public url
-  const { data, isError, error }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
-  if (isError) {
+  const { data, isLoading, isRefetching, isRefetchError, isError, error, refetch }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
+  if (isError || isRefetchError) {
     console.error(error.message)
   }
   const publicAvatarUrl: string | undefined = data || undefined
 
   const [file, setFile] = useState<File | null>(null)
+  // Use timestamp to prevent browser from caching the result due to the same file name being used.
+  const [timestamp, setTimestamp] = useState<number>(new Date().getTime())
   const ref = useRef<HTMLInputElement>(null)
 
   const validateAndSetFile = (file: File | null) => {
     const ACCEPTED_FILE_TYPES = ['image/png', 'image/jpg', 'image/jpeg']
     const MAX_FILE_SIZE = 1 << 21
     if (file && ACCEPTED_FILE_TYPES.includes(file.type) && file.size <= MAX_FILE_SIZE) {
-      // console.log(file)
+      console.log(file)
       setFile(file)
+    } else {
+      console.log("Image file not suitable!")
     }
   }
 
@@ -65,10 +69,16 @@ function AvatarUpload({ user }: { user: User }) {
       const formData = new FormData()
       formData.append('userId', user.id)
       formData.append("file", file)
-      await fetch(`/api/avatar`, {
+      const res = await fetch(`/api/user/avatar`, {
         method: "PATCH",
         body: formData
       })
+      if (res.ok) {
+        await refetch()
+        setTimestamp(new Date().getTime())
+      } else {
+        console.error(res.statusText)
+      }
     }
     updateImage()
 
@@ -77,7 +87,7 @@ function AvatarUpload({ user }: { user: User }) {
   // Displays a overlay that allows uploading of image file when clicked.
   const UploadInput = () => (
     <div className='flex justify-center items-center h-full w-full'>
-      <img src={publicAvatarUrl} />
+      <img src={publicAvatarUrl + "?t=" + timestamp} />
       <input ref={ref} className='hidden bg-gray-100' type='file'
         onChange={(e) => { validateAndSetFile(e.target.files && e.target.files[0]) }} accept='image/png, image/jpg, image/jpeg' />
       <div id='hover-upload-overlay' className={`flex flex-col items-center justify-center absolute top-0 left-0 w-full h-full
@@ -89,15 +99,26 @@ function AvatarUpload({ user }: { user: User }) {
   )
   return (
     <>
-      <svg className='fill-black' width={100} height={100} viewBox='0 0 100 100'>
+      <svg className='fill-black' width={150} height={150} viewBox='0 0 100 100'>
         <defs>
           <clipPath id='cut-circle'>
+            <circle cx={50} cy={50} r={48} />
+          </clipPath>
+          <clipPath id='cut-circle-outline'>
             <circle cx={50} cy={50} r={50} />
           </clipPath>
         </defs>
-        <foreignObject width={100} height={100} clipPath='url(#cut-circle)'>
-          <UploadInput />
-        </foreignObject>
+        {isLoading || isRefetching
+          ? <circle cx={50} cy={50} r={50} fill='white' clipPath='url(#cut-circle)' />
+          :
+          <>
+            <circle cx={50} cy={50} r={50} clipPath='url(#cut-circle-outline)' />
+            <circle cx={50} cy={50} r={50} fill='white' clipPath='url(#cut-circle)' />
+            <foreignObject width={100} height={100} clipPath='url(#cut-circle)'>
+              <UploadInput />
+            </foreignObject>
+          </>
+        }
       </svg>
     </>
   )

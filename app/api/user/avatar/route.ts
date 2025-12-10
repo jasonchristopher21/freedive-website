@@ -47,8 +47,30 @@ export async function PATCH(req: Request) {
         })
     }
 
-    const url = await (await createClient()).storage.from('images-avatar')
-        .upload(`${data.userId}.${data.file.name.split('.').pop()}`, data.file, {upsert: true})
+    const userAvatarPath = `${data.userId}.${data.file.name.split('.').pop()}`
+
+    const prev = await prisma.$transaction(async tx => {
+        const prev = await tx.user.findUnique({
+            select: { avatarUrl: true },
+            where: { id: data.userId }
+        })
+        await tx.user.update({
+            data: { avatarUrl: { set: userAvatarPath } },
+            where: { id: data.userId }
+        })
+        return prev?.avatarUrl
+    })
+
+    const supabase = await createClient()
+
+    if (prev && prev !== userAvatarPath) {
+        supabase.storage.from('images-avatar')
+            .remove([prev])
+    }
+
+
+    const url = await supabase.storage.from('images-avatar')
+        .upload(userAvatarPath, data.file, {upsert: true})
 
 
     if (url.error) {
@@ -56,12 +78,7 @@ export async function PATCH(req: Request) {
         return NextResponse.json({status: 400})
     }
 
-    await prisma.$transaction(async tx => {
-        await tx.user.update({
-            data: { avatarUrl: { set: url.data.path } },
-            where: { id: data.userId }
-        })
-    })
+    
 
     return NextResponse.json({
         status: 200
