@@ -40,6 +40,8 @@ import RenderButton from "../RenderButton";
 import { defaultSessionBoxProps } from "../SessionBox";
 import { SessionQueryWithSignups } from "@/app/types";
 import Loading from "@/app/Loading";
+import { useAvatarQuery } from "@/queries/useAvatarQuery";
+import { UseQueryResult } from "@tanstack/react-query";
 
 export interface SessionDetailResponse {
   id: string;
@@ -87,6 +89,12 @@ interface SignupObject {
 }
 
 function AttendeeCard({ user, isIc }: { user: any; isIc: boolean }) {
+  // Fetch avatar public url
+  const { data, isError, error }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
+  if (isError) {
+    console.error(error.message)
+  }
+  const publicAvatarUrl: string | undefined = data || undefined
   return (
     <div>
       <div className="flex items-center gap-3">
@@ -97,7 +105,7 @@ function AttendeeCard({ user, isIc }: { user: any; isIc: boolean }) {
           )}
         >
           <img
-            src={user.avatarUrl || "/default-avatar.png"}
+            src={publicAvatarUrl || undefined}
             alt={user.name}
             className="w-8 h-8 rounded-full"
           />
@@ -159,7 +167,7 @@ function Page() {
       setUsers(userList);
       setRenderButtonData({
         ...data,
-        Signup: data.Signup.map((signup: SignupObject) => ({
+        signups: data.Signup.map((signup: SignupObject) => ({
           userId: signup.User.id,
         })),
       });
