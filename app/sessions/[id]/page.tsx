@@ -36,6 +36,7 @@ import clsx from "clsx";
 import RenderButton from "../RenderButton";
 import { SessionDetailedResponseMapped } from "@/app/api/sessions/[id]/route";
 import ConfirmEditModal, { EditModalProps } from "@/app/users/ConfirmEditModal";
+import { hasPermission } from "@/app/access-rules";
 
 type AttendeeCardUser =
   Pick<SessionDetailedResponseMapped['signups'][0], 'id' | 'name' | 'role' | 'preferredName' | 'level' | 'avatarUrl'> & { isIc: boolean }
@@ -49,13 +50,15 @@ function AttendeeCard({ currUser, user, dispatch }:
   if (isError) {
     console.error(error.message)
   }
+
+
   const actionIconStyle = 'transition-all p-3 hover:bg-gray-200 rounded-full cursor-pointer'
-  const dropdownItems: MenuProps['items'] = [
-    {
-      label: ("Remove"), key: '0',
-      onClick: () => dispatch('delete'),
-    }
-  ]
+
+  const dropdownItems: MenuProps['items'] = [{
+    label: ("Remove"), key: '0',
+    onClick: () => dispatch('delete'),
+  }]
+
   return (
     <div>
       <div className="flex items-center gap-3">
@@ -91,7 +94,7 @@ function AttendeeCard({ currUser, user, dispatch }:
           </span>
         </div>
         {
-          (["ADMIN", "IC"].includes(currUser.accessRole) || user.id === currUser.id) &&
+          hasPermission(currUser, "sessions", "remove-attendee", user) &&
           <Dropdown menu={{ items: dropdownItems }} trigger={["click"]}>
             <MoreOutlined className={actionIconStyle} />
           </Dropdown>
@@ -136,9 +139,6 @@ function Page() {
   }
 
   const dispatchEdit = (userId: string) => async (type: UserEditFunctions) => {
-    if (!["IC", "ADMIN"].includes(currUser.accessRole)) {
-      return
-    }
     switch (type) {
       case 'delete': {
         setEditModal({

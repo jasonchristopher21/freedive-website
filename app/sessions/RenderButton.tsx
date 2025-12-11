@@ -63,11 +63,7 @@ const RenderButton = ({ props }: { props: RenderButtonUser }) => {
   }
 
   // If user level is not suitable for the session
-  if (
-    props.levels.length > 0 &&
-    user?.level &&
-    !props.levels.includes(user.level)
-  ) {
+  if (!props.levels.includes(user.level)) {
     return (
       <button
         disabled

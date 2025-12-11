@@ -29,7 +29,7 @@ type Role = AccessRole
 // or a function that takes in data with type defined within the keyof Permissions.
 type PermissionCheck<Key extends keyof Permissions> =
     | boolean
-    | ((user: User, data: Permissions[Key]["dataType"]) => boolean)
+    | ((currUser: User, data: Permissions[Key]["dataType"]) => boolean)
 
 
 
@@ -44,8 +44,12 @@ type RolesWithPermissions = {
 
 // Define the additional data type needed if any, and the available user actions.
 type Permissions = {
+    sessions: {
+        dataType: Pick<User,"id">,
+        action: "remove-attendee"
+    },
     users: {
-        dataType: User
+        dataType: Pick<User,"id">
         action: "view-users" | "edit-user" | "edit-user-access-role" | "remove"
     },
     settings: {
@@ -54,22 +58,40 @@ type Permissions = {
     },
 }
 
-const CannotEditSelf = (user: User, resource: User) => user.id !== resource.id
+const CannotEditSelf = (user: User, resource: Pick<User,"id">) => user.id !== resource.id
+const OnlySelf = (user: User, resource: Pick<User,"id">) => user.id === resource.id
 
 // Define the logic for determining user permissions based on their role
 const ROLES = {
     ADMIN: {
+        sessions: {
+            "remove-attendee": true
+        },
         users: {
-            "view-users": true, "edit-user": CannotEditSelf, "edit-user-access-role": CannotEditSelf, remove: CannotEditSelf
+            "view-users": true, "edit-user": true, "edit-user-access-role": true, remove: CannotEditSelf
         },
         settings: {
             view: true, update: true, "delete-account": true
         }
     },
     IC: {
+        sessions: {
+            "remove-attendee": true
+        },
+        users: {
+            "view-users": true, "edit-user": true, "edit-user-access-role": true, remove: CannotEditSelf
+        },
+        settings: {
+            view: true, update: true, "delete-account": true
+        }
     },
     MEMBER: {
-
+        sessions: {
+            "remove-attendee": OnlySelf
+        },
+        users: {
+            "view-users": true
+        }
     },
     PENDING: {},
 } as const satisfies RolesWithPermissions

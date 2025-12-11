@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
-import { AccessRole } from "@prisma/client";
+import { AccessRole, User } from "@prisma/client";
 
 /**
  * GET handler to check the user's authentication status and access role.
@@ -69,7 +69,7 @@ export async function GET() {
       status: "pending",
       redirect: "/register/pending-approval",
       authUser: user,
-      user: existingUser,
+      user: existingUser as User,
     });
   }
 
@@ -79,6 +79,6 @@ export async function GET() {
     status: "complete",
     redirect: "/sessions",
     authUser: user,
-    user: existingUser,
+    user: existingUser as User,
   });
 }

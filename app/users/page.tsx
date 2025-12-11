@@ -45,12 +45,12 @@ const getTableLevelColor = (level: Level) => {
       return "blue";
   }
 };
-
+// TODO: Add back AdmnGuard
 export default function PageAuth() {
   return (
-    <AdminGuard>
+    // <AdminGuard>
       <Page/>
-    </AdminGuard>
+    // </AdminGuard>
   )
 }
 
@@ -125,7 +125,7 @@ function Page() {
       key: "accessRole",
       render: (_, record) => (
         hasPermission(user, "users", "edit-user-access-role", record) ?
-          <EditAccessRolesSelect userRow={record} userList={userList} setEdit={setEdit} refetch={refetch} /> :
+          <EditAccessRolesSelect user={user} userRow={record} oldValue={record.accessRole} setEdit={setEdit} refetch={refetch} /> :
           <Space size="middle"><Tag style={{ marginLeft: 12 }} color={getTableAccessRoleColor(record.accessRole)}>{record.accessRole}</Tag></Space>
       ),
       onFilter: (value, record) => record.accessRole === value,

@@ -1,4 +1,6 @@
-import { AccessRole, Prisma } from "@prisma/client";
+import { setUser } from "@/redux/features/user/userSlice";
+import { useAppDispatch } from "@/redux/store";
+import { AccessRole, Prisma, User } from "@prisma/client";
 import { Select, Space, Tag } from "antd";
 import React, { SetStateAction } from "react";
 
@@ -12,8 +14,9 @@ type Edit = {
 }
 
 interface Props {
+  user: User
   userRow: UserWithRole
-  userList: UserWithRole[]
+  oldValue: string
   setEdit: React.Dispatch<SetStateAction<Edit | null>>
   refetch: () => void
 }
@@ -48,8 +51,8 @@ const updateAccessRole = async (userId: string, role: AccessRole) => {
 }
 
 
-export default function EditAccessRolesSelect({ userRow, userList, setEdit, refetch }: Props) {
-
+export default function EditAccessRolesSelect({ user, userRow, oldValue, setEdit, refetch }: Props) {
+  const dispatch = useAppDispatch()
   return (
       <Select
         variant="borderless"
@@ -59,14 +62,23 @@ export default function EditAccessRolesSelect({ userRow, userList, setEdit, refe
           .filter(k => typeof k === 'string')
           .map(k => { return { value: k } })} value={userRow.accessRole}
         onChange={v => {
-          const old = userList.find(u => u.id === userRow.id)!
-          if (old.accessRole === v) {
+          if (oldValue === v) {
             return
           }
           // If user confirms change, send request to update database, then refetch.
           setEdit({
             confirm: async () => {
-              await updateAccessRole(old.id, v)
+              await updateAccessRole(userRow.id, v)
+              // Change own credentials
+              if (user.id === userRow.id) {
+                const response = await fetch("/api/user/status")
+                if (!response.ok) {
+                  console.error("Failed to re-fetch user data")
+                } else {
+                  const newUser = (await response.json()).user as User
+                  dispatch(setUser(newUser))
+                }
+              }
               refetch()
               setEdit(null)
             },
