@@ -34,7 +34,7 @@ const RenderButton = ({ props, refresh }: { props: RenderButtonUser, refresh: ()
     await refresh()
   }
 
-  // If date is past the session
+  // If current date is past the session
   if (new Date() > new Date(props.date.slice(0, 10) + "T" + props.endTime)) {
     return (
       <>

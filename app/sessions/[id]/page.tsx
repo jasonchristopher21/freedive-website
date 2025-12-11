@@ -2,103 +2,22 @@
 
 import styles from "@/app/styles";
 import { useSessionDetailQuery } from "@/queries/useSessionDetailQuery";
-import { MoreOutlined } from '@ant-design/icons';
-import { User } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import TrainingPlan from "./TrainingPlan";
 
-import { hasPermission } from "@/app/access-rules";
-import { SessionDetailedResponseMapped } from "@/app/api/sessions/[id]/route";
 import MemberGuard from "@/app/common/authguard/MemberGuard";
-import { getUserLevelColor } from "@/app/common/functions/userUtils";
 import Loading from "@/app/Loading";
 import ConfirmEditModal, { EditModalProps } from "@/app/users/ConfirmEditModal";
 import {
   SidebarInset
 } from "@/components/ui/sidebar";
-import { useAvatarQuery } from "@/queries/useAvatarQuery";
 import { useAppSelector } from "@/redux/store";
-import { UseQueryResult } from "@tanstack/react-query";
-import { Dropdown, MenuProps } from "antd";
-import clsx from "clsx";
 import RenderButton from "../RenderButton";
 import SessionDetails from "./SessionDetails";
 import SessionHeader from "./SessionHeader";
+import AttendeeCard from "./AttendeeCard";
 
-type AttendeeCardUser =
-  Pick<SessionDetailedResponseMapped['signups'][0], 'id' | 'name' | 'role' | 'preferredName' | 'level' | 'avatarUrl'> & { isIc: boolean }
-
-type UserEditFunctions = "delete"
-
-function AttendeeCard({ sessionId, currUser, user, dispatch }:
-  { sessionId: string, currUser: User, user: AttendeeCardUser, dispatch: (fn: () => Promise<void>) => void }) {
-  // Fetch avatar public url
-  const { data: publicAvatarUrl, isError, error }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
-  if (isError) {
-    console.error(error.message)
-  }
-
-  const actionIconStyle = 'transition-all p-3 hover:bg-gray-200 rounded-full cursor-pointer'
-
-  const handleRemoveFromSession = async () => {
-    const response = await fetch(`/api/sessions/${sessionId}/remove-user`, {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user.id })
-    })
-    if (!response.ok) {
-      console.error("Failed to remove member from session")
-    }
-  }
-
-  const dropdownItems: MenuProps['items'] = [{
-    label: ("Remove"), key: '0',
-    onClick: () => dispatch(handleRemoveFromSession),
-  }]
-
-  return (
-    <div>
-      <div className="flex items-center gap-3">
-        <div
-          className={clsx(
-            "p-1 rounded-full flex-none justify-center items-center",
-            getUserLevelColor(user.level)
-          )}
-        >
-          <img
-            src={publicAvatarUrl || undefined}
-            alt={user.name}
-            className="w-8 h-8 rounded-full"
-          />
-        </div>
-        <div className="flex flex-col justify-center">
-          <div className="flex gap-1.5">
-            <span className={`${styles.heading3} font-bold text-black`}>
-              {user.preferredName
-                ? user.preferredName.toUpperCase()
-                : user.name.split(" ")[0].toUpperCase()}
-            </span>
-            {user.isIc && (
-              <div className="flex flex-col justify-center">
-                <span className={`${styles.paragraph} text-white font-bold text-[11px] my-auto bg-blue-500 px-1 rounded-sm`}>
-                  IC
-                </span>
-              </div>
-            )}
-          </div>
-          <span className="text-[11px] text-grey-500 -mt-0.5">
-            {user.role}
-          </span>
-        </div>
-        {
-          hasPermission(currUser, "sessions", "remove-attendee", user) &&
-          <Dropdown menu={{ items: dropdownItems }} trigger={["click"]}>
-            <MoreOutlined className={actionIconStyle} />
-          </Dropdown>
-        }
-      </div>
-    </div>
-  );
-}
 
 export default function PageAuth() {
   return (
@@ -186,9 +105,7 @@ function Page() {
           )}
 
           {/* Training Plan */}
-          {session.trainingPlan && (
-            <TrainingPlan props={session.trainingPlan} />
-          )}
+          {session.trainingPlan && (<TrainingPlan props={session.trainingPlan} />)}
         </div>
       </div>
     </SidebarInset>

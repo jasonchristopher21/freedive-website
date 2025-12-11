@@ -9,6 +9,8 @@ import styles from "../styles";
 import { UseQueryResult } from '@tanstack/react-query';
 import { setUser } from '@/redux/features/user/userSlice';
 import { Input } from 'antd';
+import { useDispatch } from 'react-redux';
+import { setError } from '@/redux/features/error/errorSlice';
 
 
 export default function SettingsPageAuth() {
@@ -31,7 +33,7 @@ function SettingsPage() {
         {/** Row 1 */}
         <div className='flex flex-row gap-12 items-center'>
           <EdittableAvatar user={user} />
-          <EdittableText user={user} />
+          <EdittableName user={user} />
         </div>
 
         <div className="w-full border-t-2 border-grey-200 mt-4 mb-6" />
@@ -41,12 +43,17 @@ function SettingsPage() {
           {/** Row 2 */}
           <div className='flex flex-row gap-12 items-center'>
             <h1 className={styles.heading2 + " min-w-[200]"}>Preferred name: </h1>
-            <h1 className={styles.heading2}>{user.preferredName}</h1>
+            <EdittableAttribute user={user} attribute='preferredName' />
           </div>
 
           <div className='flex flex-row gap-12 items-center'>
             <h1 className={styles.heading2 + " min-w-[200]"}>Email: </h1>
-            <h1 className={styles.heading2}>{user.email}</h1>
+            <EdittableAttribute user={user} attribute='email' />
+          </div>
+
+          <div className='flex flex-row gap-12 items-center'>
+            <h1 className={styles.heading2 + " min-w-[200]"}>Telegram Handle: </h1>
+            <EdittableAttribute user={user} attribute='telegramHandle' />
           </div>
 
           <div className='flex flex-row gap-12 items-center'>
@@ -57,11 +64,6 @@ function SettingsPage() {
           <div className='flex flex-row gap-12 items-center'>
             <h1 className={styles.heading2 + " min-w-[200]"}>Year of Study: </h1>
             <h1 className={styles.heading2}>{user.yearOfStudy}</h1>
-          </div>
-
-          <div className='flex flex-row gap-12 items-center'>
-            <h1 className={styles.heading2 + " min-w-[200]"}>Telegram Handle: </h1>
-            <h1 className={styles.heading2}>{user.telegramHandle}</h1>
           </div>
         </div>
 
@@ -78,6 +80,7 @@ function EdittableAvatar({ user }: { user: User }) {
 
   if (isError || isRefetchError) {
     console.error(error.message)
+    dispatch(setError("Failed to fetch avatar: " + error.message))
   }
 
   // Use timestamp to prevent browser from caching the result due to the same file name being used.
@@ -105,6 +108,7 @@ function EdittableAvatar({ user }: { user: User }) {
           setTimestamp(new Date().getTime())
         } else {
           console.error(res.statusText)
+          dispatch(setError("Failed to update image: " + res.statusText))
         }
       }
 
@@ -155,11 +159,12 @@ function EdittableAvatar({ user }: { user: User }) {
   )
 }
 
-function EdittableText({ user }: { user: User }) {
+function EdittableName({ user }: { user: User }) {
   const actionIconStyle = 'transition-all p-3 hover:bg-gray-200 rounded-full cursor-pointer'
 
   const [edit, setEdit] = useState<boolean>(false)
   const [editName, setEditName] = useState<string>(user.name)
+
 
   return (
     <div className='flex min-w-[300] p-4 items-center border-2 shadow-md'>
@@ -172,6 +177,59 @@ function EdittableText({ user }: { user: User }) {
         :
         <>
           <h1 className={styles.heading1 + " mr-auto pl-2"}>{user.name}</h1>
+          <EditOutlined className={actionIconStyle}
+            onClick={() => setEdit(true)} />
+        </>
+      }
+    </div>
+  )
+}
+
+type UserAttribute = 'name'|'preferredName'|'email'|'telegramHandle'
+function EdittableAttribute({ user, attribute }: { user: User, attribute: UserAttribute }) {
+  const actionIconStyle = 'transition-all p-3 hover:bg-gray-200 rounded-full cursor-pointer'
+
+  const dispatch = useDispatch()
+  const data = user[attribute]
+  const [edit, setEdit] = useState<boolean>(false)
+  const [editAttribute, setEditAttribute] = useState<string>(data || "")
+
+  const handlePrefNameUpdate = async () => {
+    const newData = editAttribute === '' ? null : editAttribute
+
+    if (newData === data) {
+      setEdit(false)
+      return
+    }
+
+    const response = await fetch(`/api/user/update`, {
+      method: "PATCH", headers: {
+        "Content-Type": "application/json",
+      }, 
+      body: JSON.stringify({
+        userId: user.id, data: newData, type: attribute
+      })
+    })
+    if (!response.ok) {
+      console.error("Failed to update name")
+      dispatch(setError("Failed to update name: " + response.statusText))
+    } else {
+      dispatch(setUser({...user, [attribute]: newData}))
+    }
+    setEdit(false)
+  }
+
+  return (
+    <div className='flex min-w-[300] px-4 py-0 items-center border-[1px] shadow-md'>
+      {edit ?
+        <>
+          <Input value={editAttribute} onChange={e => setEditAttribute(e.target.value)} className={styles.heading3 + " mr-auto w-44"} variant='underlined' />
+          <CheckOutlined className={actionIconStyle} onClick={handlePrefNameUpdate} />
+          <CloseCircleOutlined className={actionIconStyle} onClick={() => { setEdit(false); setEditAttribute(data || "") }} />
+        </>
+        :
+        <>
+          <h1 className={styles.heading2 + " mr-auto pl-2"}>{data}</h1>
           <EditOutlined className={actionIconStyle}
             onClick={() => setEdit(true)} />
         </>
