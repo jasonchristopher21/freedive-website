@@ -6,7 +6,7 @@ import { SessionDetailedResponseMapped } from "../api/sessions/[id]/route";
 
 // Pick the smallest subset of attributes that we need.
 type RenderButtonUser = Pick<SessionDetailedResponseMapped, 'id'|'levels'|'maxParticipants'|'date'|'startTime'|'endTime'>
-  & { signups: Pick<SessionDetailedResponseMapped['signups'][0], 'userId'>[] }
+  & { signups: Pick<SessionDetailedResponseMapped['signups'][0], 'id'>[] }
 
 const RenderButton = ({ props }: { props: RenderButtonUser }) => {
   const user = useAppSelector((state) => state.user.user);
@@ -34,7 +34,7 @@ const RenderButton = ({ props }: { props: RenderButtonUser }) => {
     props.signups &&
     props.signups.length > 0 &&
     userId &&
-    props.signups.some((signup) => signup.userId === userId)
+    props.signups.some((signup) => signup.id === userId)
   ) {
     return (
       <>

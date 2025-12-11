@@ -11,7 +11,7 @@ import { MoreOutlined } from '@ant-design/icons';
 import { UserIcon } from "@heroicons/react/24/outline";
 import { Level, User } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import TrainingPlan from "./TrainingPlan";
 
 import MemberGuard from "@/app/common/authguard/MemberGuard";
@@ -34,12 +34,15 @@ import { UseQueryResult } from "@tanstack/react-query";
 import { Dropdown, MenuProps } from "antd";
 import clsx from "clsx";
 import RenderButton from "../RenderButton";
-import { defaultSessionBoxProps } from "../SessionBox";
 import { SessionDetailedResponseMapped } from "@/app/api/sessions/[id]/route";
+import ConfirmEditModal, { EditModalProps } from "@/app/users/ConfirmEditModal";
 
-type AttendeeCardUser = Pick<SessionDetailedResponseMapped['signups'][0], 'name'|'role'|'preferredName'|'level'|'avatarUrl'>
-function AttendeeCard({ currUser, user, isIc }: { currUser: User, user: AttendeeCardUser, isIc: boolean }) {
-  
+type AttendeeCardUser = Pick<SessionDetailedResponseMapped['signups'][0], 'name' | 'role' | 'preferredName' | 'level' | 'avatarUrl'> & { isIc: boolean }
+
+type UserEditFunctions = "delete"
+
+function AttendeeCard({ currUser, user, dispatch }:
+  { currUser: User, user: AttendeeCardUser, dispatch: (type: UserEditFunctions) => Promise<void> }) {
   // Fetch avatar public url
   const { data: publicAvatarUrl, isError, error }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
   if (isError) {
@@ -48,7 +51,8 @@ function AttendeeCard({ currUser, user, isIc }: { currUser: User, user: Attendee
   const actionIconStyle = 'transition-all p-3 hover:bg-gray-200 rounded-full cursor-pointer'
   const dropdownItems: MenuProps['items'] = [
     {
-      label: ("Remove"), key: '0'
+      label: ("Remove"), key: '0',
+      onClick: () => dispatch('delete'),
     }
   ]
   return (
@@ -73,7 +77,7 @@ function AttendeeCard({ currUser, user, isIc }: { currUser: User, user: Attendee
                 ? user.preferredName.toUpperCase()
                 : user.name.split(" ")[0].toUpperCase()}
             </span>
-            {isIc && (
+            {user.isIc && (
               <div className="flex flex-col justify-center">
                 <span className={`${styles.paragraph} text-white font-bold text-[11px] my-auto bg-blue-500 px-1 rounded-sm`}>
                   IC
@@ -86,7 +90,7 @@ function AttendeeCard({ currUser, user, isIc }: { currUser: User, user: Attendee
           </span>
         </div>
         {
-          currUser.accessRole === 'ADMIN' &&
+          ["ADMIN","IC"].includes(currUser.accessRole) &&
           <Dropdown menu={{ items: dropdownItems }} trigger={["click"]}>
             <MoreOutlined className={actionIconStyle} />
           </Dropdown>
@@ -106,9 +110,10 @@ export default function PageAuth() {
 
 function Page() {
   const router = useRouter()
-  const { id } = useParams();
+  const { id } = useParams() // Session ID
   const currUser = useAppSelector(state => state.user.user)!
-  const { data, isLoading, isError, error } = useSessionDetailQuery(id as string);
+  const { data, isLoading, isError, error, refetch } = useSessionDetailQuery(id as string);
+  const [editModal, setEditModal] = useState<EditModalProps | null>(null)
 
   if (isLoading) {
     return (
@@ -129,9 +134,36 @@ function Page() {
     );
   }
 
+  const dispatchEdit = (userId: string) => async (type: UserEditFunctions) => {
+    if (!["IC", "ADMIN"].includes(currUser.accessRole)) {
+      return
+    }
+    switch (type) {
+      case 'delete': {
+        setEditModal({
+          confirm: async () => {
+            const response = await fetch(`/api/sessions/${id}/remove-user`, {
+              method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({userId})
+            })
+            if (!response.ok) {
+              console.error("Failed to remove member from session")
+            }
+            await refetch()
+            setEditModal(null)
+          },
+          cancel: () => {
+            setEditModal(null)
+          }
+        })
+
+      }
+    }
+  }
+
+
   const icList = data.ics.map((ic) => ic.id)
   const userList = data.signups.map(u => {
-    return {...u, isIc: icList.includes(u.id)}
+    return { ...u, isIc: icList.includes(u.id) }
   })
 
   return (
@@ -191,16 +223,14 @@ function Page() {
             <span className={`${styles.heading2}`}>ATTENDEES</span>
             <div className="flex flex-col border rounded-lg border-grey-300 max-w-screen-lg p-4 mt-2">
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {userList.map((user) => (
-                  <AttendeeCard currUser={currUser} user={user} isIc={user.isIc} key={user.id} />
-                ))}
+                {userList.map((user) => (<AttendeeCard currUser={currUser} user={user} dispatch={dispatchEdit(user.id)} key={user.id} />))}
               </div>
               <div className="w-full mt-2">
-                <RenderButton
-                  props={data || defaultSessionBoxProps}
-                />
+                <RenderButton props={data} />
               </div>
             </div>
+            {editModal && <ConfirmEditModal confirm={editModal.confirm} cancel={editModal.cancel} />}
+
           </div>
 
           {/* Description Box */}

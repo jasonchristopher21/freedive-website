@@ -11,7 +11,7 @@ import { useState } from "react";
 import { hasPermission } from "../access-rules";
 import AdminGuard from "../common/authguard/AdminGuard";
 import Loading from "../Loading";
-import ConfirmEditModal from "./ConfirmEditModal";
+import ConfirmEditModal, { EditModalProps } from "./ConfirmEditModal";
 import EditCcaRolesSelect from "./EditCcaRolesSelect";
 import EditLevelSelect from "./EditLevelSelect";
 import EditAccessRolesSelect from "./EditAccessRoleSelect";
@@ -19,11 +19,6 @@ import EditAccessRolesSelect from "./EditAccessRoleSelect";
 type UserWithRole = Prisma.UserGetPayload<{
   include: { role: true };
 }>;
-
-type Edit = {
-  confirm: () => Promise<void>,
-  cancel: () => void
-}
 
 const getTableAccessRoleColor = (role: string) => {
   switch (role) {
@@ -61,7 +56,7 @@ export default function PageAuth() {
 
 function Page() {
   const user = useAppSelector(state => state.user.user)!
-  const [edit, setEdit] = useState<Edit | null>(null)
+  const [edit, setEdit] = useState<EditModalProps | null>(null)
   const { data, isRefetchError, isLoading, error, refetch }: UseQueryResult<UserWithRole[]> = useUserListQuery();
 
   if (isLoading) {
@@ -152,14 +147,8 @@ function Page() {
           rowKey="id"
           pagination={false}
           className="cursor-pointer"
-        // onRow={(record, rowIndex) => ({
-        //   onClick: (event) => {
-        //     // Handle row click if needed
-        //     console.log("Row clicked:", record);
-        //   },
-        // })}
         />
-        {edit && <ConfirmEditModal edit={edit} setEdit={setEdit} />}
+        {edit && <ConfirmEditModal confirm={edit.confirm} cancel={edit.cancel} />}
       </div>
     </div>
   );

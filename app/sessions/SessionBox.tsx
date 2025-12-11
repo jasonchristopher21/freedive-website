@@ -6,22 +6,7 @@ import { UserIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Session, Signup } from "../types";
 
-type SessionBoxProps = Session & {signups: Pick<Signup,'userId'>[]}
-
-export const defaultSessionBoxProps: SessionBoxProps = {
-  id: "",
-  name: "",
-  description: "",
-  date: new Date().toString(),
-  startTime: "00:00:00",
-  endTime: "00:00:00",
-  lanes: [],
-  maxParticipants: 0,
-  createdAt: new Date().toString(),
-  sessionType: "TRAINING",
-  levels: [],
-  signups: [],
-}
+type SessionBoxProps = Session & {signups: Pick<Signup,'id'>[]}
 
 export default function SessionBox({ props }: {props: SessionBoxProps}) {
   const user = useAppSelector((state) => state.user.user);

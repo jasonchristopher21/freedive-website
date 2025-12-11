@@ -7,14 +7,13 @@ import { NextResponse } from "next/server";
 
 type SessionDetailedResponse = {
   signups: {
-    id: string;
+    id: string; // Same as userId
     role: string
     name: string;
     preferredName: string | null;
     year: YearOfStudy;
     level: Level;
     avatarUrl: string | null;
-    userId: string;
   }[];
   startTime: string;
   endTime: string;
@@ -64,7 +63,7 @@ export async function GET(
       select: {
         id: true, name: true, description: true, date: true, startTime: true, endTime: true, lanes: true, maxParticipants: true, createdAt: true, sessionType: true, levels: true,
         trainingPlan: true,
-        signups: { select: { userId: true, user: { select: { id: true, name: true, yearOfStudy: true, preferredName: true, avatarUrl: true, level: true, role: { select: { name: true } } } } } },
+        signups: { select: { user: { select: { id: true, name: true, yearOfStudy: true, preferredName: true, avatarUrl: true, level: true, role: { select: { name: true } } } } } },
         ics: { select: { userId: true, user: { select: { id: true, name: true, preferredName: true, avatarUrl: true, level: true, role: { select: { name: true } } } } } },
       },
       where: { id }
@@ -78,9 +77,9 @@ export async function GET(
 
     // Flatten user name, year, and role
     const flattenUser = mappedSession && {
-      ...mappedSession, signups: mappedSession.signups.map(u => {
+      ...mappedSession, signups: mappedSession.signups.map(s => {
         return {
-          ...u.user, userId: u.userId, year: u.user.yearOfStudy, role: u.user.role.name
+          ...s.user, year: s.user.yearOfStudy, role: s.user.role.name
         }
       }),
       ics: mappedSession.ics.map(ic => { return { ...ic.user, role: ic.user.role.name, userId: ic.userId } })

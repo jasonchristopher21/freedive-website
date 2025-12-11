@@ -2,18 +2,12 @@ import React, { SetStateAction, useState } from "react";
 import styles from "../styles";
 import clsx from "clsx";
 
-type Edit = {
+export type EditModalProps = {
     confirm: () => Promise<void>,
     cancel: () => void
 }
 
-interface props {
-    edit: Edit,
-    setEdit: React.Dispatch<SetStateAction<Edit | null>>
-}
-
-export default function ConfirmEditModal({ edit, setEdit }: props) {
-    console.log("edit", edit)
+export default function ConfirmEditModal({ confirm, cancel }: EditModalProps) {
     const [loading, setLoading] = useState<boolean>(false)
 
     return (
@@ -35,7 +29,7 @@ export default function ConfirmEditModal({ edit, setEdit }: props) {
                             )}
                             onClick={async () => {
                                 setLoading(true)
-                                await edit.confirm()
+                                await confirm()
                                 setLoading(false)
                             }}
                         >
@@ -44,7 +38,7 @@ export default function ConfirmEditModal({ edit, setEdit }: props) {
 
                         <button
                             className="font-heading text-grey-300 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto border border-grey-100 hover:border-red-500 hover:text-red-500 transition-colors duration-200"
-                            onClick={() => edit.cancel()}
+                            onClick={() => cancel()}
                         >
                             CANCEL
                         </button>
@@ -54,7 +48,7 @@ export default function ConfirmEditModal({ edit, setEdit }: props) {
                     <div className="hidden md:flex flex-row gap-2 mt-2 w-2/3 mr-0 ml-auto">
                         <button
                             className="font-heading text-grey-300 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto border border-grey-100 hover:border-red-500 hover:text-red-500 transition-colors duration-200"
-                            onClick={() => edit.cancel()}
+                            onClick={() => cancel()}
                         >
                             CANCEL
                         </button>
@@ -65,7 +59,7 @@ export default function ConfirmEditModal({ edit, setEdit }: props) {
                             )}
                             onClick={async () => {
                                 setLoading(true)
-                                await edit.confirm()
+                                await confirm()
                                 setLoading(false)
                             }}
                         >
