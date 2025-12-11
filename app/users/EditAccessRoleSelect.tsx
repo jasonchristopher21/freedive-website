@@ -1,3 +1,4 @@
+import { setError } from "@/redux/features/error/errorSlice";
 import { setUser } from "@/redux/features/user/userSlice";
 import { useAppDispatch } from "@/redux/store";
 import { AccessRole, Prisma, User } from "@prisma/client";
@@ -73,7 +74,8 @@ export default function EditAccessRolesSelect({ user, userRow, oldValue, setEdit
               if (user.id === userRow.id) {
                 const response = await fetch("/api/user/status")
                 if (!response.ok) {
-                  console.error("Failed to re-fetch user data")
+                  console.error("Failed to refetch user data")
+                  dispatch(setError("Failed to refetch user data: " + response.statusText))
                 } else {
                   const newUser = (await response.json()).user as User
                   dispatch(setUser(newUser))

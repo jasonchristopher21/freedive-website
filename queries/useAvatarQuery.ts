@@ -14,7 +14,7 @@ export const useAvatarQuery = (avatarUrl: string | null) => {
       })
 
       if (!response.ok) {
-        console.error("Failed to fetch user avatar");
+        console.error("Failed to fetch user avatar")
       }
       const data = await response.json();
       console.log(data);

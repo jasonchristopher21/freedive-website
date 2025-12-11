@@ -12,11 +12,12 @@ import ConfirmEditModal, { EditModalProps } from "@/app/users/ConfirmEditModal";
 import {
   SidebarInset
 } from "@/components/ui/sidebar";
-import { useAppSelector } from "@/redux/store";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
 import RenderButton from "../RenderButton";
 import SessionDetails from "./SessionDetails";
 import SessionHeader from "./SessionHeader";
 import AttendeeCard from "./AttendeeCard";
+import { setError } from "@/redux/features/error/errorSlice";
 
 
 export default function PageAuth() {
@@ -29,6 +30,7 @@ export default function PageAuth() {
 
 function Page() {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const { id } = useParams() // Session ID
   const currUser = useAppSelector(state => state.user.user)!
   const { data: session, isLoading, isError, error, refetch } = useSessionDetailQuery(id as string);
@@ -41,6 +43,7 @@ function Page() {
   }
   if (isError) {
     console.error(error.message)
+    dispatch(setError(error.message))
     return (
       <div>ERROR</div>
     )
@@ -84,7 +87,7 @@ function Page() {
             <span className={`${styles.heading2}`}>ATTENDEES</span>
             <div className="flex flex-col border rounded-lg border-grey-300 max-w-screen-lg p-4 mt-2">
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {userList.map((user) => (<AttendeeCard sessionId={session.id} currUser={currUser} user={user} dispatch={dispatchEdit} key={user.id} />))}
+                {userList.map((user) => (<AttendeeCard sessionId={session.id} currUser={currUser} user={user} key={user.id} callbackFn={dispatchEdit} />))}
               </div>
               <div className="w-full mt-2">
                 <RenderButton refresh={async () => { await refetch() }} props={session} />

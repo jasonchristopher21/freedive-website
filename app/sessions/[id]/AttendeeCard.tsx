@@ -8,17 +8,21 @@ import { MenuProps, Dropdown } from "antd"
 import clsx from "clsx"
 import { MoreOutlined } from '@ant-design/icons';
 import { User } from "@prisma/client"
+import { setError } from "@/redux/features/error/errorSlice"
+import { useAppDispatch } from "@/redux/store"
 
 
 type AttendeeCardUser =
   Pick<SessionDetailedResponseMapped['signups'][0], 'id' | 'name' | 'role' | 'preferredName' | 'level' | 'avatarUrl'> & { isIc: boolean }
   
-export default function AttendeeCard({ sessionId, currUser, user, dispatch }:
-  { sessionId: string, currUser: User, user: AttendeeCardUser, dispatch: (fn: () => Promise<void>) => void }) {
+export default function AttendeeCard({ sessionId, currUser, user, callbackFn }:
+  { sessionId: string, currUser: User, user: AttendeeCardUser, callbackFn: (fn: () => Promise<void>) => void }) {
+  const dispatch = useAppDispatch()
   // Fetch avatar public url
   const { data: publicAvatarUrl, isError, error }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
   if (isError) {
     console.error(error.message)
+    dispatch(setError(error.message))
   }
 
   const actionIconStyle = 'transition-all p-3 hover:bg-gray-200 rounded-full cursor-pointer'
@@ -29,12 +33,13 @@ export default function AttendeeCard({ sessionId, currUser, user, dispatch }:
     })
     if (!response.ok) {
       console.error("Failed to remove member from session")
+      dispatch(setError(response.statusText))
     }
   }
 
   const dropdownItems: MenuProps['items'] = [{
     label: ("Remove"), key: '0',
-    onClick: () => dispatch(handleRemoveFromSession),
+    onClick: () => callbackFn(handleRemoveFromSession),
   }]
 
   return (

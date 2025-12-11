@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { createClient } from "@/utils/supabase/client";
 import { selectAuthUser } from "@/redux/features/auth/authSlice";
-import { useAppSelector } from "@/redux/store";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { Button } from "@/components/ui/button";
 import { AutosizeTextarea } from "@/components/ui/autosize-textarea";
 import {
@@ -32,6 +32,7 @@ import { useIcListQuery } from "@/queries/useIcListQuery";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import Loading from "@/app/Loading";
+import { setError } from "@/redux/features/error/errorSlice";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -68,6 +69,7 @@ export default function AddSessionPageAuth() {
 }
 
 function AddSessionPage() {
+  const dispatch = useAppDispatch()
 
   const laneOptions = Array.from({ length: 10 }, (_, i) => ({
     value: i + 1,
@@ -141,7 +143,7 @@ function AddSessionPage() {
       })
       .catch((error) => {
         console.error("Error during signup:", error);
-        alert(error.message);
+        dispatch(setError("Error during signup: " + error.message))
       });
   }
 

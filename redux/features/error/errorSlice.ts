@@ -5,16 +5,18 @@ import { createSlice } from "@reduxjs/toolkit";
  */
 export interface AuthErrorState {
   isError: boolean,
-  message: string
+  message: string,
+  response?: Response
 }
 
 
 /**
  * Initial state for the authentication slice
  */
-const errorInitialState = {
+const errorInitialState: AuthErrorState = {
   isError: false,
-  message: ""
+  message: "",
+  response: undefined
 }
 
 const errorSlice = createSlice({
@@ -26,8 +28,11 @@ const errorSlice = createSlice({
       return errorInitialState;
     },
     // Sets the error in the state.
-    setError: (state, action: {payload: string, type: string}) => {
-      return { isError: true, message: action.payload };
+    setError: (_state, action: {payload: {message: string, response?: Response} | string, type: string}) => {
+      if (typeof action.payload === 'string') {
+        return { isError: true, message: action.payload }
+      }
+      return { isError: true, message: action.payload.message, response: action.payload.response };
     }
   },
 });

@@ -107,7 +107,7 @@ function EdittableAvatar({ user }: { user: User }) {
           dispatch(setUser({ ...user, avatarUrl: filename! }))
           setTimestamp(new Date().getTime())
         } else {
-          console.error(res.statusText)
+          console.error("Failed to update image:", res.statusText)
           dispatch(setError("Failed to update image: " + res.statusText))
         }
       }
@@ -185,7 +185,7 @@ function EdittableName({ user }: { user: User }) {
   )
 }
 
-type UserAttribute = 'name'|'preferredName'|'email'|'telegramHandle'
+type UserAttribute = 'name' | 'preferredName' | 'email' | 'telegramHandle'
 function EdittableAttribute({ user, attribute }: { user: User, attribute: UserAttribute }) {
   const actionIconStyle = 'transition-all p-3 hover:bg-gray-200 rounded-full cursor-pointer'
 
@@ -205,16 +205,16 @@ function EdittableAttribute({ user, attribute }: { user: User, attribute: UserAt
     const response = await fetch(`/api/user/update`, {
       method: "PATCH", headers: {
         "Content-Type": "application/json",
-      }, 
+      },
       body: JSON.stringify({
         userId: user.id, data: newData, type: attribute
       })
     })
     if (!response.ok) {
-      console.error("Failed to update name")
-      dispatch(setError("Failed to update name: " + response.statusText))
+      console.error("Failed to update " + attribute)
+      dispatch(setError({ message: `Failed to update ${attribute}:`, response }))
     } else {
-      dispatch(setUser({...user, [attribute]: newData}))
+      dispatch(setUser({ ...user, [attribute]: newData }))
     }
     setEdit(false)
   }

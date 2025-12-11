@@ -112,7 +112,7 @@ export default function ProfileForm() {
       })
       .catch((error) => {
         console.error("Error during signup:", error);
-        dispatch(setError(error))
+        dispatch(setError("Error during signup: " + error.message))
       });
   }
   return (

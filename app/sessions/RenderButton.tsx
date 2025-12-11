@@ -1,8 +1,9 @@
-import { useAppSelector } from "@/redux/store";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { useState } from "react";
 import ConfirmSignupModal from "./signup-modals/ConfirmSignupModal";
 import SignupConfirmedModal from "./signup-modals/SignupConfirmedModal";
 import { SessionDetailedResponseMapped } from "../api/sessions/[id]/route";
+import { setError } from "@/redux/features/error/errorSlice";
 
 // Pick the smallest subset of attributes that we need.
 type RenderButtonUser = Pick<SessionDetailedResponseMapped, 'id' | 'levels' | 'maxParticipants' | 'date' | 'startTime' | 'endTime'>
@@ -10,6 +11,7 @@ type RenderButtonUser = Pick<SessionDetailedResponseMapped, 'id' | 'levels' | 'm
 
 const RenderButton = ({ props, refresh }: { props: RenderButtonUser, refresh: () => Promise<void> }) => {
   const user = useAppSelector((state) => state.user.user)!
+  const dispatch = useAppDispatch()
   const userId = user.id
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -29,6 +31,7 @@ const RenderButton = ({ props, refresh }: { props: RenderButtonUser, refresh: ()
       .then((response) => {
         if (!response.ok) {
           console.error("Error during signup")
+          dispatch(setError("Error during signup: " + response.statusText))
         }
       })
     await refresh()

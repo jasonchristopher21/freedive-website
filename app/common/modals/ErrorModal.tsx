@@ -3,12 +3,24 @@
 import styles from "@/app/styles";
 import { closeError } from "@/redux/features/error/errorSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
+import { useEffect, useState } from "react";
 
 export default function ErrorModal() {
-  const errorState = useAppSelector(state => state.error)
+  const { isError, message, response } = useAppSelector(state => state.error)
   const dispatch = useAppDispatch()
 
-  if (!errorState.isError) {
+  const [json, setJson] = useState("")
+  
+  useEffect(() => {
+    const fn = async () => {
+      if (isError && response) {
+        setJson(JSON.stringify(await response.json()))
+      }
+    }
+    fn()
+  }, [isError])
+  
+  if (!isError) {
     return <></>
   }
 
@@ -17,8 +29,8 @@ export default function ErrorModal() {
       <div className="bg-red-500 rounded-lg shadow-lg w-5/6 md:w-1/2 flex flex-col gap-y-4 max-h-[60vh] overflow-y-auto -mt-2">
         <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col gap-y-4 max-h-[60vh] overflow-y-auto mt-2">
           <div className="flex flex-col gap-2">
-            <h1 className={styles.heading1}>ERROR OCCURED</h1>
-            <p className="text-[16px] text-grey-500">
+            <h1 className={styles.heading1}>AN ERROR OCCURED</h1>
+            <p className="text-[16px] text-red-500">
               Something went wrong. If this is a big issue, please screenshot this page and contact the exco team.
             </p>
           </div>
@@ -44,7 +56,7 @@ export default function ErrorModal() {
           </div>
 
           <div className="bg-red-300 bg-opacity-25 rounded-lg p-4 mt-2">
-            <p className="text-[14px] text-red-500">Error: {errorState.message}</p>
+            <p className="text-[14px] text-red-500">Error: {message}{'\n'}{json}</p>
           </div>
         </div>
       </div>
