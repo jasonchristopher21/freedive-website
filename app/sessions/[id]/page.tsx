@@ -1,30 +1,19 @@
 "use client";
 
-import {
-  getDateString,
-  getTimeString,
-} from "@/app/common/functions/dateTimeUtils";
 import styles from "@/app/styles";
-import LevelLabel from "@/components/LevelLabel";
 import { useSessionDetailQuery } from "@/queries/useSessionDetailQuery";
 import { MoreOutlined } from '@ant-design/icons';
-import { UserIcon } from "@heroicons/react/24/outline";
-import { Level, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
-import { SetStateAction, useEffect, useState } from "react";
+import { useState } from "react";
 import TrainingPlan from "./TrainingPlan";
 
+import { hasPermission } from "@/app/access-rules";
+import { SessionDetailedResponseMapped } from "@/app/api/sessions/[id]/route";
 import MemberGuard from "@/app/common/authguard/MemberGuard";
 import { getUserLevelColor } from "@/app/common/functions/userUtils";
 import Loading from "@/app/Loading";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import ConfirmEditModal, { EditModalProps } from "@/app/users/ConfirmEditModal";
 import {
   SidebarInset
 } from "@/components/ui/sidebar";
@@ -34,29 +23,36 @@ import { UseQueryResult } from "@tanstack/react-query";
 import { Dropdown, MenuProps } from "antd";
 import clsx from "clsx";
 import RenderButton from "../RenderButton";
-import { SessionDetailedResponseMapped } from "@/app/api/sessions/[id]/route";
-import ConfirmEditModal, { EditModalProps } from "@/app/users/ConfirmEditModal";
-import { hasPermission } from "@/app/access-rules";
+import SessionDetails from "./SessionDetails";
+import SessionHeader from "./SessionHeader";
 
 type AttendeeCardUser =
   Pick<SessionDetailedResponseMapped['signups'][0], 'id' | 'name' | 'role' | 'preferredName' | 'level' | 'avatarUrl'> & { isIc: boolean }
 
 type UserEditFunctions = "delete"
 
-function AttendeeCard({ currUser, user, dispatch }:
-  { currUser: User, user: AttendeeCardUser, dispatch: (type: UserEditFunctions) => Promise<void> }) {
+function AttendeeCard({ sessionId, currUser, user, dispatch }:
+  { sessionId: string, currUser: User, user: AttendeeCardUser, dispatch: (fn: () => Promise<void>) => void }) {
   // Fetch avatar public url
   const { data: publicAvatarUrl, isError, error }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
   if (isError) {
     console.error(error.message)
   }
 
-
   const actionIconStyle = 'transition-all p-3 hover:bg-gray-200 rounded-full cursor-pointer'
+
+  const handleRemoveFromSession = async () => {
+    const response = await fetch(`/api/sessions/${sessionId}/remove-user`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user.id })
+    })
+    if (!response.ok) {
+      console.error("Failed to remove member from session")
+    }
+  }
 
   const dropdownItems: MenuProps['items'] = [{
     label: ("Remove"), key: '0',
-    onClick: () => dispatch('delete'),
+    onClick: () => dispatch(handleRemoveFromSession),
   }]
 
   return (
@@ -116,7 +112,7 @@ function Page() {
   const router = useRouter()
   const { id } = useParams() // Session ID
   const currUser = useAppSelector(state => state.user.user)!
-  const { data, isLoading, isError, error, refetch } = useSessionDetailQuery(id as string);
+  const { data: session, isLoading, isError, error, refetch } = useSessionDetailQuery(id as string);
   const [editModal, setEditModal] = useState<EditModalProps | null>(null)
 
   if (isLoading) {
@@ -130,7 +126,7 @@ function Page() {
       <div>ERROR</div>
     )
   }
-  if (!data) {
+  if (!session) {
     return (
       <div className="flex justify-center items-center h-screen">
         <span className="text-grey-500">Session not found</span>
@@ -138,96 +134,41 @@ function Page() {
     );
   }
 
-  const dispatchEdit = (userId: string) => async (type: UserEditFunctions) => {
-    switch (type) {
-      case 'delete': {
-        setEditModal({
-          confirm: async () => {
-            const response = await fetch(`/api/sessions/${id}/remove-user`, {
-              method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId })
-            })
-            if (!response.ok) {
-              console.error("Failed to remove member from session")
-            }
-            await refetch()
-            setEditModal(null)
-          },
-          cancel: () => {
-            setEditModal(null)
-          }
-        })
-
+  /** Executes the function only on confirmation in EditModal */
+  const dispatchEdit = (fn: () => Promise<void>) => {
+    setEditModal({
+      confirm: async () => {
+        await fn()
+        await refetch()
+        setEditModal(null)
+      },
+      cancel: () => {
+        setEditModal(null)
       }
-    }
+    })
   }
 
 
-  const icList = data.ics.map((ic) => ic.id)
-  const userList = data.signups.map(u => {
+  const icList = session.ics.map((ic) => ic.id)
+  const userList = session.signups.map(u => {
     return { ...u, isIc: icList.includes(u.id) }
   })
 
   return (
     <SidebarInset>
-      <header className="sticky flex mt-8 shrink-0 items-center gap-2 transition-[width,height] ease-linear">
-        <div className="flex items-center gap-2 px-4">
-          {/** Breadcrumbs */}
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink onClick={() => router.back()}>Sessions</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{data.name}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
+      <SessionHeader name={session.name} />
       <div>
         <div className="px-4 py-6 flex flex-col gap-4 max-w-screen-xl mx-auto">
-          {/* <Link href="/sessions">
-              <button className="flex gap-4 items-center">
-                <ChevronLeftIcon className="h-5 text-grey-500" />
-                <span className={`${styles.heading4} text-grey-500`}>BACK TO UPCOMING SESSIONS</span>
-              </button>
-            </Link> */}
-          <span className="font-heading font-bold text-[22px] leading-tight">
-            {data.name.toUpperCase()}
-          </span>
-          <div className="flex flex-col gap-1">
-            <span className={`${styles.paragraph}`}>
-              {getDateString(data.date)}
-            </span>
-            <span className={`${styles.paragraph}`}>
-              {getTimeString(data.startTime)} - {getTimeString(data.endTime)}
-            </span>
-            <div className="flex">
-              <span className={`${styles.paragraph}`}>
-                Lanes {data.lanes.join(", ")}
-              </span>
-              <UserIcon className="ml-3 h-4 my-auto text-grey-500" />
-              <span className={`ml-1 ${styles.paragraph}`}>
-                {userList.length}/{data.maxParticipants}
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {data.levels.map((level) => (
-                <LevelLabel label={level} key={level} />
-              ))}
-            </div>
-          </div>
+          <SessionDetails {...session} numberOfParticipants={userList.length} />
           <div>
-
             { /** Attendees */}
             <span className={`${styles.heading2}`}>ATTENDEES</span>
             <div className="flex flex-col border rounded-lg border-grey-300 max-w-screen-lg p-4 mt-2">
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {userList.map((user) => (<AttendeeCard currUser={currUser} user={user} dispatch={dispatchEdit(user.id)} key={user.id} />))}
+                {userList.map((user) => (<AttendeeCard sessionId={session.id} currUser={currUser} user={user} dispatch={dispatchEdit} key={user.id} />))}
               </div>
               <div className="w-full mt-2">
-                <RenderButton props={data} />
+                <RenderButton refresh={async () => { await refetch() }} props={session} />
               </div>
             </div>
             {editModal && <ConfirmEditModal confirm={editModal.confirm} cancel={editModal.cancel} />}
@@ -235,18 +176,18 @@ function Page() {
           </div>
 
           {/* Description Box */}
-          {data.description && data.description.length > 0 && (
+          {session.description && session.description.length > 0 && (
             <div className="flex flex-col gap-2">
               <span className={`${styles.heading2}`}>DESCRIPTION</span>
               <span className={`${styles.paragraph}`}>
-                {data.description}
+                {session.description}
               </span>
             </div>
           )}
 
           {/* Training Plan */}
-          {data.trainingPlan && (
-            <TrainingPlan props={data.trainingPlan} />
+          {session.trainingPlan && (
+            <TrainingPlan props={session.trainingPlan} />
           )}
         </div>
       </div>

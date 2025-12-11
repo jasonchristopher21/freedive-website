@@ -6,34 +6,11 @@ import { UserIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Session, Signup } from "../types";
 
-type SessionBoxProps = Session & {signups: Pick<Signup,'id'>[]}
+type SessionBoxProps = Session & { signups: Pick<Signup, 'id'>[] }
 
-export default function SessionBox({ props }: {props: SessionBoxProps}) {
+export default function SessionBox({ props, refresh }: { props: SessionBoxProps, refresh: () => Promise<void> }) {
   const user = useAppSelector((state) => state.user.user)!
   const userId = user.id
-
-  const handleSignup = async () => {
-    await fetch("/api/sessions/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        sessionId: props.id,
-        userId: userId,
-      }),
-    }).then(async (response) => {
-      if (response.ok) {
-        window.location.reload();
-      } else {
-        const err = await response.json()
-        throw new Error(err.error)
-      }
-    }).catch((error) => {
-      console.error("Error during signup:", error);
-      alert(error.message);
-    });
-  }
 
   return (
     <div className="flex flex-col h-full justify-between rounded-xl border border-grey-100 px-5 py-5">
@@ -58,7 +35,7 @@ export default function SessionBox({ props }: {props: SessionBoxProps}) {
           </div>
         </div>
       </Link>
-      <RenderButton props={props} />
+      <RenderButton props={props} refresh={refresh} />
     </div>
   );
 }

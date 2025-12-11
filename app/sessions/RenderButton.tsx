@@ -5,15 +5,34 @@ import SignupConfirmedModal from "./signup-modals/SignupConfirmedModal";
 import { SessionDetailedResponseMapped } from "../api/sessions/[id]/route";
 
 // Pick the smallest subset of attributes that we need.
-type RenderButtonUser = Pick<SessionDetailedResponseMapped, 'id'|'levels'|'maxParticipants'|'date'|'startTime'|'endTime'>
+type RenderButtonUser = Pick<SessionDetailedResponseMapped, 'id' | 'levels' | 'maxParticipants' | 'date' | 'startTime' | 'endTime'>
   & { signups: Pick<SessionDetailedResponseMapped['signups'][0], 'id'>[] }
 
-const RenderButton = ({ props }: { props: RenderButtonUser }) => {
+const RenderButton = ({ props, refresh }: { props: RenderButtonUser, refresh: () => Promise<void> }) => {
   const user = useAppSelector((state) => state.user.user)!
   const userId = user.id
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSignupConfirmedModal, setShowSignupConfirmedModal] = useState(false);
+
+  const handleSignup = async () => {
+    await fetch("/api/sessions/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sessionId: props.id,
+        userId: userId,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          console.error("Error during signup")
+        }
+      })
+    await refresh()
+  }
 
   // If date is past the session
   if (new Date() > new Date(props.date.slice(0, 10) + "T" + props.endTime)) {
@@ -28,7 +47,6 @@ const RenderButton = ({ props }: { props: RenderButtonUser }) => {
       </>
     )
   }
-
   // If user already signed up for the session
   if (
     props.signups.some((signup) => signup.id === userId)
@@ -49,7 +67,6 @@ const RenderButton = ({ props }: { props: RenderButtonUser }) => {
       </>
     );
   }
-
   // If session is full
   if (props.signups.length >= props.maxParticipants) {
     return (
@@ -61,7 +78,6 @@ const RenderButton = ({ props }: { props: RenderButtonUser }) => {
       </button>
     );
   }
-
   // If user level is not suitable for the session
   if (!props.levels.includes(user.level)) {
     return (
@@ -85,10 +101,9 @@ const RenderButton = ({ props }: { props: RenderButtonUser }) => {
       </button>
       {showConfirmModal && (
         <ConfirmSignupModal
-          closeFn={() => setShowConfirmModal(false)}
+          confirm={handleSignup}
+          cancel={() => setShowConfirmModal(false)}
           sessionDate={props.date}
-          sessionId={props.id}
-          userId={userId}
         />
       )}
     </>

@@ -17,6 +17,6 @@ export const useUpcomingSessionsQuery = () => {
       console.log(data)
       return data.sessions as SessionResponseMapped;
     },
-    refetchOnWindowFocus: false,
+    refetchOnMount: 'always'
   });
 }

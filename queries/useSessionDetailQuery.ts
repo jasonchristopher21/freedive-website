@@ -13,7 +13,7 @@ export const useSessionDetailQuery = (sessionId: string) => {
       return data.session as SessionDetailedResponseMapped;
     }
     ,
-    refetchOnWindowFocus: false,
+    refetchOnMount: 'always',
     enabled: !!sessionId, // Only run the query if sessionId is provided
   });
 }

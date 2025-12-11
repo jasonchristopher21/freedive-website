@@ -7,47 +7,15 @@ import styles from "@/app/styles";
 import clsx from "clsx";
 import dayjs from "dayjs";
 
-const handleSignup = async (sessionId: string, userId: string) => {
-  await fetch("/api/sessions/signup", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      sessionId: sessionId,
-      userId: userId,
-    }),
-  })
-    .then((response) => {
-      if (response.ok) {
-        window.location.reload();
-      } else {
-        return response.json().then((data) => {
-          throw new Error(data.error || "Something went wrong");
-        });
-      }
-    })
-    .catch((error) => {
-      console.error("Error during signup:", error);
-      alert(error.message);
-    });
-};
+export type SignupModalProps = {
+    sessionDate: string,
+    confirm: () => Promise<void>,
+    cancel: () => void
+}
 
-const ConfirmSignupModal = ({
-  closeFn,
-  sessionDate,
-  sessionId,
-  userId,
-}: {
-  closeFn: () => void;
-  sessionDate: string;
-  sessionId: string;
-  userId: string;
-}) => {
+const ConfirmSignupModal = ({ sessionDate, confirm, cancel }: SignupModalProps) => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [loading, setLoading] = useState<boolean>(false);
-
-  const router = useRouter();
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-md flex items-center justify-center z-50">
@@ -67,9 +35,10 @@ const ConfirmSignupModal = ({
                 "font-heading text-white bg-blue-500 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto hover:bg-opacity-80 transition duration-200",
                 loading ? "cursor-not-allowed bg-grey-300" : "cursor-pointer"
               )}
-              onClick={() => {
+              onClick={async () => {
                 setLoading(true);
-                handleSignup(sessionId, userId);
+                await confirm()
+                setLoading(false)
               }}
             >
               {loading ? "SIGNING UP..." : "CONFIRM SIGN UP"}
@@ -77,7 +46,7 @@ const ConfirmSignupModal = ({
 
             <button
               className="font-heading text-grey-300 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto border border-grey-100 hover:border-red-500 hover:text-red-500 transition-colors duration-200"
-              onClick={closeFn}
+              onClick={cancel}
             >
               CANCEL
             </button>
@@ -87,7 +56,7 @@ const ConfirmSignupModal = ({
           <div className="hidden md:flex flex-row gap-2 mt-2 w-2/3 mr-0 ml-auto">
             <button
               className="font-heading text-grey-300 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto border border-grey-100 hover:border-red-500 hover:text-red-500 transition-colors duration-200"
-              onClick={closeFn}
+              onClick={cancel}
             >
               CANCEL
             </button>
@@ -96,9 +65,10 @@ const ConfirmSignupModal = ({
                 "font-heading text-white bg-blue-500 rounded-md font-bold text-[16px] py-1.5 w-full mx-auto hover:bg-opacity-80 transition duration-200",
                 loading ? "cursor-not-allowed bg-grey-300" : "cursor-pointer"
               )}
-              onClick={() => {
+              onClick={async () => {
                 setLoading(true);
-                handleSignup(sessionId, userId);
+                await confirm()
+                setLoading(false)
               }}
             >
               {loading ? "SIGNING UP..." : "CONFIRM SIGN UP"}
