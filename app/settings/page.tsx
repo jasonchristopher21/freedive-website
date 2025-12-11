@@ -117,7 +117,7 @@ function EdittableAvatar({ user }: { user: User }) {
   // Displays a overlay that allows uploading of image file when clicked.
   const UploadInput = () => (
     <div className='flex justify-center items-center h-full w-full'>
-      <img src={publicAvatarUrl + "?t=" + timestamp} />
+      <img src={!publicAvatarUrl?.startsWith('https://media.discord') ? publicAvatarUrl + "?t=" + timestamp : publicAvatarUrl} /> {/** TODO: Replace with a better method or remove support for discord attachments */}
       <input ref={ref} className='hidden bg-gray-100' type='file'
         onChange={(e) => { validateAndUploadFile(e.target.files && e.target.files[0]) }} accept='image/png, image/jpg, image/jpeg' />
       <div id='hover-upload-overlay' className={`flex flex-col items-center justify-center absolute top-0 left-0 w-full h-full

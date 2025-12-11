@@ -2,9 +2,13 @@ import { useAppSelector } from "@/redux/store";
 import { useState } from "react";
 import ConfirmSignupModal from "./signup-modals/ConfirmSignupModal";
 import SignupConfirmedModal from "./signup-modals/SignupConfirmedModal";
-import { SessionQueryWithSignups } from "../types";
+import { SessionDetailedResponseMapped } from "../api/sessions/[id]/route";
 
-const RenderButton = ({ props }: { props: SessionQueryWithSignups }) => {
+// Pick the smallest subset of attributes that we need.
+type RenderButtonUser = Pick<SessionDetailedResponseMapped, 'id'|'levels'|'maxParticipants'|'date'|'startTime'|'endTime'>
+  & { signups: Pick<SessionDetailedResponseMapped['signups'][0], 'userId'>[] }
+
+const RenderButton = ({ props }: { props: RenderButtonUser }) => {
   const user = useAppSelector((state) => state.user.user);
   const userId = user?.id || "";
 
@@ -12,7 +16,7 @@ const RenderButton = ({ props }: { props: SessionQueryWithSignups }) => {
   const [showSignupConfirmedModal, setShowSignupConfirmedModal] = useState(false);
 
   // If date is past the session
-  if (new Date() > new Date(props.date.slice(0,10) + "T" + props.endTime)) {
+  if (new Date() > new Date(props.date.slice(0, 10) + "T" + props.endTime)) {
     return (
       <>
         <button

@@ -4,9 +4,9 @@ export const useIcListQuery = () => {
   return useQuery({
     queryKey: ["icList"],
     queryFn: async () => {
-        const response = await fetch(`/api/user/ic-list`);
+        const response = await fetch(`/api/user/ic-list`)
         if (!response.ok) {
-            throw new Error("Failed to fetch session details");
+            console.error("Failed to fetch session details")
         }
         const data = await response.json();
         console.log(data);

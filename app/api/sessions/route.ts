@@ -1,5 +1,29 @@
 import { prisma } from "@/lib/prisma";
+import { Level, SessionType, YearOfStudy } from "@prisma/client";
 import { NextResponse } from "next/server";
+
+type SessionResponse = {
+    signups: {
+        userId: string;
+        name: string;
+        year: YearOfStudy;
+        role: string;
+    }[];
+    startTime: string;
+    endTime: string;
+    name: string;
+    id: string;
+    createdAt: Date;
+    description: string | null;
+    date: Date;
+    lanes: number[];
+    maxParticipants: number;
+    sessionType: SessionType;
+    levels: Level[];
+}[]
+
+/** Converts any Date types to string */
+export type SessionResponseMapped = { [P in keyof SessionResponse[0]]: SessionResponse[0][P] extends Date ? string : SessionResponse[0][P] }[]
 
 /**
  * GET handler to check the user's authentication status and access role.
@@ -37,47 +61,11 @@ export async function GET() {
         }})
       }
     })
-    return flattenUser
+    return flattenUser as SessionResponse
   })
 
   console.log("Sessions fetched: ", result)
   return NextResponse.json({
     sessions: result
   }, { status: 201 })
-
-  
-
-//   const supabase = await createClient();
-
-//   // Fetch the user's access role from the User table
-//   // This is to check if the user has completed the sign up process (i.e., has an entry in the User table).
-//   const { data: sessions, error } = await supabase
-//     .from("Session")
-//     .select(`
-//       *,
-//       Signup(userId)
-//     `)
-//     .gt("date", new Date().toISOString())
-
-//   if (error) {
-//     console.error("Error fetching sessions:", error);
-//     return NextResponse.json(
-//       { status: "error", message: "Failed to fetch sessions." },
-//       { status: 500 }
-//     );
-//   }
-
-//   if (!sessions || sessions.length === 0) {
-//     return NextResponse.json(
-//       { status: "no-sessions", message: "No upcoming sessions found." },
-//       { status: 404 }
-//     );
-//   }
-
-//   console.log("Fetched sessions:", sessions);
-//   console.log("Sessions signup", sessions.map(session => session.Signup));
-//   return NextResponse.json({
-//     status: "success",
-//     sessions: sessions,
-//   });
 }

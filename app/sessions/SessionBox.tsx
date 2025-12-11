@@ -4,9 +4,11 @@ import LevelLabel from "@/components/LevelLabel";
 import { useAppSelector } from "@/redux/store";
 import { UserIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { SessionQueryWithSignups } from "../types";
+import { Session, Signup } from "../types";
 
-export const defaultSessionBoxProps: SessionQueryWithSignups = {
+type SessionBoxProps = Session & {signups: Pick<Signup,'userId'>[]}
+
+export const defaultSessionBoxProps: SessionBoxProps = {
   id: "",
   name: "",
   description: "",
@@ -21,7 +23,7 @@ export const defaultSessionBoxProps: SessionQueryWithSignups = {
   signups: [],
 }
 
-export default function SessionBox({ props }: { props: SessionQueryWithSignups }) {
+export default function SessionBox({ props }: {props: SessionBoxProps}) {
   const user = useAppSelector((state) => state.user.user);
   const userId = user?.id || "";
 
