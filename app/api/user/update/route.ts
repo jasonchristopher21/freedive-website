@@ -4,7 +4,7 @@ import { z } from "zod"
 
 const bodySchema = z.object({
   userId: z.string(),
-  data: z.string(),
+  data: z.string().nullable(),
   type: z.enum(["name", "preferredName", "email", "telegramHandle"])
 })
 
