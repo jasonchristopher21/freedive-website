@@ -10,6 +10,7 @@ const bodySchema = z.object({
 
 /** Update one attribute of the user table */
 export async function PATCH(req: Request) {
+  
   const body = await req.json()
   const parseResult = bodySchema.safeParse(body)
 

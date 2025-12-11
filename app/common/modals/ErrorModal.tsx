@@ -1,16 +1,16 @@
 "use client"
 
-import styles from "@/app/styles";
-import { closeError } from "@/redux/features/error/errorSlice";
-import { useAppDispatch, useAppSelector } from "@/redux/store";
-import { useEffect, useState } from "react";
+import styles from "@/app/styles"
+import { closeError } from "@/redux/features/error/errorSlice"
+import { useAppDispatch, useAppSelector } from "@/redux/store"
+import { useEffect, useState } from "react"
 
 export default function ErrorModal() {
-  const { isError, message, response } = useAppSelector(state => state.error)
+  const { isError, message, response } = useAppSelector((state) => state.error)
   const dispatch = useAppDispatch()
 
   const [json, setJson] = useState("")
-  
+
   useEffect(() => {
     const fn = async () => {
       if (isError && response) {
@@ -19,7 +19,7 @@ export default function ErrorModal() {
     }
     fn()
   }, [isError])
-  
+
   if (!isError) {
     return <></>
   }
@@ -56,10 +56,14 @@ export default function ErrorModal() {
           </div>
 
           <div className="bg-red-300 bg-opacity-25 rounded-lg p-4 mt-2">
-            <p className="text-[14px] text-red-500">Error: {message}{'\n'}{json}</p>
+            <p className="text-[14px] text-red-500">
+              Error: {message}
+              {"\n"}
+              {json}
+            </p>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
