@@ -1,7 +1,7 @@
 "use client";
 
 import AdminGuard from "@/app/common/authguard/AdminGuard";
-import { Month, SessionQueryWithSignups } from "@/app/types";
+import { Month } from "@/app/types";
 import { SubmitButton } from "@/components/submit-button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,7 +14,6 @@ import { exportExcel } from "@/app/actions";
 import { format } from "date-fns";
 import { ArrowUpRightFromSquare } from "lucide-react";
 import { useMonthlySessionsQuery } from "@/queries/useMonthlySessionsQuery";
-import Data from "./Data";
 import { Label } from "@/components/ui/label";
 import Loading from "@/app/Loading";
 import saveAs from "file-saver";
@@ -94,8 +93,11 @@ function ViewSessionsPage() {
 			<div className="w-full border-t border-grey-200 my-6" />
 
 			{res.isLoading ? <Loading /> :
-				sessions.length == 0 ? <h1 className="flex mt-10 items-center justify-center font-bold text-2xl">No Sessions Found!</h1>
-					: <Data date={date} sessions={sessions} />}
+				sessions.length == 0
+					? <h1 className="flex mt-10 items-center justify-center font-bold text-2xl">No Sessions Found!</h1>
+					: <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
+						{sessions.map((session) => <SessionBox props={session} key={session.id} />)}
+					</div>}
 		</div>
 	)
 }

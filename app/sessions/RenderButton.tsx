@@ -9,8 +9,8 @@ type RenderButtonUser = Pick<SessionDetailedResponseMapped, 'id'|'levels'|'maxPa
   & { signups: Pick<SessionDetailedResponseMapped['signups'][0], 'id'>[] }
 
 const RenderButton = ({ props }: { props: RenderButtonUser }) => {
-  const user = useAppSelector((state) => state.user.user);
-  const userId = user?.id || "";
+  const user = useAppSelector((state) => state.user.user)!
+  const userId = user.id
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSignupConfirmedModal, setShowSignupConfirmedModal] = useState(false);
@@ -31,9 +31,6 @@ const RenderButton = ({ props }: { props: RenderButtonUser }) => {
 
   // If user already signed up for the session
   if (
-    props.signups &&
-    props.signups.length > 0 &&
-    userId &&
     props.signups.some((signup) => signup.id === userId)
   ) {
     return (
@@ -54,7 +51,7 @@ const RenderButton = ({ props }: { props: RenderButtonUser }) => {
   }
 
   // If session is full
-  if (props.signups && props.signups.length >= props.maxParticipants) {
+  if (props.signups.length >= props.maxParticipants) {
     return (
       <button
         disabled

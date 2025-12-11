@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 type SessionResponse = {
     signups: {
-        userId: string;
+        id: string;
         name: string;
         year: YearOfStudy;
         role: string;
@@ -57,7 +57,7 @@ export async function GET() {
     const flattenUser = mappedSessions.map(s => {
       return {
         ...s, signups: s.signups.map(u => { return {
-          userId: u.userId, name: u.user.name, year: u.user.yearOfStudy, role: u.user.role.name
+          id: u.userId, name: u.user.name, year: u.user.yearOfStudy, role: u.user.role.name
         }})
       }
     })

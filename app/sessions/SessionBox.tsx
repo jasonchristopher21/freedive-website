@@ -9,8 +9,8 @@ import { Session, Signup } from "../types";
 type SessionBoxProps = Session & {signups: Pick<Signup,'id'>[]}
 
 export default function SessionBox({ props }: {props: SessionBoxProps}) {
-  const user = useAppSelector((state) => state.user.user);
-  const userId = user?.id || "";
+  const user = useAppSelector((state) => state.user.user)!
+  const userId = user.id
 
   const handleSignup = async () => {
     await fetch("/api/sessions/signup", {

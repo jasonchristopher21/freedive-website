@@ -37,7 +37,8 @@ import RenderButton from "../RenderButton";
 import { SessionDetailedResponseMapped } from "@/app/api/sessions/[id]/route";
 import ConfirmEditModal, { EditModalProps } from "@/app/users/ConfirmEditModal";
 
-type AttendeeCardUser = Pick<SessionDetailedResponseMapped['signups'][0], 'name' | 'role' | 'preferredName' | 'level' | 'avatarUrl'> & { isIc: boolean }
+type AttendeeCardUser =
+  Pick<SessionDetailedResponseMapped['signups'][0], 'id' | 'name' | 'role' | 'preferredName' | 'level' | 'avatarUrl'> & { isIc: boolean }
 
 type UserEditFunctions = "delete"
 
@@ -90,7 +91,7 @@ function AttendeeCard({ currUser, user, dispatch }:
           </span>
         </div>
         {
-          ["ADMIN","IC"].includes(currUser.accessRole) &&
+          (["ADMIN", "IC"].includes(currUser.accessRole) || user.id === currUser.id) &&
           <Dropdown menu={{ items: dropdownItems }} trigger={["click"]}>
             <MoreOutlined className={actionIconStyle} />
           </Dropdown>
@@ -143,7 +144,7 @@ function Page() {
         setEditModal({
           confirm: async () => {
             const response = await fetch(`/api/sessions/${id}/remove-user`, {
-              method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({userId})
+              method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId })
             })
             if (!response.ok) {
               console.error("Failed to remove member from session")
