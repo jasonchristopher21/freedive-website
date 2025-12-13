@@ -14,6 +14,8 @@ import { ArrowUpRightFromSquare } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import SessionBox from "../SessionBox";
+import { useAppDispatch } from "@/redux/store"
+import { setError } from "@/redux/features/error/errorSlice"
 
 const formSchema = z.object({
 	month: z.nativeEnum(Month),
@@ -29,13 +31,19 @@ export default function ViewSessionsPageAuth() {
 }
 
 function ViewSessionsPage() {
+	const dispatch = useAppDispatch()
 	const [date, setDate] = useState<{ month: Month, year: number }>(
 		{ month: parseInt(format(new Date(), "M")), year: parseInt(format(new Date(), "y")) }
 	)
 
-	const res = useMonthlySessionsQuery(date)
+	const { data: sessions = [], isLoading, error, isError, refetch } = useMonthlySessionsQuery(date)
 
-	const sessions = res.data || []
+	if (isError) {
+		console.error("Failed to fetch monthly sessions", error.message)
+		dispatch(setError("Failed to fetch monthly sessions: " + error.message))
+	}
+
+
 
 	const ex = async () => {
 		const monthWithYear = format(new Date(date.year + '-' + date.month), "MMMM Y")
@@ -88,11 +96,11 @@ function ViewSessionsPage() {
 			</div>
 			<div className="w-full border-t border-grey-200 my-6" />
 
-			{res.isLoading ? <Loading /> :
+			{isLoading ? <Loading /> :
 				sessions.length == 0
 					? <h1 className="flex mt-10 items-center justify-center font-bold text-2xl">No Sessions Found!</h1>
 					: <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
-						{sessions.map((session) => <SessionBox props={session} key={session.id} />)}
+						{sessions.map((session) => <SessionBox props={session} key={session.id} refresh={async () => {await refetch()}}/>)}
 					</div>}
 		</div>
 	)

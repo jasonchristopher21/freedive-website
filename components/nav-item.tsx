@@ -28,7 +28,7 @@ export function NavItem({
 	items: {
 		name: string
 		url: string
-		icon: LucideIcon
+		icon: LucideIcon | React.ForwardRefExoticComponent<React.RefAttributes<HTMLSpanElement>>
 	}[],
 	title: string,
 }) {

@@ -87,7 +87,7 @@ const ROLES = {
     },
     MEMBER: {
         sessions: {
-            "remove-attendee": OnlySelf
+            "remove-attendee": false
         },
         users: {
             "view-users": true

@@ -9,7 +9,7 @@
   "insertPragma": false,
   "singleAttributePerLine": false,
   "bracketSameLine": false,
-  "jsxBracketSameLine": false,
+  "jsxBracketSameLine": true,
   "jsxSingleQuote": false,
   "printWidth": 600,
   "objectWrap": "preserve",

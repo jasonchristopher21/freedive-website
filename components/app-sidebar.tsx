@@ -12,6 +12,7 @@ import {
   SquareTerminal,
   Users
 } from "lucide-react"
+import DashboardOutline from "@ant-design/icons/DashboardOutlined"
 import * as React from "react"
 
 import { NavFooter } from "@/components/nav-footer"
@@ -129,6 +130,11 @@ const data = {
       name: "Sessions",
       url: "/sessions",
       icon: Calendar
+    },
+    {
+      name: "Dashboard",
+      url: "/dashboard",
+      icon: DashboardOutline
     }
   ],
   adminView: [
