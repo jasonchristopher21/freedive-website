@@ -22,7 +22,7 @@ export default function Page() {
         className=" grid grid-cols-[1fr_1fr] h-fit w-full items-center p-8 border-2 border-grey-100 border-opacity-50
                         rounded-lg gap-6 md:flex-row md:px-8 md:py-6 md:gap-10">
         {/** Grid row 1 - 1 */}
-        <div className="flex flex-col md:flex-row min-w-fit h-full rounded-xl bg-muted/50 p-6 items-center gap-4">
+        <div className="flex flex-col md:flex-row h-full rounded-xl bg-muted/50 p-6 justify-center items-center gap-4">
           <CircularProgress value={percent} size={100} strokeWidth={10} />
           <div>
             <h1 className="text-sm font-medium">Attendance</h1>
