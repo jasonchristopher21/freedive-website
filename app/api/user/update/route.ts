@@ -5,21 +5,17 @@ import { z } from "zod"
 const bodySchema = z.object({
   userId: z.string(),
   data: z.string().nullable(),
-  type: z.enum(["name", "preferredName", "telegramHandle"])
+  type: z.enum(["name", "preferredName", "telegramHandle"]),
 })
 
 /** Update one attribute of the user table */
 export async function PATCH(req: Request) {
-  
   const body = await req.json()
   const parseResult = bodySchema.safeParse(body)
 
   if (!parseResult.success) {
     console.error(parseResult.error)
-    return NextResponse.json(
-      { error: "Invalid input", details: parseResult.error.flatten() },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid input", details: z.treeifyError(parseResult.error) }, { status: 400 })
   }
 
   const { userId, data, type } = parseResult.data
@@ -28,10 +24,10 @@ export async function PATCH(req: Request) {
     case "name":
     case "preferredName":
     case "telegramHandle":
-      await prisma.$transaction(async tx => {
+      await prisma.$transaction(async (tx) => {
         await tx.user.update({
-          data: { [type]: { set: data, } },
-          where: { id: userId }
+          data: { [type]: { set: data } },
+          where: { id: userId },
         })
 
         console.log(`User's ${type} updated to: ${data}`)
@@ -40,11 +36,14 @@ export async function PATCH(req: Request) {
     default:
       console.error("Unhandled type")
       return NextResponse.json({
-        status: 200
+        status: 200,
       })
   }
 
-  return NextResponse.json({
-    message: "Update success!",
-  }, { status: 200 })
+  return NextResponse.json(
+    {
+      message: "Update success!",
+    },
+    { status: 200 }
+  )
 }

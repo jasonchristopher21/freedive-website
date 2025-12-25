@@ -1,19 +1,33 @@
 "use client"
+import { useUserSessionHistoryQuery } from "@/queries/useUserSessionHistory"
 import CircularProgress from "../../components/ui/circular-progress"
 import styles from "../styles"
+import { useAppSelector } from "@/redux/store"
+import MemberGuard from "../common/authguard/MemberGuard"
+import Loading from "../Loading"
+import { Session } from "@prisma/client"
 
-export default function Page() {
-  // mock data — replace with real user/session data
-  const attended = 12
-  const total = 15
+export default function PageAuth() {
+    return (
+      <MemberGuard>
+        <Page />
+      </MemberGuard>
+    )
+}
+
+function Page() {
+  const user = useAppSelector((state) => state.user.user)!
+
+  const { data, isLoading } = useUserSessionHistoryQuery(user.id)
+
+  if (isLoading) {
+    return <Loading />
+  }
+
+  const sessions = (data as Session[])
+  const attended = sessions.length
+  const total = 69
   const percent = total > 0 ? Math.round((attended / total) * 100) : 0
-
-  // mock attended sessions list — replace with real query data
-  const sessions = [
-    { id: "s1", name: "Intro to Freediving", date: "2025-11-02T18:00:00Z" },
-    { id: "s2", name: "Breathhold Techniques", date: "2025-11-16T18:00:00Z" },
-    { id: "s3", name: "Pool Practice", date: "2025-12-01T16:30:00Z" },
-  ]
 
   return (
     <div className="h-[90vh] min-w-full w-fit px-8 py-8 flex flex-col gap-4 max-w-screen-lg ml-0">

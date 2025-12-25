@@ -24,6 +24,5 @@ export const useMonthlySessionsQuery = (val: {month: Month, year: number}) => {
             console.log(data)
             return data.sessions as MonthlySessionsMapped;
         },
-        refetchOnWindowFocus: false,
     });
 }

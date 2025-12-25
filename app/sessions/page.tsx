@@ -4,6 +4,7 @@ import { useUpcomingSessionsQuery } from "@/queries/useUpcomingSessionsQuery";
 import MemberGuard from "../common/authguard/MemberGuard";
 import Loading from "../Loading";
 import SessionBox from "./SessionBox";
+import { SessionResponseMapped } from "../api/sessions/route"
 
 export default function PageAuth() {
   return (
@@ -14,7 +15,8 @@ export default function PageAuth() {
 }
 
 function Page() {
-  const { data: sessions, refetch, isLoading } = useUpcomingSessionsQuery();
+  const { data, refetch, isLoading } = useUpcomingSessionsQuery();
+  const sessions = data as SessionResponseMapped
   
   if (isLoading) {
     return <Loading />

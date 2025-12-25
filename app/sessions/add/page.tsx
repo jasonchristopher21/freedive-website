@@ -27,6 +27,7 @@ import utc from "dayjs/plugin/utc"
 import { CalendarIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { useRouter } from "next/navigation"
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -63,6 +64,7 @@ export default function AddSessionPageAuth() {
 }
 
 function AddSessionPage() {
+  const router = useRouter()
   const dispatch = useAppDispatch()
 
   const laneOptions = Array.from({ length: 10 }, (_, i) => ({
@@ -128,7 +130,7 @@ function AddSessionPage() {
     })
       .then((response) => {
         if (response.ok) {
-          window.location.href = "/sessions";
+          router.push("/sessions")
         } else {
           return response.json().then((data) => {
             throw new Error(data.error || "Something went wrong");
