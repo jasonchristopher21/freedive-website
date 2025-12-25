@@ -1,18 +1,18 @@
-import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { NextResponse } from "next/server";
-import { Level, SessionType } from "@prisma/client";
+import { Level, SessionType  } from "@prisma/client" // Workaround as const import from @prisma/client doesn't work
+import { prisma } from "@/lib/prisma"
 
 const sessionSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
-  date: z.string().datetime(),
-  startTime: z.string().datetime(),
-  endTime: z.string().datetime(),
+  date: z.iso.datetime(),
+  startTime: z.iso.datetime(),
+  endTime: z.iso.datetime(),
   lanes: z.array(z.number()),
   maxParticipants: z.number(),
-  sessionType: z.nativeEnum(SessionType),
-  levels: z.array(z.nativeEnum(Level)).optional(),
+  sessionType: z.enum(SessionType),
+  levels: z.array(z.enum(Level)).optional(),
 });
 
 const trainingPlanSchema = z.object({
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const parseResult = bodySchema.safeParse(body);
     if (!parseResult.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: parseResult.error.flatten() },
+        { error: "Invalid input", details: z.treeifyError(parseResult.error) },
         { status: 400 }
       );
     }

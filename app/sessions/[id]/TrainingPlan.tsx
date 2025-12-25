@@ -4,10 +4,10 @@ import { useState } from "react";
 import clsx from "clsx";
 import styles from "@/app/styles";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import type { TrainingPlan } from "@prisma/client";
+import type { TrainingPlan } from "@prisma/client"
 
 
-export default function TrainingPlan({ props }: { props: TrainingPlan }) {
+export default function TrainingPlan({ props }: { props: any }) { // TODO: UPDATE TYPE
     const [selected, setSelected] = useState("");
 
     function sectionComponent({ title, content, keyword, color }: { title: string, content?: string, keyword: string, color: string }) {

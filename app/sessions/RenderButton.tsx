@@ -1,18 +1,44 @@
-import { useAppSelector } from "@/redux/store";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { useState } from "react";
 import ConfirmSignupModal from "./signup-modals/ConfirmSignupModal";
 import SignupConfirmedModal from "./signup-modals/SignupConfirmedModal";
-import { SessionQueryWithSignups } from "../types";
+import { SessionDetailedResponseMapped } from "../api/sessions/[id]/route";
+import { setError } from "@/redux/features/error/errorSlice";
 
-const RenderButton = ({ props }: { props: SessionQueryWithSignups }) => {
-  const user = useAppSelector((state) => state.user.user);
-  const userId = user?.id || "";
+// Pick the smallest subset of attributes that we need.
+type RenderButtonUser = Pick<SessionDetailedResponseMapped, 'id' | 'levels' | 'maxParticipants' | 'date' | 'startTime' | 'endTime'>
+  & { signups: Pick<SessionDetailedResponseMapped['signups'][0], 'id'>[] }
+
+const RenderButton = ({ props, refresh }: { props: RenderButtonUser, refresh: () => Promise<void> }) => {
+  const user = useAppSelector((state) => state.user.user)!
+  const dispatch = useAppDispatch()
+  const userId = user.id
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSignupConfirmedModal, setShowSignupConfirmedModal] = useState(false);
 
-  // If date is past the session
-  if (new Date() > new Date(props.date.slice(0,10) + "T" + props.endTime)) {
+  const handleSignup = async () => {
+    await fetch("/api/sessions/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sessionId: props.id,
+        userId: userId,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          console.error("Error during signup")
+          dispatch(setError("Error during signup: " + response.statusText))
+        }
+      })
+    await refresh()
+  }
+
+  // If current date is past the session
+  if (new Date() > new Date(props.date.slice(0, 10) + "T" + props.endTime)) {
     return (
       <>
         <button
@@ -24,13 +50,9 @@ const RenderButton = ({ props }: { props: SessionQueryWithSignups }) => {
       </>
     )
   }
-
   // If user already signed up for the session
   if (
-    props.signups &&
-    props.signups.length > 0 &&
-    userId &&
-    props.signups.some((signup) => signup.userId === userId)
+    props.signups.some((signup) => signup.id === userId)
   ) {
     return (
       <>
@@ -48,9 +70,8 @@ const RenderButton = ({ props }: { props: SessionQueryWithSignups }) => {
       </>
     );
   }
-
   // If session is full
-  if (props.signups && props.signups.length >= props.maxParticipants) {
+  if (props.signups.length >= props.maxParticipants) {
     return (
       <button
         disabled
@@ -60,13 +81,8 @@ const RenderButton = ({ props }: { props: SessionQueryWithSignups }) => {
       </button>
     );
   }
-
   // If user level is not suitable for the session
-  if (
-    props.levels.length > 0 &&
-    user?.level &&
-    !props.levels.includes(user.level)
-  ) {
+  if (!props.levels.includes(user.level)) {
     return (
       <button
         disabled
@@ -88,10 +104,9 @@ const RenderButton = ({ props }: { props: SessionQueryWithSignups }) => {
       </button>
       {showConfirmModal && (
         <ConfirmSignupModal
-          closeFn={() => setShowConfirmModal(false)}
+          confirm={handleSignup}
+          cancel={() => setShowConfirmModal(false)}
           sessionDate={props.date}
-          sessionId={props.id}
-          userId={userId}
         />
       )}
     </>

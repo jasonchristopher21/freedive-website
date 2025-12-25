@@ -5,7 +5,7 @@ import { z } from "zod"
 
 const bodySchema = z.object({
     userId: z.string(),
-    role: z.nativeEnum(AccessRole)
+    role: z.enum(AccessRole)
 })
 
 export async function POST(req: Request) {

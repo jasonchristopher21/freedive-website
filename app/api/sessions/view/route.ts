@@ -1,7 +1,31 @@
 import { Month } from "@/app/types";
 import { prisma } from "@/lib/prisma";
+import { Level, SessionType, YearOfStudy } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+
+type MonthlySessionsQuery = {
+    signups: {
+        id: string;
+        name: string;
+        year: YearOfStudy;
+        role: string;
+    }[];
+    startTime: string;
+    endTime: string;
+    name: string;
+    id: string;
+    createdAt: Date;
+    description: string | null;
+    date: Date;
+    lanes: number[];
+    maxParticipants: number;
+    sessionType: SessionType;
+    levels: Level[];
+}[]
+
+/** Converts any Date types to string */
+export type MonthlySessionsMapped = { [P in keyof MonthlySessionsQuery[0]]: MonthlySessionsQuery[0][P] extends Date ? string : MonthlySessionsQuery[0][P] }[]
 
 const bodySchema = z.object({
     month: z.nativeEnum(Month),
@@ -46,7 +70,7 @@ export async function POST(req: Request) {
             return {
                 ...s, signups: s.signups.map(u => {
                     return {
-                        userId: u.userId, name: u.user.name, year: u.user.yearOfStudy, role: u.user.role.name
+                        id: u.userId, name: u.user.name, year: u.user.yearOfStudy, role: u.user.role.name
                     }
                 })
             }
@@ -58,6 +82,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
         message: "Sessions fetched",
-        sessions: result
+        sessions: result as MonthlySessionsQuery
     }, { status: 201 })
 }

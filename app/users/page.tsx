@@ -3,7 +3,7 @@
 import styles from "@/app/styles";
 import { useUserListQuery } from "@/queries/useUserListQuery";
 import { useAppSelector } from "@/redux/store";
-import { AccessRole, Level, Prisma } from "@prisma/client";
+import { AccessRole, Level, Prisma, User } from "@prisma/client";
 import { UseQueryResult } from "@tanstack/react-query";
 import type { TableProps } from "antd";
 import { Space, Table, Tag } from "antd";
@@ -11,7 +11,7 @@ import { useState } from "react";
 import { hasPermission } from "../access-rules";
 import AdminGuard from "../common/authguard/AdminGuard";
 import Loading from "../Loading";
-import ConfirmEditModal from "./ConfirmEditModal";
+import ConfirmEditModal, { EditModalProps } from "./ConfirmEditModal";
 import EditCcaRolesSelect from "./EditCcaRolesSelect";
 import EditLevelSelect from "./EditLevelSelect";
 import EditAccessRolesSelect from "./EditAccessRoleSelect";
@@ -19,11 +19,6 @@ import EditAccessRolesSelect from "./EditAccessRoleSelect";
 type UserWithRole = Prisma.UserGetPayload<{
   include: { role: true };
 }>;
-
-type Edit = {
-  confirm: () => Promise<void>,
-  cancel: () => void
-}
 
 const getTableAccessRoleColor = (role: string) => {
   switch (role) {
@@ -50,18 +45,18 @@ const getTableLevelColor = (level: Level) => {
       return "blue";
   }
 };
-
+// TODO: Add back AdmnGuard
 export default function PageAuth() {
   return (
-    <AdminGuard>
-      <Page />
-    </AdminGuard>
+    // <AdminGuard>
+      <Page/>
+    // </AdminGuard>
   )
 }
 
 function Page() {
   const user = useAppSelector(state => state.user.user)!
-  const [edit, setEdit] = useState<Edit | null>(null)
+  const [edit, setEdit] = useState<EditModalProps | null>(null)
   const { data, isRefetchError, isLoading, error, refetch }: UseQueryResult<UserWithRole[]> = useUserListQuery();
 
   if (isLoading) {
@@ -130,8 +125,8 @@ function Page() {
       key: "accessRole",
       render: (_, record) => (
         hasPermission(user, "users", "edit-user-access-role", record) ?
-        <EditAccessRolesSelect userRow={record} userList={userList} setEdit={setEdit} refetch={refetch} /> :
-        <Space size="middle"><Tag style={{marginLeft: 12}} color={getTableAccessRoleColor(record.accessRole)}>{record.accessRole}</Tag></Space>
+          <EditAccessRolesSelect user={user} userRow={record} oldValue={record.accessRole} setEdit={setEdit} refetch={refetch} /> :
+          <Space size="middle"><Tag style={{ marginLeft: 12 }} color={getTableAccessRoleColor(record.accessRole)}>{record.accessRole}</Tag></Space>
       ),
       onFilter: (value, record) => record.accessRole === value,
       filters: Object.values(AccessRole).map((role) => ({
@@ -144,20 +139,17 @@ function Page() {
   return (
     <div className="px-8 py-8 flex flex-col gap-4 max-w-screen-xl ml-0">
       <span className={styles.heading1}>MANAGE USERS</span>
-      <Table<UserWithRole>
-        columns={columns}
-        dataSource={userList}
-        rowKey="id"
-        pagination={false}
-        className="cursor-pointer"
-      // onRow={(record, rowIndex) => ({
-      //   onClick: (event) => {
-      //     // Handle row click if needed
-      //     console.log("Row clicked:", record);
-      //   },
-      // })}
-      />
-      {edit && <ConfirmEditModal edit={edit} setEdit={setEdit} />}
+      <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
+
+        <Table<UserWithRole>
+          columns={columns}
+          dataSource={userList}
+          rowKey="id"
+          pagination={false}
+          className="cursor-pointer"
+        />
+        {edit && <ConfirmEditModal confirm={edit.confirm} cancel={edit.cancel} />}
+      </div>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { MonthlySessionsMapped } from "@/app/api/sessions/view/route";
 import { Month } from "@/app/types";
 import { useQuery } from "@tanstack/react-query";
 
@@ -21,7 +22,7 @@ export const useMonthlySessionsQuery = (val: {month: Month, year: number}) => {
             }
             const data = await response.json();
             console.log(data)
-            return data.sessions;
+            return data.sessions as MonthlySessionsMapped;
         },
         refetchOnWindowFocus: false,
     });

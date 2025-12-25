@@ -5,7 +5,7 @@ import { z } from "zod"
 
 const bodySchema = z.object({
     userId: z.string(),
-    level: z.nativeEnum(Level)
+    level: z.enum(Level)
 })
 
 export async function POST(req: Request) {

@@ -1,40 +1,32 @@
 "use client"
 
-import * as React from "react"
 import {
-  AudioWaveform,
+  ArrowUpRightFromSquare,
   BookOpen,
   Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  LogOut,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
   Calendar,
   CalendarPlus,
-  Users,
   FileSpreadsheet,
-  ArrowUpRightFromSquare,
+  LogOut,
+  Settings2,
+  SquareTerminal,
+  Users
 } from "lucide-react"
+import DashboardOutline from "@ant-design/icons/DashboardOutlined"
+import * as React from "react"
 
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavItem } from "@/components/nav-item"
-import { NavUser } from "@/components/nav-user"
 import { NavFooter } from "@/components/nav-footer"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { NavItem } from "@/components/nav-item"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
+  SidebarRail
 } from "@/components/ui/sidebar"
-import { usePathname } from "next/navigation"
 import { NO_SIDEBAR_PATHS } from "@/constants"
+import { usePathname } from "next/navigation"
+import { hasPermission } from "@/app/access-rules"
+import { useAppSelector } from "@/redux/store"
 
 // This is sample data.
 const data = {
@@ -138,6 +130,11 @@ const data = {
       name: "Sessions",
       url: "/sessions",
       icon: Calendar
+    },
+    {
+      name: "Dashboard",
+      url: "/dashboard",
+      icon: DashboardOutline
     }
   ],
   adminView: [
@@ -165,7 +162,7 @@ const data = {
   footer: [
     {
       title: "Settings",
-      url: "#",
+      url: "/settings",
       icon: Settings2,
     },
     {
@@ -177,7 +174,8 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname();
+  const pathname = usePathname()
+  const user = useAppSelector(state => state.user.user)
   if (NO_SIDEBAR_PATHS.includes(pathname)) {
     return null;
   }
@@ -185,7 +183,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
         <NavItem items={data.userView} title="Menu" />
-        <NavItem items={data.adminView} title="Admin" />
+        {user?.accessRole === 'ADMIN' && <NavItem items={data.adminView} title="Admin" />}
       </SidebarContent>
       <SidebarFooter>
         <NavFooter items={data.footer} />

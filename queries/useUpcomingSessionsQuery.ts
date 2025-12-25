@@ -1,3 +1,4 @@
+import { SessionResponseMapped } from "@/app/api/sessions/route";
 import { useQuery } from "@tanstack/react-query";
 
 /**
@@ -14,8 +15,8 @@ export const useUpcomingSessionsQuery = () => {
       }
       const data = await response.json();
       console.log(data)
-      return data.sessions;
+      return data.sessions as SessionResponseMapped;
     },
-    refetchOnWindowFocus: false,
+    refetchOnMount: 'always'
   });
 }

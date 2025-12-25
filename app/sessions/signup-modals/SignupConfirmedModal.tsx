@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAppDispatch } from "@/redux/store";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { CrossIcon } from "lucide-react";
 // import { toast, Bounce } from "react-toastify"
@@ -7,7 +7,6 @@ import styles from "@/app/styles";
 
 const SignupConfirmedModal = ({ closeFn }: { closeFn: () => void }) => {
   const [errorMessage, setErrorMessage] = useState<string>();
-  const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
 

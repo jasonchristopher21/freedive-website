@@ -40,6 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# prisma
-/prisma/zod
-/lib/generated/prisma
+# prisma / zod
+/generated

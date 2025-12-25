@@ -1,6 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
-import { AccessRole } from "@prisma/client";
+import { AccessRole } from "@prisma/client" // Workaround as const import from @prisma/client doesn't work
+import { User } from "@prisma/client"
 
 /**
  * GET handler to check the user's authentication status and access role.
@@ -27,7 +28,10 @@ export async function GET() {
   console.log(user);
 
   if (!user) {
-    return NextResponse.json({ status: "unauthenticated" }, { status: 401 });
+    return NextResponse.json({
+      status: "unauthenticated",
+      // redirect: "/sign-in"
+     }, { status: 401 });
   }
 
   // Fetch the user's access role from the User table
@@ -66,7 +70,7 @@ export async function GET() {
       status: "pending",
       redirect: "/register/pending-approval",
       authUser: user,
-      user: existingUser,
+      user: existingUser as User,
     });
   }
 
@@ -76,6 +80,6 @@ export async function GET() {
     status: "complete",
     redirect: "/sessions",
     authUser: user,
-    user: existingUser,
+    user: existingUser as User,
   });
 }

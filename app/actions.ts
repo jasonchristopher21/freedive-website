@@ -1,12 +1,14 @@
-"use server";
-import { encodedRedirect } from "@/utils/utils";
+"use server"
+
 import { createClient } from "@/utils/supabase/server";
+import { encodedRedirect } from "@/utils/utils";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { readFileSync } from "fs";
-import { SessionQueryWithSignups } from "./types";
+import { YearOfStudy } from "@/generated/prisma/client";
 import { format } from "date-fns";
-import { YearOfStudy } from "@prisma/client";
+import { MonthlySessionsMapped } from "./api/sessions/view/route";
+
 
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
@@ -160,7 +162,7 @@ export const signOutAction = async () => {
   return redirect("/sign-in");
 };
 
-export const exportExcel = async (sessions: SessionQueryWithSignups[], monthWithYear: string) => {
+export const exportExcel = async (sessions: MonthlySessionsMapped, monthWithYear: string) => {
   const defaultFont = { size: 10, color: { theme: 1 }, name: 'Calibri', family: 2, scheme: 'minor' }
   const defaultAllBorderFill = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
   const formatOrange = (cell: any) => {

@@ -19,6 +19,7 @@ import { NO_SIDEBAR_PATHS } from "@/constants";
 import QueryProvider from "./providers/QueryProvider";
 import { AntdRegistry } from "@ant-design/nextjs-registry"
 import { ConfigProvider } from 'antd';
+import ErrorModal from "./common/modals/ErrorModal";
 
 export default function RootLayout({
   children,
@@ -55,6 +56,7 @@ export default function RootLayout({
                         </div>
                         {/* </div> */}
                       </div>
+                      <ErrorModal />
                     </main>
                   </SidebarProvider>
                 </ConfigProvider>

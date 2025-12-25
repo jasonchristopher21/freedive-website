@@ -1,23 +1,21 @@
 "use client";
 
+import { exportExcel } from "@/app/actions";
 import AdminGuard from "@/app/common/authguard/AdminGuard";
-import { Month, SessionQueryWithSignups } from "@/app/types";
-import { SubmitButton } from "@/components/submit-button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import Loading from "@/app/Loading";
+import styles from "@/app/styles";
+import { Month } from "@/app/types";
+import { Label } from "@/components/ui/label";
+import { useMonthlySessionsQuery } from "@/queries/useMonthlySessionsQuery";
 import { Select } from "antd";
-import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { format } from "date-fns";
+import saveAs from "file-saver";
+import { ArrowUpRightFromSquare } from "lucide-react";
+import { useState } from "react";
 import { z } from "zod";
 import SessionBox from "../SessionBox";
-import { exportExcel } from "@/app/actions";
-import { format } from "date-fns";
-import { ArrowUpRightFromSquare } from "lucide-react";
-import { useMonthlySessionsQuery } from "@/queries/useMonthlySessionsQuery";
-import Data from "./Data";
-import { Label } from "@/components/ui/label";
-import Loading from "@/app/Loading";
-import saveAs from "file-saver";
+import { useAppDispatch } from "@/redux/store"
+import { setError } from "@/redux/features/error/errorSlice"
 
 const formSchema = z.object({
 	month: z.nativeEnum(Month),
@@ -33,13 +31,19 @@ export default function ViewSessionsPageAuth() {
 }
 
 function ViewSessionsPage() {
+	const dispatch = useAppDispatch()
 	const [date, setDate] = useState<{ month: Month, year: number }>(
 		{ month: parseInt(format(new Date(), "M")), year: parseInt(format(new Date(), "y")) }
 	)
 
-	const res = useMonthlySessionsQuery(date)
+	const { data: sessions = [], isLoading, error, isError, refetch } = useMonthlySessionsQuery(date)
 
-	const sessions = res.data || []
+	if (isError) {
+		console.error("Failed to fetch monthly sessions", error.message)
+		dispatch(setError("Failed to fetch monthly sessions: " + error.message))
+	}
+
+
 
 	const ex = async () => {
 		const monthWithYear = format(new Date(date.year + '-' + date.month), "MMMM Y")
@@ -49,6 +53,7 @@ function ViewSessionsPage() {
 
 	return (
 		<div className="min-h-[90vh] min-w-full px-8 py-8 flex flex-col gap-4 max-w-screen-lg ml-0">
+			<span className={styles.heading1}>VIEW SESSIONS</span>
 			<div className="flex flex-col h-full w-full items-center p-8 border-2 border-grey-100 border-opacity-50 rounded-lg gap-6 
 													md:flex-row md:px-8 md:py-6 md:gap-10">
 				<div className="flex items-center gap-4">
@@ -91,9 +96,12 @@ function ViewSessionsPage() {
 			</div>
 			<div className="w-full border-t border-grey-200 my-6" />
 
-			{res.isLoading ? <Loading /> :
-				sessions.length == 0 ? <h1 className="flex mt-10 items-center justify-center font-bold text-2xl">No Sessions Found!</h1>
-					: <Data date={date} sessions={sessions} />}
+			{isLoading ? <Loading /> :
+				sessions.length == 0
+					? <h1 className="flex mt-10 items-center justify-center font-bold text-2xl">No Sessions Found!</h1>
+					: <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
+						{sessions.map((session) => <SessionBox props={session} key={session.id} refresh={async () => {await refetch()}}/>)}
+					</div>}
 		</div>
 	)
 }

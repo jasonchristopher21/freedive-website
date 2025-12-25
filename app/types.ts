@@ -17,7 +17,7 @@ export enum Month {
   DECEMBER
 }
 
-export type SessionQuery = {
+export type Session = {
   id: string,
   name: string,
   description: string | null,
@@ -30,14 +30,15 @@ export type SessionQuery = {
   sessionType: SessionType,
   levels: Level[],
 }
-
-export type SessionQueryWithSignups = SessionQuery & {
-  signups: {
-    userId: string,
-    name: string,
-    year: YearOfStudy,
-    role: string
-  }[]
+export type Signup = {
+  id: string,
+  userId: string,
+  name: string,
+  year: YearOfStudy,
+  role: string
+  preferredName: string,
+  level: Level,
+  avatarUrl: string
 }
 
 export enum CcaRoles {

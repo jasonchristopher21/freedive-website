@@ -12,6 +12,7 @@ import {
 import storage from "redux-persist/lib/storage";
 import authReducer from "./features/auth/authSlice";
 import userReducer from "./features/user/userSlice";
+import errorReducer from "./features/error/errorSlice";
 
 const persistConfig = {
   key: "nus-freedive-website",
@@ -23,6 +24,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer,
   user: userReducer,
+  error: errorReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

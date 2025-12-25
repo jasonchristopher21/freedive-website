@@ -16,7 +16,9 @@ import {
 	SidebarMenuSub,
 	SidebarMenuSubButton,
 	SidebarMenuSubItem,
+	useSidebar,
 } from "@/components/ui/sidebar"
+import { useRouter } from "next/navigation"
 
 export function NavFooter({
 	items,
@@ -32,6 +34,8 @@ export function NavFooter({
 		}[]
 	}[]
 }) {
+	const router = useRouter();
+	const { setOpenMobile } = useSidebar();
 	return (
 		<SidebarGroup>
 			<SidebarMenu>
@@ -44,7 +48,7 @@ export function NavFooter({
 					>
 						<SidebarMenuItem>
 							<CollapsibleTrigger asChild>
-								<SidebarMenuButton tooltip={item.title}>
+								<SidebarMenuButton tooltip={item.title} onClick={() => { router.push(item.url); setOpenMobile(false); }}>
 									{item.icon && <item.icon />}
 									<span>{item.title}</span>
 								</SidebarMenuButton>
