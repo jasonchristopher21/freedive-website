@@ -5,7 +5,7 @@ import styles from "../styles"
 import { useAppSelector } from "@/redux/store"
 import MemberGuard from "../common/authguard/MemberGuard"
 import Loading from "../Loading"
-import type { Session } from "@prisma/client"
+import { Session } from "@/app/types"
 
 export default function PageAuth() {
   return (

@@ -1,4 +1,4 @@
-import type { Session } from "@prisma/client"
+import { Session } from "@/app/types"
 import { useQuery } from "@tanstack/react-query"
 
 /**
@@ -14,7 +14,7 @@ export const useUserSessionHistoryQuery = (userId: string) => {
             });
             if (!response.ok) {
                 console.error("Failed to fetch session history")
-                return {sessions: []}
+                return []
             }
             const data = await response.json();
             console.log(data)

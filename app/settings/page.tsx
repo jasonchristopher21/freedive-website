@@ -2,7 +2,6 @@
 import { useAvatarQuery } from "@/queries/useAvatarQuery"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { CheckOutlined, CloseCircleOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons"
-import { type User } from "@prisma/client"
 import { useEffect, useRef, useState } from "react"
 import MemberGuard from "../common/authguard/MemberGuard"
 import styles from "../styles"
@@ -11,6 +10,7 @@ import { setUser } from "@/redux/features/user/userSlice"
 import { Input } from "antd"
 import { useDispatch } from "react-redux"
 import { setError } from "@/redux/features/error/errorSlice"
+import { User } from "@/generated/prisma"
 
 export default function SettingsPageAuth() {
   return (
