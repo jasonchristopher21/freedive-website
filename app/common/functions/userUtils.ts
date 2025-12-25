@@ -1,6 +1,6 @@
 "use client"
 
-import { Level } from "@prisma/client";
+import { Level } from "@/app/types"
 
 export function getUserLevelColor(level: Level): string {
     switch (level) {

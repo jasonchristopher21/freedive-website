@@ -2,7 +2,7 @@
 import { useAvatarQuery } from "@/queries/useAvatarQuery"
 import { useAppDispatch, useAppSelector } from "@/redux/store"
 import { CheckOutlined, CloseCircleOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons"
-import { User } from "@prisma/client"
+import { type User } from "@prisma/client"
 import { useEffect, useRef, useState } from "react"
 import MemberGuard from "../common/authguard/MemberGuard"
 import styles from "../styles"

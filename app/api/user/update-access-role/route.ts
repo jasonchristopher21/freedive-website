@@ -1,5 +1,5 @@
+import { AccessRole } from "@/app/types"
 import { prisma } from "@/lib/prisma"
-import { AccessRole } from "@prisma/client"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 

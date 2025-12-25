@@ -1,6 +1,6 @@
+import { AccessRole } from "@/app/types"
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
-import { AccessRole } from "@prisma/client";
 
 /**
  * GET handler to check the user's authentication status and access role.

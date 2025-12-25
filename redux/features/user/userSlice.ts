@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { User } from "@prisma/client";
+import type { User } from "@prisma/client";
 
 /**
  * Represents the state of the user slice.

@@ -3,9 +3,10 @@
 import { setError } from "@/redux/features/error/errorSlice";
 import { setUser } from "@/redux/features/user/userSlice";
 import { useAppDispatch } from "@/redux/store";
-import { AccessRole, Prisma, User } from "@prisma/client";
+import { Prisma, type User } from "@prisma/client";
 import { Select, Space, Tag } from "antd";
 import React, { SetStateAction } from "react";
+import { AccessRole } from "@/app/types"
 
 type UserWithRole = Prisma.UserGetPayload<{
   include: { role: true };

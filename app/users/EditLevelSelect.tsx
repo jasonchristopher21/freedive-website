@@ -1,8 +1,9 @@
 "use client"
 
-import { Level, Prisma } from "@prisma/client"
+import { Prisma } from "@prisma/client"
 import { Select, Space, Tag } from "antd"
 import { SetStateAction } from "react"
+import { Level } from "@/app/types"
 
 type UserWithRole = Prisma.UserGetPayload<{
     include: { role: true };

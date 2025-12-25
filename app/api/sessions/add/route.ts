@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { NextResponse } from "next/server";
-import { Level, SessionType  } from "@prisma/client" // Workaround as const import from @prisma/client doesn't work
 import { prisma } from "@/lib/prisma"
+import { Level, SessionType } from "@/app/types"
 
 const sessionSchema = z.object({
   name: z.string(),

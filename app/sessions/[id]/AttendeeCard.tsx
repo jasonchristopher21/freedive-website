@@ -9,7 +9,7 @@ import { UseQueryResult } from "@tanstack/react-query"
 import { MenuProps, Dropdown } from "antd"
 import clsx from "clsx"
 import { MoreOutlined } from '@ant-design/icons';
-import { User } from "@prisma/client"
+import type { User } from "@prisma/client"
 import { setError } from "@/redux/features/error/errorSlice"
 import { useAppDispatch } from "@/redux/store"
 

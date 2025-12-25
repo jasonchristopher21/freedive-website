@@ -1,5 +1,5 @@
+import { Level } from "@/app/types"
 import { prisma } from "@/lib/prisma"
-import { Level } from "@prisma/client"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 

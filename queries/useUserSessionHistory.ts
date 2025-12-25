@@ -1,7 +1,5 @@
-import { MonthlySessionsMapped } from "@/app/api/sessions/view/route";
-import { Month } from "@/app/types";
-import { Session } from "@prisma/client"
-import { useQuery } from "@tanstack/react-query";
+import type { Session } from "@prisma/client"
+import { useQuery } from "@tanstack/react-query"
 
 /**
  * Fetches the user's session history.
