@@ -1,4 +1,4 @@
-import { Level, SessionType, YearOfStudy } from "@prisma/client";
+import { AccessRole as AccessRoleEnum, Level as LevelEnum, SessionType, YearOfStudy } from "@prisma/client";
 
 // This file defines common types used in various places
 
@@ -28,7 +28,7 @@ export type Session = {
   maxParticipants: number,
   createdAt: string,
   sessionType: SessionType,
-  levels: Level[],
+  levels: LevelEnum[],
 }
 export type Signup = {
   id: string,
@@ -37,10 +37,23 @@ export type Signup = {
   year: YearOfStudy,
   role: string
   preferredName: string,
-  level: Level,
+  level: LevelEnum,
   avatarUrl: string
 }
 
 export enum CcaRoles {
   'Member', 'Publicity Manager', 'Logistics Manager', 'Projects Manager', 'Captain', 'Vice Captain', 'Events Manager', 'Admin'
+}
+
+export const AccessRole: { [k in AccessRoleEnum]: k } = {
+  "MEMBER": "MEMBER",
+  "PENDING": "PENDING",
+  "ADMIN": "ADMIN",
+  "IC": "IC"
+}
+
+export const Level: { [k in LevelEnum]: k } = {
+  "BEGINNER": "BEGINNER",
+  "INTERMEDIATE": "INTERMEDIATE",
+  "ADVANCED": "ADVANCED"
 }

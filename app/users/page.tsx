@@ -3,7 +3,7 @@
 import styles from "@/app/styles";
 import { useUserListQuery } from "@/queries/useUserListQuery";
 import { useAppSelector } from "@/redux/store";
-import { AccessRole, Level, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { UseQueryResult } from "@tanstack/react-query";
 import type { TableProps } from "antd";
 import { Space, Table, Tag } from "antd";
@@ -15,6 +15,7 @@ import ConfirmEditModal, { EditModalProps } from "./ConfirmEditModal";
 import EditCcaRolesSelect from "./EditCcaRolesSelect";
 import EditLevelSelect from "./EditLevelSelect";
 import EditAccessRolesSelect from "./EditAccessRoleSelect";
+import { AccessRole, Level } from "../types"
 
 type UserWithRole = Prisma.UserGetPayload<{
   include: { role: true };
@@ -33,7 +34,7 @@ const getTableAccessRoleColor = (role: string) => {
   }
 };
 
-const getTableLevelColor = (level: Level) => {
+const getTableLevelColor = (level: typeof Level[keyof typeof Level]) => {
   switch (level) {
     case Level.BEGINNER:
       return "green";
