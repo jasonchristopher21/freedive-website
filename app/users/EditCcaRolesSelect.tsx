@@ -1,3 +1,5 @@
+"use client"
+
 import { Prisma } from "@prisma/client";
 import { Select } from "antd";
 import React, { SetStateAction } from "react";

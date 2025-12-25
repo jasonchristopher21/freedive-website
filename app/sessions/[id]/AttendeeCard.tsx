@@ -1,3 +1,5 @@
+"use client"
+
 import { hasPermission } from "@/app/access-rules"
 import { SessionDetailedResponseMapped } from "@/app/api/sessions/[id]/route"
 import { getUserLevelColor } from "@/app/common/functions/userUtils"

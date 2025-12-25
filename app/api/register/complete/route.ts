@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { AccessRole, Level, YearOfStudy } from "@prisma/client";
+import { AccessRole, Level, YearOfStudy } from "@prisma/client" // Workaround as const import from @prisma/client doesn't work
 
 function convertToYearOfStudy(year: string | number): string {
   const yearOfStudyMap: Record<string, string> = {
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
 
   // Default role
   let accessRole: string = AccessRole.PENDING; // Default role
-  let roleId: string = "40f4fa13-d766-4a82-9f7b-5eacbf20883a"; // Default roleId
+  let roleId: string = "70938598-0b3a-403d-9dc4-0691c0a0db20"; // Default roleId
   let level: string = Level.BEGINNER; // Default level
 
   // Check access code

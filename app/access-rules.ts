@@ -1,7 +1,8 @@
-import { AccessRole, User } from "@prisma/client";
 
 // This file handles the logic for determining whether the current logged in user has the ability to perform
 // an action, as defined in this file, based on their access role.
+
+import { User, AccessRole } from "@/generated/prisma/client"
 
 const roleToValue = (v: AccessRole) => {
     switch (v) {

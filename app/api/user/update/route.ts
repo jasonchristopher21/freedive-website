@@ -5,7 +5,7 @@ import { z } from "zod"
 const bodySchema = z.object({
   userId: z.string(),
   data: z.string().nullable(),
-  type: z.enum(["name", "preferredName", "email", "telegramHandle"])
+  type: z.enum(["name", "preferredName", "telegramHandle"])
 })
 
 /** Update one attribute of the user table */
@@ -27,6 +27,7 @@ export async function PATCH(req: Request) {
   switch (type) {
     case "name":
     case "preferredName":
+    case "telegramHandle":
       await prisma.$transaction(async tx => {
         await tx.user.update({
           data: { [type]: { set: data, } },

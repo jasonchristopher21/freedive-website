@@ -1,3 +1,5 @@
+"use client"
+
 import { setError } from "@/redux/features/error/errorSlice";
 import { setUser } from "@/redux/features/user/userSlice";
 import { useAppDispatch } from "@/redux/store";

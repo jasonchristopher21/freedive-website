@@ -1,38 +1,32 @@
 "use client";
 
-import React from "react";
-import AdminGuard from "@/app/common/authguard/AdminGuard";
+import AdminGuard from "@/app/common/authguard/AdminGuard"
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { createClient } from "@/utils/supabase/client";
-import { selectAuthUser } from "@/redux/features/auth/authSlice";
-import { useAppDispatch, useAppSelector } from "@/redux/store";
-import { Button } from "@/components/ui/button";
-import { AutosizeTextarea } from "@/components/ui/autosize-textarea";
+import Loading from "@/app/Loading"
+import styles from "@/app/styles"
+import { AutosizeTextarea } from "@/components/ui/autosize-textarea"
+import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useSearchParams } from "next/navigation";
-import { SessionType, Level, User } from "@prisma/client";
-import styles from "@/app/styles";
-import { CalendarIcon, Divide } from "lucide-react"
-import { DatePicker, TimePicker, Select, InputNumber } from "antd";
-import dayjs from "dayjs";
-import { useIcListQuery } from "@/queries/useIcListQuery";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import Loading from "@/app/Loading";
-import { setError } from "@/redux/features/error/errorSlice";
+  FormMessage
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Level, SessionType } from "@prisma/client"
+import { useIcListQuery } from "@/queries/useIcListQuery"
+import { setError } from "@/redux/features/error/errorSlice"
+import { useAppDispatch } from "@/redux/store"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { DatePicker, InputNumber, Select, TimePicker } from "antd"
+import dayjs from "dayjs"
+import timezone from "dayjs/plugin/timezone"
+import utc from "dayjs/plugin/utc"
+import { CalendarIcon } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -40,20 +34,20 @@ dayjs.extend(timezone);
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name cannot be empty" }),
   description: z.string().optional(),
-  date: z.coerce.date({
+  date: z.date({
     message: "Please enter a valid date",
   }),
-  startTime: z.coerce.date({
+  startTime: z.date({
     message: "Please enter a valid start time",
   }),
-  endTime: z.coerce.date({
+  endTime: z.date({
     message: "Please enter a valid end time",
   }),
   // add a field called lanes which is an array of numbers
-  lanes: z.array(z.coerce.number()).min(1, { message: "At least one lane is required" }),
-  maxParticipants: z.coerce.number().min(1, { message: "Max participants must be at least 1" }),
-  sessionType: z.nativeEnum(SessionType),
-  levels: z.array(z.nativeEnum(Level)),
+  lanes: z.array(z.number()).min(1, { message: "At least one lane is required" }),
+  maxParticipants: z.number().min(1, { message: "Max participants must be at least 1" }),
+  sessionType: z.enum(SessionType),
+  levels: z.array(z.enum(Level)),
   generalPlan: z.string().optional(),
   beginnerPlan: z.string().optional(),
   intermediatePlan: z.string().optional(),
@@ -76,7 +70,7 @@ function AddSessionPage() {
     label: `${i + 1}`,
   }));
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -210,7 +204,7 @@ function AddSessionPage() {
                       format="dddd, D MMMM YYYY"
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(date, dateString) => {
-                        field.onChange(date);
+                        field.onChange(new Date(date.toDate()));
                       }}
                       placeholder="Select date"
                       suffixIcon={<CalendarIcon />}

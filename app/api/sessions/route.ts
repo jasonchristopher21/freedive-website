@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Level, SessionType, YearOfStudy } from "@prisma/client";
+import { Level, SessionType, YearOfStudy } from "@prisma/client"
 import { NextResponse } from "next/server";
 
 type SessionResponse = {

@@ -5,7 +5,7 @@ import { encodedRedirect } from "@/utils/utils";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { readFileSync } from "fs";
-import { YearOfStudy } from "@prisma/client";
+import { YearOfStudy } from "@/generated/prisma/client";
 import { format } from "date-fns";
 import { MonthlySessionsMapped } from "./api/sessions/view/route";
 

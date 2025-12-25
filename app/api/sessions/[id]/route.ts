@@ -1,7 +1,6 @@
 // File: app/api/session/[id]/route.ts
 
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/utils/supabase/server";
 import { Level, SessionType, YearOfStudy } from "@prisma/client";
 import { NextResponse } from "next/server";
 

@@ -1,9 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import * as z from "zod";
 import { createClient } from "@/utils/supabase/client";
 import { selectAuthUser } from "@/redux/features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
@@ -27,6 +26,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useSearchParams } from "next/navigation";
 import { setError } from "@/redux/features/error/errorSlice";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 const yearOfStudyChoices = [
   "1",
@@ -42,25 +43,21 @@ const yearOfStudyChoices = [
 const currentYear = new Date().getFullYear();
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: "Name cannot be empty" }),
-  email: z
-    .string()
-    .min(1, { message: "Email cannot be empty" })
-    .email("Please enter a valid email"),
+  name: z.string().min(1, { error: "Name cannot be empty" }),
+  email: z.email({error: "Please enter a valid email"})
+    .min(1, { error: "Email cannot be empty" }),
   preferredName: z.string().optional(),
-  yearOfEntry: z.coerce
-    .number({
-      message: "Please enter a valid year",
+  yearOfEntry: z.number({
+      error: "Please enter a valid year",
     })
     .min(2019)
     .max(9999),
   yearOfStudy: z.enum(yearOfStudyChoices),
   nusnetEmail: z
-    .string()
     .email()
-    .min(1, { message: "NUSNET Email cannot be empty" })
+    .min(1, { error: "NUSNET Email cannot be empty" })
     .regex(/^[\w.-]+@(u\.nus\.edu|nus\.edu\.sg)$/, {
-      message: "Please enter a valid NUSNET email",
+      error: "Please enter a valid NUSNET email",
     }),
   accessCode: z.string().optional(),
 });
@@ -77,7 +74,7 @@ export default function ProfileForm() {
   console.log("accessCode from searchParams:", accessCode);
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -91,10 +88,10 @@ export default function ProfileForm() {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    fetch("/api/register/complete", {
+    return fetch("/api/register/complete", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -123,8 +120,7 @@ export default function ProfileForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
-            control={form.control}
-            name="name"
+            {...form.register("name")}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Name</FormLabel>
@@ -136,8 +132,8 @@ export default function ProfileForm() {
             )}
           />
           <FormField
-            control={form.control}
-            name="preferredName"
+            {...form.register("preferredName")}
+            // name="preferredName" control={form.control}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Preferred Name (Optional)</FormLabel>
@@ -185,7 +181,7 @@ export default function ProfileForm() {
               <FormItem>
                 <FormLabel>Year of Entry</FormLabel>
                 <FormControl>
-                  <Input placeholder={currentYear.toString()} {...field} />
+                  <Input placeholder={currentYear.toString()} {...field} value={field.value} />
                 </FormControl>
                 <FormDescription>
                   Enter the year when you started joining NUS Freedive

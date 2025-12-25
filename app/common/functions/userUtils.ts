@@ -1,3 +1,5 @@
+"use client"
+
 import { Level } from "@prisma/client";
 
 export function getUserLevelColor(level: Level): string {

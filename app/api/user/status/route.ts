@@ -1,6 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
-import { AccessRole, User } from "@prisma/client";
+import { AccessRole } from "@prisma/client" // Workaround as const import from @prisma/client doesn't work
+import { User } from "@prisma/client"
 
 /**
  * GET handler to check the user's authentication status and access role.

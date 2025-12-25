@@ -45,13 +45,13 @@ function SettingsPage() {
           </div>
 
           <div className="flex flex-row gap-12 items-center">
-            <h1 className={styles.heading3 + " min-w-[200]"}>Email: </h1>
-            <EdittableAttribute user={user} attribute="email" />
+            <h1 className={styles.heading3 + " min-w-[200]"}>Telegram Handle: </h1>
+            <EdittableAttribute user={user} attribute="telegramHandle" />
           </div>
 
           <div className="flex flex-row gap-12 items-center">
-            <h1 className={styles.heading3 + " min-w-[200]"}>Telegram Handle: </h1>
-            <EdittableAttribute user={user} attribute="telegramHandle" />
+            <h1 className={styles.heading3 + " min-w-[200]"}>Email: </h1>
+            <h1 className={styles.heading3 + " pl-4"}>{user.email}</h1>
           </div>
 
           <div className="flex flex-row gap-12 items-center">
