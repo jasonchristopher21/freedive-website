@@ -1,6 +1,6 @@
 "use client"
 
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/prisma";
 import { Select } from "antd";
 import React, { SetStateAction } from "react";
 import { CcaRoles } from "../types";

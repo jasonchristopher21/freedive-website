@@ -1,6 +1,6 @@
 "use client"
 
-import { Prisma } from "@prisma/client"
+import { Prisma } from "@/generated/prisma"
 import { Select, Space, Tag } from "antd"
 import { SetStateAction } from "react"
 import { Level } from "@/app/types"

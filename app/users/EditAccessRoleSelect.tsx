@@ -3,7 +3,7 @@
 import { setError } from "@/redux/features/error/errorSlice";
 import { setUser } from "@/redux/features/user/userSlice";
 import { useAppDispatch } from "@/redux/store";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/prisma";
 import { Select, Space, Tag } from "antd";
 import React, { SetStateAction } from "react";
 import { AccessRole } from "@/app/types"
