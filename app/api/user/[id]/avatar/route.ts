@@ -6,8 +6,8 @@ import { z } from "zod"
 /**
  * Fetches the public image URL of the user from Supabase Storage.
  */
-export async function GET(req: NextRequest, { id }: { id: Promise<string> }) {
-    const userId = await id
+export async function GET(req: NextRequest, { params }: { params: Promise<string> }) {
+    const userId = await params
 
     const supabase = await createClient()
     const data = await prisma.user.findFirst({
@@ -43,8 +43,8 @@ const bodySchema = z.object({
 /**
  * Replaces the current user avatar in Supabase with the new avatar, and updates the url string in database
  */
-export async function PATCH(req: Request, { id }: { id: Promise<string> }) {
-    const userId = await id
+export async function PATCH(req: Request, { params }: { params: Promise<string> }) {
+    const userId = await params
     const data: z.infer<typeof bodySchema> = Object.fromEntries(await req.formData()) as z.infer<typeof bodySchema>
 
     try {

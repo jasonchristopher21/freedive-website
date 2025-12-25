@@ -21,7 +21,7 @@ export default function AttendeeCard({ sessionId, currUser, user, callbackFn }:
   { sessionId: string, currUser: User, user: AttendeeCardUser, callbackFn: (fn: () => Promise<void>) => void }) {
   const dispatch = useAppDispatch()
   // Fetch avatar public url
-  const { data: publicAvatarUrl, isError, error }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
+  const { data: publicAvatarUrl, isError, error }: UseQueryResult<string | null> = useAvatarQuery(user.id)
   if (isError) {
     console.error(error.message)
     dispatch(setError(error.message))
