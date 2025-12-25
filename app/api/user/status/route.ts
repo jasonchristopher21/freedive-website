@@ -1,6 +1,6 @@
 import { AccessRole } from "@/app/types"
+import { User } from "@/generated/prisma"
 import { createClient } from "@/utils/supabase/server";
-import { type User } from "@prisma/client"
 import { NextResponse } from "next/server";
 
 /**
