@@ -2,9 +2,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "postinstall": "prisma generate"
+    "build": "prisma generate && next build",
+    "start": "next start"
   },
   "dependencies": {
     "@ant-design/cssinjs": "1.18.2",

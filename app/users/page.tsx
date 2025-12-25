@@ -3,7 +3,7 @@
 import styles from "@/app/styles";
 import { useUserListQuery } from "@/queries/useUserListQuery";
 import { useAppSelector } from "@/redux/store";
-import { AccessRole, Level, Prisma, User } from "@prisma/client";
+import { AccessRole, Level, Prisma } from "@prisma/client";
 import { UseQueryResult } from "@tanstack/react-query";
 import type { TableProps } from "antd";
 import { Space, Table, Tag } from "antd";
