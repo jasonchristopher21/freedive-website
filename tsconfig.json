@@ -21,7 +21,7 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      ".prisma/*": ["node_modules/.prisma/*"]
+      ".prisma/*": ["./node_modules/.prisma/*"]
     },
     "noErrorTruncation": true,
   },
