@@ -21,9 +21,10 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      ".prisma/client/index-browser": ["./node_modules/.prisma/client/index-browser.js"]
+      ".prisma/*": ["node_modules/.prisma/*"]
     },
     "noErrorTruncation": true,
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

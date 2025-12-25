@@ -15,7 +15,7 @@ import ConfirmEditModal, { EditModalProps } from "./ConfirmEditModal";
 import EditCcaRolesSelect from "./EditCcaRolesSelect";
 import EditLevelSelect from "./EditLevelSelect";
 import EditAccessRolesSelect from "./EditAccessRoleSelect";
-import { AccessRole, Level } from "../types"
+import { AccessRole, Level } from "@/app/types"
 
 type UserWithRole = Prisma.UserGetPayload<{
   include: { role: true };
@@ -46,12 +46,12 @@ const getTableLevelColor = (level: typeof Level[keyof typeof Level]) => {
       return "blue";
   }
 };
-// TODO: Add back AdmnGuard
+
 export default function PageAuth() {
   return (
-    // <AdminGuard>
+    <AdminGuard>
       <Page/>
-    // </AdminGuard>
+    </AdminGuard>
   )
 }
 
