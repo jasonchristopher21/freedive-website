@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
-import { AccessRole, Level, YearOfStudy } from "@prisma/client" // Workaround as const import from @prisma/client doesn't work
+import { AccessRole, Level, YearOfStudy } from "@/app/types"
+import { createClient } from "@/utils/supabase/server"
+import { NextResponse } from "next/server"
 
 function convertToYearOfStudy(year: string | number): string {
   const yearOfStudyMap: Record<string, string> = {

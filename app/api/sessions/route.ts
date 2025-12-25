@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
-import { Level, SessionType, YearOfStudy } from "@prisma/client"
-import { NextResponse } from "next/server";
+import { Level, SessionType, YearOfStudy } from "@/app/types"
+import { prisma } from "@/lib/prisma"
+import { NextResponse } from "next/server"
 
 type SessionResponse = {
     signups: {

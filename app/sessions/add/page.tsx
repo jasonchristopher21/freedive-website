@@ -15,7 +15,6 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Level, SessionType } from "@prisma/client"
 import { useIcListQuery } from "@/queries/useIcListQuery"
 import { setError } from "@/redux/features/error/errorSlice"
 import { useAppDispatch } from "@/redux/store"
@@ -28,6 +27,7 @@ import { CalendarIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
+import { Level, SessionType } from "@/app/types"
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
