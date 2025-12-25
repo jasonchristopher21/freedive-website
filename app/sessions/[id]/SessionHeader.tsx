@@ -11,11 +11,10 @@ export default function SessionHeader({ name }: Pick<SessionDetailedResponseMapp
         {/** Breadcrumbs */}
         <Breadcrumb>
           <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbItem separator={<BreadcrumbSeparator />}>
               <BreadcrumbLink onClick={() => router.back()}>Sessions</BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem>
+            <BreadcrumbItem separator="">
               <BreadcrumbPage>{name}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>

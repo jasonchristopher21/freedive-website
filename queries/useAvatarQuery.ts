@@ -1,15 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 
-export const useAvatarQuery = (avatarUrl: string | null) => {
+export const useAvatarQuery = (userId: string) => {
   return useQuery({
-    queryKey: ["userAvatar", avatarUrl],
+    queryKey: ["userAvatar", userId],
     queryFn: async () => {
-      // If avatarUrl is already a public url
-      if (!avatarUrl || !["png","jpg","jpeg"].includes(avatarUrl.split('.').pop()!)) {
-        return avatarUrl
-      }
-      // Else it is the filename located in supabase Storage
-      const response = await fetch(`/api/user/avatar?url=${avatarUrl}`, {
+      const response = await fetch(`/api/user/${userId}/avatar`, {
         method: "GET"
       })
 
@@ -17,10 +12,9 @@ export const useAvatarQuery = (avatarUrl: string | null) => {
         console.error("Failed to fetch user avatar")
       }
       const data = await response.json();
-      console.log(data);
+      if (data.status == 204) { return null }
       return data.data;
     },
-    enabled: !!avatarUrl,
     refetchOnWindowFocus: false,
   });
 };

@@ -8,11 +8,11 @@ import Loading from "../Loading"
 import { Session } from "@prisma/client"
 
 export default function PageAuth() {
-    return (
-      <MemberGuard>
-        <Page />
-      </MemberGuard>
-    )
+  return (
+    <MemberGuard>
+      <Page />
+    </MemberGuard>
+  )
 }
 
 function Page() {
@@ -24,7 +24,7 @@ function Page() {
     return <Loading />
   }
 
-  const sessions = (data as Session[])
+  const sessions = data as Session[]
   const attended = sessions.length
   const total = 69
   const percent = total > 0 ? Math.round((attended / total) * 100) : 0
@@ -36,14 +36,17 @@ function Page() {
         className=" grid grid-cols-[1fr_1fr] h-fit w-full items-center p-8 border-2 border-grey-100 border-opacity-50
                         rounded-lg gap-6 md:flex-row md:px-8 md:py-6 md:gap-10">
         {/** Grid row 1 - 1 */}
-        <div className="flex flex-col md:flex-row h-full rounded-xl bg-muted/50 p-6 justify-center items-center gap-4">
-          <CircularProgress value={percent} size={100} strokeWidth={10} />
-          <div>
-            <h1 className="text-sm font-medium">Attendance</h1>
-            <h1 className="text-xs text-muted-foreground">
-              {attended} of {total} sessions
-            </h1>
+        <div  className="flex flex-col h-full rounded-xl bg-muted/50 p-4 justify-center items-center gap-4">
+          <div className="flex flex-col md:flex-row h-full justify-center items-center gap-4">
+            <CircularProgress value={percent} size={100} strokeWidth={10} />
+            <div>
+              <h1 className="text-sm font-medium">Attendance</h1>
+              <h1 className="text-xs text-muted-foreground">
+                {attended} of {total} sessions
+              </h1>
+            </div>
           </div>
+          <h1 className={styles.paragraph + " py-3"}>Hit 50% attendance to get the teamNUS shirt!</h1>
         </div>
         {/** Grid row 1 - 2 */}
         <div className="flex flex-col min-w-fit w-full h-full rounded-xl bg-muted/50 p-4 items-center ">
@@ -53,6 +56,7 @@ function Page() {
             <p className={styles.paragraph}>DYNB: -</p>
             <p className={styles.paragraph}>DNF: -</p>
           </div>
+          <h1 className={styles.paragraph + " py-3"}>Reach 100m DYNB to get our exclusive biege 100m shirt!</h1>
         </div>
 
         {/** Grid 2 */}

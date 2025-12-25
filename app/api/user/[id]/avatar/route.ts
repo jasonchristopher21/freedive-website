@@ -5,20 +5,28 @@ import { z } from "zod"
 
 /**
  * Fetches the public image URL of the user from Supabase Storage.
- * Avatar link should be included in the link's search parameter
  */
-export async function GET(req: NextRequest) {
-    const avatarUrl = req.nextUrl.searchParams.get('url')
-    if (!avatarUrl) {
-        console.error("No search parameter supplied")
-        return NextResponse.json({status:400})
-    }
+export async function GET(req: NextRequest, { id }: { id: Promise<string> }) {
+    const userId = await id
+
     const supabase = await createClient()
+    const data = await prisma.user.findFirst({
+        select: {avatarUrl: true},
+        where: { id: userId }
+    })
+    const avatarUrl = data?.avatarUrl || undefined
+
+    if (!avatarUrl) {
+        return NextResponse.json({
+            status: 204
+        })
+    }
+
     const url = supabase.storage.from('images-avatar')
         .getPublicUrl(avatarUrl).data.publicUrl
 
     if (!url) {
-        return NextResponse.json({status:404})
+        return NextResponse.json({status:204})
     }
 
     return NextResponse.json({
@@ -28,7 +36,6 @@ export async function GET(req: NextRequest) {
 }
 
 const bodySchema = z.object({
-    userId: z.string(),
     file: z.instanceof(File),
     filename: z.string()
 })
@@ -36,7 +43,8 @@ const bodySchema = z.object({
 /**
  * Replaces the current user avatar in Supabase with the new avatar, and updates the url string in database
  */
-export async function PATCH(req: Request) {
+export async function PATCH(req: Request, { id }: { id: Promise<string> }) {
+    const userId = await id
     const data: z.infer<typeof bodySchema> = Object.fromEntries(await req.formData()) as z.infer<typeof bodySchema>
 
     try {
@@ -49,13 +57,13 @@ export async function PATCH(req: Request) {
     }
 
     const prev = await prisma.$transaction(async tx => {
-        const prev = await tx.user.findUnique({
+        const prev = await tx.user.findFirst({
             select: { avatarUrl: true },
-            where: { id: data.userId }
+            where: { id: userId }
         })
-        await tx.user.update({
+        await tx.user.updateMany({
             data: { avatarUrl: { set: data.filename } },
-            where: { id: data.userId }
+            where: { id: userId }
         })
         return prev?.avatarUrl
     })

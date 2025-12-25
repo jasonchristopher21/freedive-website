@@ -73,7 +73,7 @@ function EdittableAvatar({ user }: { user: User }) {
   const dispatch = useAppDispatch()
 
   // Fetch avatar public url
-  const { data: publicAvatarUrl, isLoading, isRefetching, isRefetchError, isError, error }: UseQueryResult<string | null> = useAvatarQuery(user.avatarUrl)
+  const { data: publicAvatarUrl, isLoading, isRefetching, isRefetchError, isError, error, refetch }: UseQueryResult<string | null> = useAvatarQuery(user.id)
 
   if (isError || isRefetchError) {
     console.error(error.message)
@@ -106,16 +106,16 @@ function EdittableAvatar({ user }: { user: User }) {
 
       const updateImage = async () => {
         const formData = new FormData()
-        formData.append("userId", user.id)
         formData.append("file", file)
         formData.append("filename", filename)
-        const response = await fetch(`/api/user/avatar`, {
+        const response = await fetch(`/api/user/${user.id}/avatar`, {
           method: "PATCH",
           body: formData,
         })
         if (response.ok) {
           dispatch(setUser({ ...user, avatarUrl: filename }))
           setTimestamp(new Date().getTime())
+          await refetch()
         } else {
           console.error("Failed to update image:", response.statusText)
           dispatch(setError("Failed to update image: " + response.statusText))
@@ -129,7 +129,7 @@ function EdittableAvatar({ user }: { user: User }) {
   // Displays a overlay that allows uploading of image file when clicked.
   const UploadInput = () => (
     <div className="flex justify-center items-center h-full w-full">
-      <img src={!publicAvatarUrl?.startsWith("https://media.discord") ? publicAvatarUrl + "?t=" + timestamp : publicAvatarUrl} /> {/** TODO: Replace with a better method or remove support for discord attachments */}
+      <img src={publicAvatarUrl ? publicAvatarUrl + "?t=" + timestamp : undefined} />
       <input
         ref={ref}
         className="hidden bg-gray-100"
