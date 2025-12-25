@@ -1,7 +1,7 @@
 "use client"
 
+import { AccessRole } from "@/app/types"
 import Unauthorised from "@/app/unauthorised";
-import { AccessRole } from "@prisma/client"
 import { useAppSelector } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";

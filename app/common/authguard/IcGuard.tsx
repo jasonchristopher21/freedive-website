@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/redux/store";
-import { AccessRole } from "@prisma/client";
 import Unauthorised from "@/app/unauthorised";
 import Loading from "../../Loading";
+import { AccessRole } from "@/app/types"
 
 export default function IcGuard({ children }: { children: React.ReactNode }) {
     const router = useRouter();

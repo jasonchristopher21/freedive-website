@@ -1,4 +1,4 @@
-import { AccessRole as AccessRoleEnum, Level as LevelEnum, SessionType as SessionTypeEnum, YearOfStudy as YearOfStudyEnum } from "@prisma/client";
+import type { AccessRole as AccessRoleEnum, Level as LevelEnum, SessionType as SessionTypeEnum, YearOfStudy as YearOfStudyEnum } from "@prisma/client";
 
 // This file defines common types used in various places
 
