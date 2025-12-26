@@ -32,13 +32,13 @@ function Page() {
   const percent = total > 0 ? Math.round((attended / total) * 100) : 0
 
   return (
-    <div className="h-[90vh] px-8 py-8 flex flex-col gap-4 max-w-screen-lg ml-0">
+    <div className="h-[90vh] min-w-fit px-8 py-8 flex flex-col gap-4 max-w-screen-lg ml-0">
       <span className={styles.heading1}>DASHBOARD</span>
       <div
-        className=" grid grid-cols-[1fr_1fr] h-fit w-full items-center p-8 border-2 border-grey-100 border-opacity-50
-                        rounded-lg gap-6 md:flex-row md:px-8 md:py-6 md:gap-8">
+        className=" grid grid-cols-[1fr] h-fit w-full items-center p-8 border-2 border-grey-100 border-opacity-50
+                        rounded-lg gap-6 md:grid-cols-[1fr_1fr] md:px-8 md:py-6 md:gap-8">
         {/** Grid row 1 */}
-        <div className="flex flex-row col-span-2 px-4 pt-4">
+        <div className="flex flex-row px-4 md:col-span-2">
           <h1 className={styles.heading3}>Current level: </h1>
           <Space size='middle'><Tag style={{ marginLeft: 12 }} color={getTableLevelColor(user.level)}>{user.level}</Tag></Space>
         </div>
@@ -67,7 +67,7 @@ function Page() {
           <h1 className={styles.paragraph + " py-3"}>Reach 100m DYNB to get our exclusive biege 100m shirt!</h1>
         </div>
         {/** Grid row 3 */}
-        <div className="block col-span-2 items-center justify-between rounded-xl bg-muted/50 p-6">
+        <div className="block md:col-span-2 items-center justify-between rounded-xl bg-muted/50 p-6">
           <div>
             <div className="text-sm font-medium">Attended Sessions</div>
             <div className="text-xs text-muted-foreground">Recent sessions you've attended</div>
