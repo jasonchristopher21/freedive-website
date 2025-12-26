@@ -32,7 +32,7 @@ function Page() {
   const percent = total > 0 ? Math.round((attended / total) * 100) : 0
 
   return (
-    <div className="h-[90vh] min-w-full w-fit px-8 py-8 flex flex-col gap-4 max-w-screen-lg ml-0">
+    <div className="h-[90vh] px-8 py-8 flex flex-col gap-4 max-w-screen-lg ml-0">
       <span className={styles.heading1}>DASHBOARD</span>
       <div
         className=" grid grid-cols-[1fr_1fr] h-fit w-full items-center p-8 border-2 border-grey-100 border-opacity-50

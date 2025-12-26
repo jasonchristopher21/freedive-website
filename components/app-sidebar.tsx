@@ -135,6 +135,11 @@ const data = {
       name: "Dashboard",
       url: "/dashboard",
       icon: DashboardOutline
+    },
+    {
+      name: "Settings",
+      url: "/settings",
+      icon: Settings2,
     }
   ],
   adminView: [
@@ -159,18 +164,7 @@ const data = {
       icon: FileSpreadsheet
     }
   ],
-  footer: [
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings2,
-    },
-    {
-      title: "Log Out",
-      url: "#",
-      icon: LogOut,
-    },
-  ]
+  footer: []
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

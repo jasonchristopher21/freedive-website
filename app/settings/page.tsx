@@ -11,6 +11,7 @@ import { Input } from "antd"
 import { useDispatch } from "react-redux"
 import { setError } from "@/redux/features/error/errorSlice"
 import { User } from "@/generated/prisma"
+import { toDisplayText } from "../common/functions/userUtils"
 
 export default function SettingsPageAuth() {
   return (
@@ -61,7 +62,7 @@ function SettingsPage() {
 
           <div className="flex flex-row gap-12 items-center">
             <h1 className={styles.heading3 + " min-w-[200]"}>Year of Study: </h1>
-            <h1 className={styles.heading3 + " pl-4"}>{user.yearOfStudy}</h1>
+            <h1 className={styles.heading3 + " pl-4"}>{toDisplayText(user.yearOfStudy)}</h1>
           </div>
         </div>
       </div>

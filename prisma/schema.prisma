@@ -68,7 +68,7 @@ model TrainingPlan {
   advancedPlan     String?
   createdAt        DateTime @default(now()) @db.Timestamptz(6)
   sessionId        String?  @unique @db.Uuid
-  session          Session? @relation(fields: [sessionId], references: [id])
+  session          Session? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 
 model Signup {
@@ -76,7 +76,7 @@ model Signup {
   sessionId String   @db.Uuid
   userId    String   @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamptz(6)
-  session   Session  @relation(fields: [sessionId], references: [id])
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id])
 }
 
@@ -112,7 +112,7 @@ model SessionIC {
   sessionId String   @db.Uuid
   userId    String   @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamptz(6)
-  session   Session  @relation(fields: [sessionId], references: [id])
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id])
 }
 
