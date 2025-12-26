@@ -74,11 +74,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       },
       where: { id },
     })
-    // IMPORTANT: Prisma returns Time objects as 1970-01-01TXX:XX:XX.000Z, thus the need for further processing
+
     const mappedSession = session && {
       ...session,
-      startTime: new Date(session.startTime).toTimeString().split(" ")[0],
-      endTime: new Date(session.endTime).toTimeString().split(" ")[0],
+      startTime: session.startTime.toISOString(),
+      endTime: session.endTime.toISOString(),
     }
 
     // Flatten user name, year, and role

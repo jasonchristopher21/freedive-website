@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import AdminGuard from "@/app/common/authguard/AdminGuard"
 
@@ -6,14 +6,7 @@ import Loading from "@/app/Loading"
 import styles from "@/app/styles"
 import { AutosizeTextarea } from "@/components/ui/autosize-textarea"
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useIcListQuery } from "@/queries/useIcListQuery"
 import { setError } from "@/redux/features/error/errorSlice"
@@ -21,27 +14,22 @@ import { useAppDispatch } from "@/redux/store"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DatePicker, InputNumber, Select, TimePicker } from "antd"
 import dayjs from "dayjs"
-import timezone from "dayjs/plugin/timezone"
-import utc from "dayjs/plugin/utc"
 import { CalendarIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
 import { Level, SessionType } from "@/app/types"
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name cannot be empty" }),
   description: z.string().optional(),
-  date: z.date({
+  date: z.iso.datetime({
     message: "Please enter a valid date",
   }),
-  startTime: z.date({
+  startTime: z.iso.time({
     message: "Please enter a valid start time",
   }),
-  endTime: z.date({
+  endTime: z.iso.time({
     message: "Please enter a valid end time",
   }),
   // add a field called lanes which is an array of numbers
@@ -54,12 +42,13 @@ const formSchema = z.object({
   intermediatePlan: z.string().optional(),
   advancedPlan: z.string().optional(),
   sessionICs: z.array(z.string()).min(1, { message: "At least 1 Session IC is required" }),
-});
+})
 
 export default function AddSessionPageAuth() {
-  return (<AdminGuard>
-    <AddSessionPage />
-  </AdminGuard>
+  return (
+    <AdminGuard>
+      <AddSessionPage />
+    </AdminGuard>
   )
 }
 
@@ -70,39 +59,36 @@ function AddSessionPage() {
   const laneOptions = Array.from({ length: 10 }, (_, i) => ({
     value: i + 1,
     label: `${i + 1}`,
-  }));
+  }))
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
-      date: new Date(),
-      startTime: new Date("2023-01-01T00:00:00"),
-      endTime: new Date("2023-01-01T00:00:00"),
+      date: dayjs().utc(true).toISOString(),
+      startTime: "17:00:00",
+      endTime: "19:00:00",
       lanes: [],
-      maxParticipants: undefined,
+      maxParticipants: 12,
       sessionType: SessionType.TRAINING,
-      levels: [],
+      levels: [Level.BEGINNER, Level.INTERMEDIATE, Level.ADVANCED],
       generalPlan: "",
       beginnerPlan: "",
       intermediatePlan: "",
       advancedPlan: "",
       sessionICs: [],
     },
-  });
-
-  const formatGmt8 = (date: Date) =>
-    dayjs(date).tz("Asia/Singapore").toISOString(); // Returns ISO string with +08:00
+  })
 
   function transformFormValuesToBodySchema(values: z.infer<typeof formSchema>) {
     return {
       sessionData: {
         name: values.name,
         description: values.description ?? "",
-        date: values.date.toISOString(),
-        startTime: formatGmt8(values.startTime),
-        endTime: formatGmt8(values.endTime),
+        date: values.date,
+        startTime: dayjs.utc(values.startTime, "HH:mm:ss").toISOString(),
+        endTime: dayjs.utc(values.endTime, "HH:mm:ss").toISOString(),
         lanes: values.lanes,
         maxParticipants: values.maxParticipants,
         sessionType: values.sessionType,
@@ -115,12 +101,13 @@ function AddSessionPage() {
         advancedPlan: values.advancedPlan,
       },
       sessionICs: values.sessionICs,
-    };
+    }
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const data = transformFormValuesToBodySchema(values);
-    console.log("Submitting data:", data);
+    console.log(values.date)
+    const data = transformFormValuesToBodySchema(values)
+    console.log("Submitting data:", data)
     fetch("/api/sessions/add", {
       method: "POST",
       headers: {
@@ -133,25 +120,21 @@ function AddSessionPage() {
           router.push("/sessions")
         } else {
           return response.json().then((data) => {
-            throw new Error(data.error || "Something went wrong");
-          });
+            throw new Error(data.error || "Something went wrong")
+          })
         }
       })
       .catch((error) => {
-        console.error("Error during signup:", error);
+        console.error("Error during signup:", error)
         dispatch(setError("Error during signup: " + error.message))
-      });
+      })
   }
 
-  const { data: icList, isLoading: isIcListLoading, error: isError } = useIcListQuery();
+  const { data: icList, isLoading: isIcListLoading, error: isError } = useIcListQuery()
 
   if (isIcListLoading) {
     return <Loading />
   }
-
-  console.log("IC List:", icList);
-  // console.log(form.getValues())
-  // console.log(form.formState.errors);
 
   return (
     <div className="flex flex-col px-8 py-8 min-w-full justify-center gap-4 max-w-screen-lg ml-0">
@@ -180,9 +163,7 @@ function AddSessionPage() {
                 <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
                   <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
                     <span>Description</span>
-                    <span className="text-xs text-muted-foreground">
-                      (Optional)
-                    </span>
+                    <span className="text-xs text-muted-foreground">(Optional)</span>
                   </FormLabel>
                   <FormControl>
                     <AutosizeTextarea placeholder="Enter session description" {...field} />
@@ -204,9 +185,10 @@ function AddSessionPage() {
                     <DatePicker
                       className="w-full"
                       format="dddd, D MMMM YYYY"
-                      value={field.value ? dayjs(field.value) : null}
+                      value={field.value ? dayjs(field.value).utc(true) : null}
                       onChange={(date, dateString) => {
-                        field.onChange(new Date(date.toDate()));
+                        console.log(date.utc(true).toISOString())
+                        field.onChange(date.utc(true).toISOString())
                       }}
                       placeholder="Select date"
                       suffixIcon={<CalendarIcon />}
@@ -222,13 +204,13 @@ function AddSessionPage() {
                   <FormItem className="flex flex-col mt-4">
                     <FormLabel>Start Time</FormLabel>
                     <TimePicker
-                      defaultOpenValue={dayjs("00:00", "HH:mm")}
                       format="HH:mm"
-                      value={field.value ? dayjs(field.value) : null}
+                      value={field.value ? dayjs(field.value, "HH:mm:ss") : null}
                       onChange={(time) => {
-                        field.onChange(new Date(time.toDate()));
+                        time && field.onChange(time.utc(true).toDate().toISOString())
                       }}
-                      minuteStep={5} />
+                      minuteStep={5}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -240,13 +222,13 @@ function AddSessionPage() {
                   <FormItem className="flex flex-col mt-4">
                     <FormLabel>End Time</FormLabel>
                     <TimePicker
-                      defaultOpenValue={dayjs("00:00", "HH:mm")}
                       format="HH:mm"
-                      value={field.value ? dayjs(field.value) : null}
+                      value={field.value ? dayjs(field.value, "HH:mm:ss") : null}
                       onChange={(time) => {
-                        field.onChange(new Date(time.toDate()));
+                        time && field.onChange(time.utc(true).toDate().toISOString())
                       }}
-                      minuteStep={5} />
+                      minuteStep={5}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -265,9 +247,7 @@ function AddSessionPage() {
                     <Select
                       showSearch
                       placeholder="Select session type"
-                      filterOption={(input, option) =>
-                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                      }
+                      filterOption={(input, option) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase())}
                       defaultValue={SessionType.TRAINING}
                       options={[
                         { value: SessionType.TRAINING, label: "Training" },
@@ -315,7 +295,7 @@ function AddSessionPage() {
                       <Select
                         mode="multiple"
                         allowClear
-                        style={{ width: '100%' }}
+                        style={{ width: "100%" }}
                         placeholder="Please select"
                         options={laneOptions}
                         value={field.value.sort((a, b) => a - b)}
@@ -340,15 +320,17 @@ function AddSessionPage() {
                       <Select
                         mode="multiple"
                         allowClear
-                        style={{ width: '100%' }}
+                        style={{ width: "100%" }}
                         placeholder="Please select"
                         options={[
                           { value: Level.BEGINNER, label: "Beginner" },
                           { value: Level.INTERMEDIATE, label: "Intermediate" },
-                          { value: Level.ADVANCED, label: "Advanced" }
+                          { value: Level.ADVANCED, label: "Advanced" },
                         ]}
                         value={field.value}
-                        onChange={(value) => { field.onChange(value) }}
+                        onChange={(value) => {
+                          field.onChange(value)
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -359,9 +341,7 @@ function AddSessionPage() {
           </div>
           <div className="p-4 md:px-8 md:py-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 md:gap-0">
             <span className={`${styles.heading2} text-grey-500`}>SESSION IC</span>
-            <span className="text-sm text-grey-500 md:mt-2 mt-1">
-              Select the ICs for this session. You can select multiple ICs.
-            </span>
+            <span className="text-sm text-grey-500 md:mt-2 mt-1">Select the ICs for this session. You can select multiple ICs.</span>
             <span className="text-xs text-grey-500 md:mt-1 mb-2">
               <i>Note: Only users with the IC or Admin role can be selected as ICs.</i>
             </span>
@@ -374,11 +354,11 @@ function AddSessionPage() {
                     <Select
                       mode="multiple"
                       allowClear
-                      style={{ width: '100%' }}
+                      style={{ width: "100%" }}
                       placeholder="Please select"
                       options={icList?.map((ic: any) => ({
                         value: ic.id,
-                        label: `${ic.name} (${ic.Role.name})`
+                        label: `${ic.name} (${ic.Role.name})`,
                       }))}
                       value={field.value}
                       onChange={(value) => {
@@ -402,9 +382,7 @@ function AddSessionPage() {
                 <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
                   <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
                     <span>General Plan</span>
-                    <span className="text-xs text-muted-foreground">
-                      (Optional)
-                    </span>
+                    <span className="text-xs text-muted-foreground">(Optional)</span>
                   </FormLabel>
                   <FormControl>
                     <AutosizeTextarea placeholder="Enter general training plan" {...field} />
@@ -420,9 +398,7 @@ function AddSessionPage() {
                 <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
                   <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
                     <span>Beginner Plan</span>
-                    <span className="text-xs text-muted-foreground">
-                      (Optional)
-                    </span>
+                    <span className="text-xs text-muted-foreground">(Optional)</span>
                   </FormLabel>
                   <FormControl>
                     <AutosizeTextarea placeholder="Enter training plan for beginner level members" {...field} />
@@ -438,9 +414,7 @@ function AddSessionPage() {
                 <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
                   <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
                     <span>Intermediate Plan</span>
-                    <span className="text-xs text-muted-foreground">
-                      (Optional)
-                    </span>
+                    <span className="text-xs text-muted-foreground">(Optional)</span>
                   </FormLabel>
                   <FormControl>
                     <AutosizeTextarea placeholder="Enter training plan for intermediate level members" {...field} />
@@ -456,9 +430,7 @@ function AddSessionPage() {
                 <FormItem className="mt-4 md:mt-2 flex flex-col md:flex-row md:gap-10">
                   <FormLabel className="my-auto md:w-[150px] flex md:flex-col gap-2">
                     <span>Advanced Plan</span>
-                    <span className="text-xs text-muted-foreground">
-                      (Optional)
-                    </span>
+                    <span className="text-xs text-muted-foreground">(Optional)</span>
                   </FormLabel>
                   <FormControl>
                     <AutosizeTextarea placeholder="Enter training plan for advanced level members" {...field} />

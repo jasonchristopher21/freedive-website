@@ -32,11 +32,11 @@ const bodySchema = z.object({
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
+    
     const parseResult = bodySchema.safeParse(body);
     if (!parseResult.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: z.treeifyError(parseResult.error) },
+        { error: "Invalid input: " + z.treeifyError(parseResult.error) },
         { status: 400 }
       );
     }

@@ -47,7 +47,7 @@ type RolesWithPermissions = {
 type Permissions = {
     sessions: {
         dataType: Pick<User,"id">,
-        action: "remove-attendee"
+        action: "remove-attendee" | "delete-session"
     },
     users: {
         dataType: Pick<User,"id">
@@ -66,7 +66,7 @@ const OnlySelf = (user: User, resource: Pick<User,"id">) => user.id === resource
 const ROLES = {
     ADMIN: {
         sessions: {
-            "remove-attendee": true
+            "remove-attendee": true, "delete-session": true
         },
         users: {
             "view-users": true, "edit-user": true, "edit-user-access-role": true, remove: CannotEditSelf
@@ -77,7 +77,7 @@ const ROLES = {
     },
     IC: {
         sessions: {
-            "remove-attendee": true
+            "remove-attendee": true, "delete-session": true
         },
         users: {
             "view-users": true, "edit-user": true, "edit-user-access-role": true, remove: CannotEditSelf

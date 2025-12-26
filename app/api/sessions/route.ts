@@ -50,9 +50,10 @@ export async function GET() {
 
     // IMPORTANT: Prisma returns Time objects as 1970-01-01TXX:XX:XX.000Z, thus the need for further processing
     const mappedSessions = sessions.map(s => {return {...s,
-      startTime: new Date(s.startTime).toTimeString().split(' ')[0],
-      endTime: new Date(s.endTime).toTimeString().split(' ')[0]
+      startTime: s.startTime.toISOString(),
+      endTime: s.endTime.toISOString()
     }})
+
     // Flatten user name, year, and role
     const flattenUser = mappedSessions.map(s => {
       return {

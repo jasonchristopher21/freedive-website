@@ -12,7 +12,6 @@ export const getDateString = (date: string): string => {
 };
 
 export const getTimeString = (time: string): string => {
-    // Ensure the time is in the correct format
-    const date = `${new Date().toISOString().slice(0, 10)}T${time}`;
-    return dayjs.utc(date).tz("Asia/Singapore").format("HH:mm");
+    const date = time
+    return dayjs.utc(date).format("HH:mm");
 };
