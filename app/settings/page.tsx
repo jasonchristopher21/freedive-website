@@ -25,44 +25,46 @@ function SettingsPage() {
   const user = useAppSelector((state) => state.user.user)!
 
   return (
-    <div className="flex flex-col px-8 py-8 min-w-full justify-center gap-4 max-w-screen-lg ml-0">
-      <span className={styles.heading1}>SETTINGS</span>
-      <div
-        className="p-12 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 w-fit
+    <div className="flex flex-col px-8 py-8 justify-center items-center min-w-full max-w-screen-lg ml-0">
+      <div className="flex flex-col w-fit gap-4">
+        <span className={styles.heading1 + " place-self-start"}>SETTINGS</span>
+        <div
+          className="p-6 border-2 border-grey-100 border-opacity-50 rounded-lg flex flex-col gap-2 w-fit
                       md:px-20 md:py-12 md:gap-4">
-        {/** Row 1 */}
-        <div className="flex flex-row pl-10 gap-24 items-center">
-          <EdittableAvatar user={user} />
-          <EdittableName user={user} />
-        </div>
-
-        <div className="w-full border-t-2 border-grey-200 mt-4 mb-6" />
-
-        <div className="flex flex-col pl-10 gap-4">
-          {/** Row 2 */}
-          <div className="flex flex-row gap-12 items-center">
-            <h1 className={styles.heading3 + " min-w-[200]"}>Preferred name: </h1>
-            <EdittableAttribute user={user} attribute="preferredName" />
+          {/** Row 1 */}
+          <div className="flex flex-col gap-4 items-center md:flex-row md:gap-24 md:pl-10">
+            <EdittableAvatar user={user} />
+            <EdittableName user={user} />
           </div>
 
-          <div className="flex flex-row gap-12 items-center">
-            <h1 className={styles.heading3 + " min-w-[200]"}>Telegram Handle: </h1>
-            <EdittableAttribute user={user} attribute="telegramHandle" />
-          </div>
+          <div className="w-full border-t-2 border-grey-200 mt-4 mb-6" />
 
-          <div className="flex flex-row gap-12 items-center">
-            <h1 className={styles.heading3 + " min-w-[200]"}>Email: </h1>
-            <h1 className={styles.heading3 + " pl-4"}>{user.email}</h1>
-          </div>
+          <div className="flex flex-col md:pl-10 gap-4">
+            {/** Row 2 */}
+            <div className="flex flex-col items-center md:flex-row md:gap-12">
+              <h1 className={styles.heading3 + " md:min-w-[200]"}>Preferred name: </h1>
+              <EdittableAttribute user={user} attribute="preferredName" />
+            </div>
 
-          <div className="flex flex-row gap-12 items-center">
-            <h1 className={styles.heading3 + " min-w-[200]"}>NUSNet Email: </h1>
-            <h1 className={styles.heading3 + " pl-4"}>{user.nusnetEmail}</h1>
-          </div>
+            <div className="flex flex-col items-center md:flex-row md:gap-12">
+              <h1 className={styles.heading3 + " md:min-w-[200]"}>Telegram Handle: </h1>
+              <EdittableAttribute user={user} attribute="telegramHandle" />
+            </div>
 
-          <div className="flex flex-row gap-12 items-center">
-            <h1 className={styles.heading3 + " min-w-[200]"}>Year of Study: </h1>
-            <h1 className={styles.heading3 + " pl-4"}>{toDisplayText(user.yearOfStudy)}</h1>
+            <div className="flex flex-col items-center md:flex-row md:gap-12">
+              <h1 className={styles.heading3 + " md:min-w-[200]"}>Email: </h1>
+              <h1 className={styles.heading3 + " pl-4"}>{user.email}</h1>
+            </div>
+
+            <div className="flex flex-col items-center md:flex-row md:gap-12">
+              <h1 className={styles.heading3 + " md:min-w-[200]"}>NUSNet Email: </h1>
+              <h1 className={styles.heading3 + " pl-4"}>{user.nusnetEmail}</h1>
+            </div>
+
+            <div className="flex flex-col items-center md:flex-row md:gap-12">
+              <h1 className={styles.heading3 + " md:min-w-[200]"}>Year of Study: </h1>
+              <h1 className={styles.heading3 + " pl-4"}>{toDisplayText(user.yearOfStudy)}</h1>
+            </div>
           </div>
         </div>
       </div>
@@ -90,17 +92,14 @@ function EdittableAvatar({ user }: { user: User }) {
     const MAX_FILE_SIZE = 1 << 21 // 2 MB
 
     if (!file) {
-
     } else if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
       const message = "Image file not suitable! Accepted file types: PNG, JPG, JPEG"
       console.log(message)
       dispatch(setError(message))
-      
     } else if (file.size > MAX_FILE_SIZE) {
       const message = "Image file too large! Max file size: 2 MB"
       console.log(message)
       dispatch(setError(message))
-
     } else {
       const filetype = file.name.split(".").pop()
       const filename = `${user.id}.${filetype}` // The name of the file to be stored in Users table and Storage
