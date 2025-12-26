@@ -14,3 +14,16 @@ export function getUserLevelColor(level: Level): string {
             return "bg-blue-500"; // Fallback color
     }
 }
+
+export const getTableLevelColor = (level: Level) => {
+  switch (level) {
+    case Level.BEGINNER:
+      return "green";
+    case Level.INTERMEDIATE:
+      return "orange";
+    case Level.ADVANCED:
+      return "red";
+    default:
+      return "blue";
+  }
+};

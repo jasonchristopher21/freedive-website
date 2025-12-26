@@ -4,6 +4,7 @@ import { Prisma } from "@/generated/prisma"
 import { Select, Space, Tag } from "antd"
 import { SetStateAction } from "react"
 import { Level } from "@/app/types"
+import { getTableLevelColor } from "../common/functions/userUtils"
 
 type UserWithRole = Prisma.UserGetPayload<{
     include: { role: true };
@@ -30,19 +31,6 @@ const updateLevel = async (userId: string, level: Level) => {
         throw new Error("Failed to update CCA role")
     }
 }
-
-const getTableLevelColor = (level: Level) => {
-  switch (level) {
-    case Level.BEGINNER:
-      return "green";
-    case Level.INTERMEDIATE:
-      return "orange";
-    case Level.ADVANCED:
-      return "red";
-    default:
-      return "blue";
-  }
-};
 
 interface Props {
     userRow: UserWithRole

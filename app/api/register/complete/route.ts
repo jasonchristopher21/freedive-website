@@ -53,8 +53,8 @@ export async function POST(req: Request) {
   }
 
   // Default role
-  let accessRole: string = AccessRole.PENDING; // Default role
-  let roleId: string = "70938598-0b3a-403d-9dc4-0691c0a0db20"; // Default roleId
+  let accessRole: string = AccessRole.PENDING; // Default access role
+  let roleId: string = "9f4679b0-375f-45ec-822a-a54b4f36be76"; // Default roleId for CCA role
   let level: string = Level.BEGINNER; // Default level
 
   // Check access code
@@ -67,8 +67,8 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (validCode) {
-      accessRole = validCode.role || "MEMBER";
-      // Optional: assign roleId = validCode.roleId if applicable
+      accessRole = validCode.role || "Member";
+      roleId = validCode.id 
     }
   }
 

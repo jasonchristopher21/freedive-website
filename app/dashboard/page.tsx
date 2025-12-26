@@ -6,6 +6,8 @@ import { useAppSelector } from "@/redux/store"
 import MemberGuard from "../common/authguard/MemberGuard"
 import Loading from "../Loading"
 import { Session } from "@/app/types"
+import { Space, Tag } from "antd"
+import { getTableLevelColor } from "../common/functions/userUtils"
 
 export default function PageAuth() {
   return (
@@ -34,9 +36,15 @@ function Page() {
       <span className={styles.heading1}>DASHBOARD</span>
       <div
         className=" grid grid-cols-[1fr_1fr] h-fit w-full items-center p-8 border-2 border-grey-100 border-opacity-50
-                        rounded-lg gap-6 md:flex-row md:px-8 md:py-6 md:gap-10">
-        {/** Grid row 1 - 1 */}
-        <div  className="flex flex-col h-full rounded-xl bg-muted/50 p-4 justify-center items-center gap-4">
+                        rounded-lg gap-6 md:flex-row md:px-8 md:py-6 md:gap-8">
+        {/** Grid row 1 */}
+        <div className="flex flex-row col-span-2 px-4 pt-4">
+          <h1 className={styles.heading3}>Current level: </h1>
+          <Space size='middle'><Tag style={{ marginLeft: 12 }} color={getTableLevelColor(user.level)}>{user.level}</Tag></Space>
+        </div>
+
+        {/** Grid row 2 - 1 */}
+        <div className="flex flex-col h-full rounded-xl bg-muted/50 p-4 justify-center items-center gap-4">
           <div className="flex flex-col md:flex-row h-full justify-center items-center gap-4">
             <CircularProgress value={percent} size={100} strokeWidth={10} />
             <div>
@@ -48,7 +56,7 @@ function Page() {
           </div>
           <h1 className={styles.paragraph + " py-3"}>Hit 50% attendance to get the teamNUS shirt!</h1>
         </div>
-        {/** Grid row 1 - 2 */}
+        {/** Grid row 2 - 2 */}
         <div className="flex flex-col min-w-fit w-full h-full rounded-xl bg-muted/50 p-4 items-center ">
           <h1 className={styles.heading3 + " px-3 text-nowrap"}>Personal Bests</h1>
           <div className="my-auto">
@@ -58,8 +66,7 @@ function Page() {
           </div>
           <h1 className={styles.paragraph + " py-3"}>Reach 100m DYNB to get our exclusive biege 100m shirt!</h1>
         </div>
-
-        {/** Grid 2 */}
+        {/** Grid row 3 */}
         <div className="block col-span-2 items-center justify-between rounded-xl bg-muted/50 p-6">
           <div>
             <div className="text-sm font-medium">Attended Sessions</div>

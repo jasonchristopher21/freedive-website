@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const data = await prisma.$transaction(async (tx) => {
     return await tx.session.findMany({
-      where: { signups: { every: { userId } } }
+      where: { signups: { some: { userId } } }
     })
   })
 

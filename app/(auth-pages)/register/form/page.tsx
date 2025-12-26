@@ -1,53 +1,30 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { createClient } from "@/utils/supabase/client";
-import { selectAuthUser } from "@/redux/features/auth/authSlice";
-import { useAppDispatch, useAppSelector } from "@/redux/store";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { useSearchParams } from "next/navigation";
-import { setError } from "@/redux/features/error/errorSlice";
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { createClient } from "@/utils/supabase/client"
+import { selectAuthUser } from "@/redux/features/auth/authSlice"
+import { useAppDispatch, useAppSelector } from "@/redux/store"
+import { Button } from "@/components/ui/button"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import { useRouter, useSearchParams } from "next/navigation"
+import { setError } from "@/redux/features/error/errorSlice"
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-const yearOfStudyChoices = [
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "Graduate",
-  "Alumni",
-  "Others",
-] as const;
+const yearOfStudyChoices = ["1", "2", "3", "4", "5", "Graduate", "Alumni", "Others"] as const
 
-const currentYear = new Date().getFullYear();
+const currentYear = new Date().getFullYear()
 
 const formSchema = z.object({
   name: z.string().min(1, { error: "Name cannot be empty" }),
-  email: z.email({error: "Please enter a valid email"})
-    .min(1, { error: "Email cannot be empty" }),
+  email: z.email({ error: "Please enter a valid email" }).min(1, { error: "Email cannot be empty" }),
   preferredName: z.string().optional(),
-  yearOfEntry: z.number({
+  yearOfEntry: z
+    .number({
       error: "Please enter a valid year",
     })
     .min(2019)
@@ -60,18 +37,17 @@ const formSchema = z.object({
       error: "Please enter a valid NUSNET email",
     }),
   accessCode: z.string().optional(),
-});
+})
 
 export default function ProfileForm() {
-  const searchParams = useSearchParams();
-  const accessCode = searchParams.get("accessCode");
-  const supabase = createClient();
-  const authUser = useAppSelector((state) => state.auth.authUser);
-  const state = useAppSelector((state) => state.auth);
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const accessCode = searchParams.get("accessCode")
+  const authUser = useAppSelector((state) => state.auth.authUser)
   const dispatch = useAppDispatch()
 
-  console.log(authUser);
-  console.log("accessCode from searchParams:", accessCode);
+  console.log(authUser)
+  console.log("accessCode from searchParams:", accessCode)
 
   // 1. Define your form.
   const form = useForm({
@@ -85,7 +61,7 @@ export default function ProfileForm() {
       nusnetEmail: "",
       accessCode: accessCode || "",
     },
-  });
+  })
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -97,26 +73,19 @@ export default function ProfileForm() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(values),
+    }).then(async (response) => {
+      if (response.ok) {
+        router.push("/auth/redirect")
+      } else {
+        const data = await response.json()
+        console.error("Error during signup:", data.error)
+        dispatch(setError("Error during signup: " + data.error))
+      }
     })
-      .then((response) => {
-        if (response.ok) {
-          window.location.href = "/auth/redirect";
-        } else {
-          return response.json().then((data) => {
-            throw new Error(data.error || "Something went wrong");
-          });
-        }
-      })
-      .catch((error) => {
-        console.error("Error during signup:", error);
-        dispatch(setError("Error during signup: " + error.message))
-      });
   }
   return (
     <div className="py-10">
-      <h1 className="text-2xl font-heading font-bold mb-4">
-        CREATE AN ACCOUNT
-      </h1>
+      <h1 className="text-2xl font-heading font-bold mb-4">CREATE AN ACCOUNT</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -166,10 +135,7 @@ export default function ProfileForm() {
                 <FormControl>
                   <Input placeholder="xyz@u.nus.edu" {...field} />
                 </FormControl>
-                <FormDescription>
-                  Email assigned by NUS, ends with either @u.nus.edu or
-                  @nus.edu.sg
-                </FormDescription>
+                <FormDescription>Email assigned by NUS, ends with either @u.nus.edu or @nus.edu.sg</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -183,9 +149,7 @@ export default function ProfileForm() {
                 <FormControl>
                   <Input placeholder={currentYear.toString()} {...field} value={field.value} />
                 </FormControl>
-                <FormDescription>
-                  Enter the year when you started joining NUS Freedive
-                </FormDescription>
+                <FormDescription>Enter the year when you started joining NUS Freedive</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -196,10 +160,7 @@ export default function ProfileForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Year of Study in NUS</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select Year of Study in NUS" />
@@ -226,9 +187,7 @@ export default function ProfileForm() {
                 <FormControl>
                   <Input placeholder="Enter Access Code" {...field} />
                 </FormControl>
-                <FormDescription>
-                  Enter the access code provided by NUS Freedive
-                </FormDescription>
+                <FormDescription>Enter the access code provided by NUS Freedive</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -237,5 +196,5 @@ export default function ProfileForm() {
         </form>
       </Form>
     </div>
-  );
+  )
 }
