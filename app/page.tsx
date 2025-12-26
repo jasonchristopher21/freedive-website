@@ -19,7 +19,7 @@ export default function Home() {
   const iconProps = { className: "text-[50px] text-blue-500" }
   const userCards = [
     { href: "/sessions", title: "Sessions", icon: () => <DockerOutlined {...iconProps} />, desc: "View upcoming sessions" },
-    { href: "/dashboard", title: "Dashboard (TODO)", icon: () => <DashboardOutlined {...iconProps} />, desc: "Overview" },
+    { href: "/dashboard", title: "Dashboard", icon: () => <DashboardOutlined {...iconProps} />, desc: "Overview" },
     { href: "/settings", title: "Settings", icon: () => <SettingOutlined {...iconProps} />, desc: "Edit your profile settings" },
   ]
 
