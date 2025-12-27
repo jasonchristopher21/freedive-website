@@ -18,8 +18,8 @@ This is a **full-stack TypeScript project** built using the following technologi
 | Layer        | Tech Stack                                      |
 | ------------ | ----------------------------------------------- |
 | **Frontend** | Next.js 16, Redux, React Query, Tailwind CSS v3 |
-| **Backend**  | Next.js API Routes, Supabase                    |
-| **Database** | Supabase Postgres, Prisma ORM                   |
+| **Backend**  | Next.js API Routes, Supabase, Prisma ORM        |
+| **Database** | Supabase Postgres                               |
 | **Auth**     | Supabase Auth                                   |
 
 This project is based on the official [Supabase Next.js Starter Template](https://vercel.com/templates/next.js/supabase).
@@ -41,7 +41,7 @@ State management and data fetching are handled by a combination of:
 
 The backend leverages **Next.js API routes** to run server-side operations, including complex database queries and session validation.
 
-Authentication and session management are handled through **Supabase Auth**, using the built-in middleware provided in the Supabase starter template.
+Authentication and session management are handled through **Supabase Auth**, using the built-in proxy (middleware) provided in the Supabase starter template.
 
 ---
 
@@ -85,15 +85,18 @@ While Supabase allows schema changes via its GUI, **this should be avoided** to 
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/jasonchristopher21/nus-freedive-website.git
+git clone https://github.com/jasonchristopher21/freedive-website.git
 
 # 2. Navigate into the directory
-cd nus-freedive-website
+cd freedive-website
 
 # 3. Install dependencies
-yarn
+yarn install
 
-# 4. Start the development server
+# 4. Setup Prisma (ALT: yarn prisma generate)
+yarn build
+
+# 5. Start the development server
 yarn dev
 ```
 
@@ -106,4 +109,4 @@ This project can be deployed using **Vercel**, **Netlify**, or any other Next.js
 Make sure to:
 
 * Set up the same `.env` variables on the platform
-* Ensure your Supabase project URL and keys are properly configured
+* Ensure your Supabase and Prisma project URL and keys are properly configured
