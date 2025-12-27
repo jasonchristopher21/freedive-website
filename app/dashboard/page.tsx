@@ -8,6 +8,7 @@ import Loading from "../Loading"
 import { Session } from "@/app/types"
 import { Space, Tag } from "antd"
 import { getTableLevelColor } from "../common/functions/userUtils"
+import { useState } from "react"
 
 export default function PageAuth() {
   return (
@@ -21,10 +22,10 @@ function Page() {
   const user = useAppSelector((state) => state.user.user)!
 
   const { data, isLoading } = useUserSessionHistoryQuery(user.id)
-
-  if (isLoading) {
-    return <Loading />
-  }
+  
+  const [loading, setLoading] = useState(true)
+  if (!isLoading) setTimeout(() => setLoading(false), 500) // Artificially increase loading time
+  if (loading) return <Loading />
 
   const sessions = data as Session[]
   const attended = sessions.length

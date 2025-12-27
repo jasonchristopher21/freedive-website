@@ -7,7 +7,6 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export const getDateString = (date: string): string => {
-    
     return format(new Date(date), "EEEE, dd MMMM yyyy");
 };
 
