@@ -27,7 +27,7 @@ type MonthlySessionsQuery = {
 export type MonthlySessionsMapped = { [P in keyof MonthlySessionsQuery[0]]: MonthlySessionsQuery[0][P] extends Date ? string : MonthlySessionsQuery[0][P] }[]
 
 const bodySchema = z.object({
-    month: z.nativeEnum(Month),
+    month: z.enum(Month),
     year: z.number()
 })
 
@@ -60,8 +60,8 @@ export async function POST(req: Request) {
         const mappedSessions = sessions.map(s => {
             return {
                 ...s,
-                startTime: new Date(s.startTime).toTimeString().split(' ')[0],
-                endTime: new Date(s.endTime).toTimeString().split(' ')[0]
+                startTime: s.startTime.toISOString(),
+                endTime: s.endTime.toISOString()
             }
         })
         // Flatten user name, year, and role
