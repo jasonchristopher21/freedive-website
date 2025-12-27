@@ -17,7 +17,7 @@ This is a **full-stack TypeScript project** built using the following technologi
 
 | Layer        | Tech Stack                                      |
 | ------------ | ----------------------------------------------- |
-| **Frontend** | Next.js 14, Redux, React Query, Tailwind CSS v3 |
+| **Frontend** | Next.js 16, Redux, React Query, Tailwind CSS v3 |
 | **Backend**  | Next.js API Routes, Supabase                    |
 | **Database** | Supabase Postgres, Prisma ORM                   |
 | **Auth**     | Supabase Auth                                   |
